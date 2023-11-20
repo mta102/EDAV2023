@@ -8,9 +8,9 @@ execute:
 book:
   title: "YOUR PROJECT TITLE"
   author:
-    - AUTHOR1 (UNI1)
-    - AUTHOR2 (UNI2)
-  repo-url: https://github.com/YOUR_GITHUB_ACCOUNT/REPO_NAME
+    - Min Aung (mta2151)
+    - Karl Garcia-Meza (krg2150)
+  repo-url: https://github.com/mta102/EDAV2023
   date: today
   page-footer:
     right: |
