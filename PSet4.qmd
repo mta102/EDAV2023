@@ -4,26 +4,42 @@ server: shiny
 ---
 
 ```{r}
+library(tidyverse)
+```
 
-data = read.csv(unzip("covid_monthly.zip","covid_monthly.csv"))
-data_full = read.csv("covid.csv")
+```{r}
+data = read.csv("covid.csv")
 
 ```
 
 ```{r}
 
-data_full2 = data_full |> filter(Suppression.Flag==0)
+#boxplot of sample size
 
-table(data_full$Suppression.Flag)
+data |> filter(Time.Type == "Weekly") |> 
+  ggplot(aes(Sample.Size)) +
+  geom_boxplot(outlier.colour="black", outlier.shape=16) +
+  ggtitle("boxplot") +
+  labs(x = "sample size") +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5))
+```
 
-unique(data_full$Indicator.Name)
+```{r}
 
-colSums(is.na(data_full))
+#missing data analysis
 
-colnames(data_full)[10] = "estimate"
+data |> filter(Time.Type == "Weekly") |> mutate(missing_estimate = is.na(Estimate....)) |> 
+  ggplot(aes(x = Sample.Size)) +
+  geom_histogram(binwidth = 10) +
+  ggtitle("x") +
+  labs(x = "x", y = "y") +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  facet_wrap(~missing_estimate,scales = "free_y")
 
 
-a = filter(data_full,estimate=="NA")
-library(dplyr)
-a = data_full |> filter(is.na(estimate))
+```
+
+```{}
 ```
