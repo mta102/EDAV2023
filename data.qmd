@@ -1,5 +1,106 @@
 # Data
 
 ## Description
+[Note to Karl: I have purposely used a Q&A format So we can easily check that we are answering every question that is asked. Once we are both happy with the answers, we can write in prose]
+
+2.1 Technical Description
+Identify one or more data sources:
+The data source which we will use for our study is the CDC’s National Immunization Survey Adult COVID Module (NIS-ACM). It provides information on COVID-19 vaccine confidence, as visible vaccination status and intent, segmented by demographics, and behavioural indicators such as health behaviours, perceptions, and other characteristics. The data can be found at: https://www.cdc.gov/vaccines/imz-managers/coverage/covidvaxview/interactive/adults.html
+
+how the data are collected and by whom:
+Approximately 14,000-17,000 US adults aged 18 years and above were surveyed each week through telephone interviews by the CDC using a random-digit-dialled sample of cell telephone numbers. Samples were stratified by state, the District of Columbia, five local jurisdictions (Bexar County, TX; Chicago, IL; Houston, TX; New York City, NY; and Philadelphia County, PA), and in some survey periods, Guam, the US Virgin Islands and Puerto Rico. CDC estimates the weighted proportion of the sampled individuals giving a particular response in the survey, where the weighting attempts to correct any imbalances or biases in the sample that might arise due to the survey design or data collection methods.
+
+format of the data: The data is presented as a CSV file in a “pivot longer” format that is downloadable from the CDC’s website provided above. 
+Each column defines the segments and estimates as follows:
+list https://data.cdc.gov/Vaccinations/National-Immunization-Survey-Adult-COVID-Module-NI/udsf-9v7b
+Each “row” of data thus represents a single segment observation
+
+frequency of updates: weekly, between Apr 22 – May 1 2021, while the final data collection was during the week of June 25 – June 30 2023. CDC also aggregates weekly estimates to determine monthly estimates
+dimensions: The data is 5.08M rows x 13 columns.
+other relevant information: Dataset includes the following additional information which we will not be studying, as it does not directly address the question of vaccine hesitance
+•	Vaccination coverage
+•	Bivalent booster update & intention
+•	
+issues/problems: 
+1.	All responses are self-reported & random dialled – potential for careless / mis-reporting by respondents
+2.	Random sampling means that each survey will interview different people (i.e. not tracking the response / perspective of the same people across surveys) – not likely to be an issue, since we are concerned with population level statistics rather than individual statistics
+3.	Sample size varies by demographic subgroup – ideally should be stratified, but likely not possible due to random-dialled survey design (i.e. cannot target phone calls to specific demographics). Likely already corrected by CDC’s weighting technique.
+how to import data:
+1.	Download CSV
+2.	Import
+3.	Check for errors
+
+
+2.2 Research plan
+Explain in detail how your data will enable you to answer your research questions from the introduction. 
+
+Variables
+
+The data has the following dependent variables of interest to the study, which can be identified from Indicator.name = “Vaccine uptake and intention”:
+-	Indicator.Category = “Probably or definitely will not get vaccinated”
+-	Indicator.Category = “Probably will not get vaccinated or unsure”
+-	Indicator.Category = “Definitely will get vaccinated”
+-	Indicator.Category = “Vaccinated”
+We will combine the dependent variables above as follows:
+-	Hesitant: Indicator.Category = “Probably or definitely will not get vaccinated”
+-	Not hesitant or unsure: all other Indicator.Category
+
+The correlation between the hesitance and the following independent variables (segments of the samples) will be studied:
+
+Demographics
+•	State
+•	Gender 
+•	Age
+•	Race  
+•	Age & race
+•	Sexual orientation
+•	Gender identity
+•	Rural/urban
+•	Birth
+•	Interview language
+•	Poverty
+•	Insurance
+•	SVI
+•	Political leaning
+Health condition
+•	Previous vaccination status
+•	Comorbidity
+•	Disability
+•	Pregnancy
+•	Past covid-19 contraction
+•	Reaction to previous dose of vaccine
+"Thinking & feeling"
+•	Concern about getting disease
+•	Vaccine safety concerns
+•	"Importance" of vaccine
+Social pressure
+•	Recommended by healthcare providers
+•	Family & friends' vaccination status
+•	Employer vaccine mandate
+Logistics
+•	Difficulty in accessing vaccine (general “difficulty”, distance to site, convenience, uncertainty about eligibility, cost, difficulty in getting an appointment) 
+
+
+Time window
+As we want to study changes in hesitance at particular points in time and changes over a large period of time (2 years, from Apr/May 2021 to Jun 2023), we will use monthly data for our study. This is because we do not expect significant changes in hesitance on a weekly basis, and attempting to compare weekly data could be subject to sampling error due to the random-dialed study design
+
+
+Approach:
+1.	Snapshot analysis:
+-	Write R-code to auto rank every possible segment’s hesitance by statistical significance at a given point in time (i.e. using p-values and test-statistics from Chi-sq tests) 
+-	Visually show top 10 using one of the following graph types: (x / indpt vars are cat: y / dep vars are numerical (% or n stating “Probably or definitely will not get vaccinated”)
+o	Bars / stacked bars
+o	Mosaic
+2.	Time series analysis:
+-	Monthly plot or annual snapshot of change in variable(s) of interest over time
+
 
 ## Missing value analysis
+Need to identify pattern of ~31.8k NA in Estimate(%). Clues:
+-	Suppression flag
+-	Small sample size / Wide 95% CI
+o	Draw 2 histograms of sample size for NA/non-NA
+-	Other patterns?
+
+Describe any patterns you discover in missing values. If no values are missing, graphs should still be included showing that.
+(suggested: 2 graphs plus commentary)

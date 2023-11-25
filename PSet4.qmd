@@ -5,4 +5,25 @@ server: shiny
 
 ```{r}
 
+data = read.csv(unzip("covid_monthly.zip","covid_monthly.csv"))
+data_full = read.csv("covid.csv")
+
+```
+
+```{r}
+
+data_full2 = data_full |> filter(Suppression.Flag==0)
+
+table(data_full$Suppression.Flag)
+
+unique(data_full$Indicator.Name)
+
+colSums(is.na(data_full))
+
+colnames(data_full)[10] = "estimate"
+
+
+a = filter(data_full,estimate=="NA")
+library(dplyr)
+a = data_full |> filter(is.na(estimate))
 ```
