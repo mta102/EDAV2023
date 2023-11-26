@@ -20,11 +20,13 @@ dimensions: The data is 5.08M rows x 13 columns.
 other relevant information: Dataset includes the following additional information which we will not be studying, as it does not directly address the question of vaccine hesitance
 •	Vaccination coverage
 •	Bivalent booster update & intention
-•	
+
 issues/problems: 
 1.	All responses are self-reported & random dialled – potential for careless / mis-reporting by respondents
 2.	Random sampling means that each survey will interview different people (i.e. not tracking the response / perspective of the same people across surveys) – not likely to be an issue, since we are concerned with population level statistics rather than individual statistics
 3.	Sample size varies by demographic subgroup – ideally should be stratified, but likely not possible due to random-dialled survey design (i.e. cannot target phone calls to specific demographics). Likely already corrected by CDC’s weighting technique.
+4. rounding errors - estimates do not sum to 100% due to 1 dp rounding of estimates in raw data - causes sum of calculated sub-samples not to sum to total of sample.size
+
 how to import data:
 1.	Download CSV
 2.	Import
