@@ -36,7 +36,7 @@ how to import data:
 2.2 Research plan
 Explain in detail how your data will enable you to answer your research questions from the introduction. 
 
-Variables
+Dependent Variable(s)
 
 The data has the following dependent variables of interest to the study, which can be identified from Indicator.name = “Vaccine uptake and intention”:
 -	Indicator.Category = “Probably or definitely will not get vaccinated”
@@ -47,10 +47,24 @@ We will combine the dependent variables above as follows:
 -	Hesitant: Indicator.Category = “Probably or definitely will not get vaccinated”
 -	Not hesitant or unsure: all other Indicator.Category
 
+
+
+Independent variables
+
+
+
+
 The correlation between the hesitance and the following independent variables (segments of the samples) will be studied:
 
-Demographics
+Geography
+Group.Name = Segment
+Group.Category = Subsegments (no need to manually specify)
+[?bivalent]
+
+Geography
 •	State
+
+Demographics
 •	Gender 
 •	Age
 •	Race  
@@ -88,16 +102,24 @@ As we want to study changes in hesitance at particular points in time and change
 
 
 Approach:
-1.	Snapshot analysis:
+1.	Snapshot analysis - Study which segments of the population exhibited greatest covid vaccine hesitancy following the deployment of mass vaccinations in the US in early 2021
+
 -	Write R-code to auto rank every possible segment’s hesitance by statistical significance at a given point in time (i.e. using p-values and test-statistics from Chi-sq tests) 
 -	Visually show top 10 using one of the following graph types: (x / indpt vars are cat: y / dep vars are numerical (% or n stating “Probably or definitely will not get vaccinated”)
 o	Bars / stacked bars
 o	Mosaic
-2.	Time series analysis:
+o	spatial heatmap
+- w-average first 3 periods where overall hesitance ~18% 
+
+2.	Time series analysis - Analyse which segments showed the greatest reduction in covid vaccine hesitancy between 2021 and 2023
+
 -	Monthly plot or annual snapshot of change in variable(s) of interest over time
 
 
-## Missing value analysis
+3. Propose high-level recommendations for segments of the population that need further public health interventions
+
+
+2.3 Missing value analysis
 Need to identify pattern of ~31.8k NA in Estimate(%). Clues:
 -	Suppression flag
 -	Small sample size / Wide 95% CI
