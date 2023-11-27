@@ -34,6 +34,8 @@ how to import data:
 
 
 2.2 Research plan
+
+
 Explain in detail how your data will enable you to answer your research questions from the introduction. 
 
 Dependent Variable(s)
@@ -56,13 +58,10 @@ Independent variables
 
 The correlation between the hesitance and the following independent variables (segments of the samples) will be studied:
 
-Geography
+Geography = National
 Group.Name = Segment
 Group.Category = Subsegments (no need to manually specify)
-[?bivalent]
 
-Geography
-•	State
 
 Demographics
 •	Gender 

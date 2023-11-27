@@ -79,7 +79,6 @@ temp2 = see_hesitance_summary(geography="National",time_period = "June 25 - June
 unique(data$Group.Name)
 
 group_name_toloop = c("Sex","Age","Race/Ethnicity (7 level)")
-
 result_df <- data.frame(matrix(ncol = 3, nrow = 0))
 colnames(result_df) <- c("group_name", "X2_test_stat", "p_value")
 
@@ -90,6 +89,18 @@ for (x in group_name_toloop) {
 }
 result_df = arrange(result_df,desc(X2_test_stat))
 
+
+
+```
+
+```{r}
+
+output = data |> filter(grepl("TX",Geography)|Geography=="Texas",Indicator.Category=="Unvaccinated",Time.Period == "April 22 - May 29",Year == 2021, Group.Name=="All adults 18+" ) |> select(Geography,Sample.Size)
+
+```
+
+```{r}
+unique(data$Geography)
 
 
 
