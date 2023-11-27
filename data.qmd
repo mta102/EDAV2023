@@ -1,7 +1,7 @@
 # Data
 
 ## Description
-[Note to Karl: I have purposely used a Q&A format So we can easily check that we are answering every question that is asked. Once we are both happy with the answers, we can write in prose]
+[Note to Karl 123: I have purposely used a Q&A format So we can easily check that we are answering every question that is asked. Once we are both happy with the answers, we can write in prose]
 
 2.1 Technical Description
 Identify one or more data sources:
@@ -111,9 +111,10 @@ o	Mosaic
 o	spatial heatmap
 - w-average first 3 periods where overall hesitance ~18% 
 
-2.	Time series analysis - Analyse which segments showed the greatest reduction in covid vaccine hesitancy between 2021 and 2023
-
--	Monthly plot or annual snapshot of change in variable(s) of interest over time
+2.	Time series analysis - Analyse which segments showed the greatest reduction in covid vaccine hesitancy between 2021 and 2023 as:
+- Cleveland dot plot - plot or annual snapshot of change in variable(s) of interest over time
+- Geographic heatmap (colours = changes)
+- Bar chart
 
 
 3. Propose high-level recommendations for segments of the population that need further public health interventions
