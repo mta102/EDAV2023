@@ -1,16 +1,15 @@
 # Data
 
 ## Description
-[Note to Karl 123: I have purposely used a Q&A format So we can easily check that we are answering every question that is asked. Once we are both happy with the answers, we can write in prose]
 
 2.1 Technical Description
 Identify one or more data sources:
 The data source which we will use for our study is the CDC’s National Immunization Survey Adult COVID Module (NIS-ACM). It provides information on COVID-19 vaccination status and intent, segmented by geography, age, ethnicity, socio-economic status, and other characteristics. The data can be found at: https://www.cdc.gov/vaccines/imz-managers/coverage/covidvaxview/interactive/adults.html
 
-how the data are collected and by whom:
-Approximately 14,000-17,000 US adults aged 18 years and above were surveyed each week through telephone interviews by the CDC using a random-digit-dialled sample of cell telephone numbers. Samples were stratified by state, the District of Columbia, five local jurisdictions (Bexar County, TX; Chicago, IL; Houston, TX; New York City, NY; and Philadelphia County, PA), and in some survey periods, Guam, the US Virgin Islands and Puerto Rico. CDC estimates the weighted proportion of the sampled individuals giving a particular response in the survey, where the weighting attempts to correct any imbalances or biases in the sample that might arise due to the survey design or data collection methods.
+How the data are collected and by whom:
+Approximately 14,000-17,000 US adults aged 18 years and above were surveyed each week through telephone interviews by the CDC using a random-digit-dialed sample of cell telephone numbers. Samples were stratified by state, the District of Columbia, five local jurisdictions (Bexar County, TX; Chicago, IL; Houston, TX; New York City, NY; and Philadelphia County, PA), and in some survey periods, Guam, the US Virgin Islands and Puerto Rico. CDC estimates the weighted proportion of the sampled individuals giving a particular response in the survey, where the weighting attempts to correct any imbalances or biases in the sample that might arise due to the survey design or data collection methods.
 
-format of the data: The data is presented as a CSV file in a “pivot longer” format that is downloadable from the CDC’s website provided above. 
+Format of the data: The data is presented as a CSV file in a “pivot longer” format that is downloadable from the CDC’s website provided above. 
 Each column defines the segments and estimates as follows:
 list https://data.cdc.gov/Vaccinations/National-Immunization-Survey-Adult-COVID-Module-NI/udsf-9v7b
 Each “row” of data thus represents a single segment observation
