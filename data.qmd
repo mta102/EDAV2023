@@ -1,66 +1,108 @@
 # Data
 
-## Description
+## 2.1 Technical Description 
 
-2.1 Technical Description
-Identify one or more data sources:
+### Identify one or more data sources:
 The data source which we will use for our study is the CDC’s National Immunization Survey Adult COVID Module (NIS-ACM). It provides information on COVID-19 vaccination status and intent, segmented by geography, age, ethnicity, socio-economic status, and other characteristics. The data can be found at: https://www.cdc.gov/vaccines/imz-managers/coverage/covidvaxview/interactive/adults.html
 
-How the data are collected and by whom:
-Approximately 14,000-17,000 US adults aged 18 years and above were surveyed each week through telephone interviews by the CDC using a random-digit-dialed sample of cell telephone numbers. Samples were stratified by state, the District of Columbia, five local jurisdictions (Bexar County, TX; Chicago, IL; Houston, TX; New York City, NY; and Philadelphia County, PA), and in some survey periods, Guam, the US Virgin Islands and Puerto Rico. CDC estimates the weighted proportion of the sampled individuals giving a particular response in the survey, where the weighting attempts to correct any imbalances or biases in the sample that might arise due to the survey design or data collection methods.
+### How the data are collected and by whom:
+The data was collected by the CDC through a series of telephone interviews conducted between April 2021 and June 2023 (latest sample available). Each week, the CDC surveyed between 7,500 to 20,000 US adults aged 18 years and above using a random-digit-dialed sample of cell telephone numbers. These samples were stratified by state, the District of Columbia, and five local jurisdictions (Bexar County, TX; Chicago, IL; Houston, TX; New York City, NY; and Philadelphia County, PA). During some survey periods, Guam, the US Virgin Islands, and Puerto Rico were included as well.
 
-Format of the data: The data is presented as a CSV file in a “pivot longer” format that is downloadable from the CDC’s website provided above. 
-Each column defines the segments and estimates as follows:
+The CDC estimated the weighted proportion of the sampled individuals giving a particular response in the survey, where the weighting attempts to correct any imbalances or biases in the sample that might arise due to the survey design or data collection methods.
+
+
+### Format of the data:
+The data is presented as a CSV file in a “pivot longer” format that is downloadable from the CDC’s website provided above. The exact format can be seen without exporting the data using the following link: https://data.cdc.gov/Vaccinations/National-Immunization-Survey-Adult-COVID-Module-NI/udsf-9v7b
+
+The first four columns (Geography Type, Geography, Group Name, and Group Category) are used to characterize the segments of individuals who were surveyed, where any given Geography may contain multiple Group Names and Group Categories. For example, the Geographies "Alabama" and "New York" will each have multiple Group Names, such as "Age by race/ethnicity" or "Pregnancy status (females age 18 – 49 years)".
+
+The next two columns in the dataset, Indicator Name and Indicator Category, specify the vaccination status/intent variables being analyzed. Each Indicator Name is comprised of several Indicator Categories. For instance, the Indicator Name "Vaccination uptake and intention" has four possible responses such as "Probably or definitely will not get vaccinated" or "Definitely will get vaccinated".
+
+In addition to the combinations of geographies, participant groups, and survey questions/answers, the data is further subdivided by time period and duration of data collection, which can either be weekly or monthly.
+
+For all the permutations mentioned above, the response rates/proportions and their corresponding confidence intervals and sample sizes are recorded in the columns Estimate (%), 95% CI (%), and Sample Size, respectively.
+
+A complete column-by-column description of all attributes in the dataset is available in the "Columns in This Dataset" section of the page linked below: 
 list https://data.cdc.gov/Vaccinations/National-Immunization-Survey-Adult-COVID-Module-NI/udsf-9v7b
-Each “row” of data thus represents a single segment observation
 
-frequency of updates: weekly, between Apr 22 – May 1 2021, while the final data collection was during the week of June 25 – June 30 2023. CDC also aggregates weekly estimates to determine monthly estimates
-dimensions: The data is 5.08M rows x 13 columns.
-other relevant information: Dataset includes the following additional information which we will not be studying, as it does not directly address the question of vaccine hesitance
+Given that the participant demographics and combinations of survey questions and answers have been pivoted, each “row” of data represents a single observation for each segment/demographic. 
+
+### Frequency of updates:
+The data is updated weekly, with the first samples of data having been collected the week of Apr 22 – May 1 2021 and the latest samples corresponding to the week of June 25 – June 30 2023. The CDC also aggregates its weekly estimates to determine monthly estimates.
+
+### Dimensions:
+The data contains 5.08M rows x 13 columns.
+
+### Other relevant information:
+The dataset includes the following additional information, which we will not be studying, as it does not directly address the question of vaccine hesitance:
 •	Vaccination coverage
 •	Bivalent booster update & intention
 
-issues/problems: 
-1.	All responses are self-reported & random dialled – potential for careless / mis-reporting by respondents
-2.	Random sampling means that each survey will interview different people (i.e. not tracking the response / perspective of the same people across surveys) – not likely to be an issue, since we are concerned with population level statistics rather than individual statistics
-3.	Sample size varies by demographic subgroup – ideally should be stratified, but likely not possible due to random-dialled survey design (i.e. cannot target phone calls to specific demographics). Likely already corrected by CDC’s weighting technique.
-4. rounding errors - estimates do not sum to 100% due to 1 dp rounding of estimates in raw data - causes sum of calculated sub-samples not to sum to total of sample.size
+### Potential issues/concerns with the data:
+Through data exploration and reviews of the data source documentation, we identified the following potential concerns:
 
-how to import data:
-1.	Download CSV
-2.	Import
-3.	Check for errors
+1. All responses are self-reported & random dialed, making the data quality susceptible to misreporting by respondents.
+
+2. Due to the random sampling performed, the individuals being interviewed will differ from one period of time to another. While this limits our ability to track changes in perspective from the same people over time, it is likely not going to be an issue since we are concerned with population level statistics rather than individual statistics.
+
+3. The sample size in the dataset varies by demographic subgroup. Ideally, it would be stratified, but this is likely not possible due to the random-dialed survey design (i.e. the CDC cannot target phone calls to specific demographics). This is likely accounted for by the CDC’s estimate weighting technique.
+
+4. There appear to be rounding errors in the response rate estimates. For any given combination of geography, participant group, question, and time period, the sum of proportions do not exactly equal 100%. This is due to the response rates in the Estimate (%) column being rounded to just one decimal point. As a result, some sub-samples sum up to 101% across all the response options specified in the Indicator Category.
+
+5. The data contains NAs in the Estimate (%) column. According to the data source documentations, NAs should only be present in smaller sub-samples (<30) for which the data was intentionally suppressed. However, our data exploration revealed that groups with larger sample sizes, even surpassing 10,000, contained NAs in the Estimate (%) column. Conversely, some groups with samples less than 30 do not have NA response rate values. A related concern is that the Suppression Flag (1 = suppressed) should only be set to 1 where sample sizes were smaller than 30; however, we see Suppression values of 1 for groups of larger sizes. In some instances, the Estimate (%) may not be NA, yet the Suppression Flag was still set to 1.
+
+### How to import the data:
+1. Select Download Data Table from the link provided at the beginning of the technical description.
+
+2. On the following page, select Export from the top right corner next to the Actions button.
+
+3. Keep the default Export Format as CSV and click Download.
+
+4. Once downloaded, import the dataset into RStudio for analysis. The function fread() from the data.table library is recommended to reduce load time.
 
 
-2.2 Research plan
+## 2.2 Research plan
 
 
-Explain in detail how your data will enable you to answer your research questions from the introduction. 
+### Explain in detail how your data will enable you to answer your research questions from the introduction. 
+The chosen dataset provides a number of interesting factors to be examined in the context of vaccine hesitance.
+
+The research questions can be divided into 3 parts:
+
+Part 1: Study which segments of the population exhibited greatest covid vaccine hesitancy following the deployment of mass vaccinations in the US in early 2021. 
+#---#
+
+Below, we have outlined the fields we plan to leverage in order to explore potential relationships between our dependent variable - vaccine hesitance response rates - and various independent variables such as geography, age, and ethnicity.
+
+Time Window:
+The beginning of the dataset where vaccine hesitance was stable: [Karl to add]
+```{r}
+
+
+
+```
 
 Dependent Variable(s)
 
-The data has the following dependent variables of interest to the study, which can be identified from Indicator.name = “Vaccine uptake and intention”:
--	Indicator.Category = “Probably or definitely will not get vaccinated”
--	Indicator.Category = “Probably will not get vaccinated or unsure”
--	Indicator.Category = “Definitely will get vaccinated”
--	Indicator.Category = “Vaccinated”
-We will combine the dependent variables above as follows:
--	Hesitant: Indicator.Category = “Probably or definitely will not get vaccinated”
--	Not hesitant or unsure: all other Indicator.Category
+The data contains the following dependent variables of interest to our study, which can be identified by filtering our starting-point table for Indicator Name = “Vaccine uptake and intention”:
+-	Estimate (%) (i.e., response rate) for Indicator Category = “Probably or definitely will not get vaccinated”
+-	Estimate (%) for Indicator Category = “Probably will not get vaccinated or unsure”
+-	Estimate (%) for Indicator Category = “Definitely will get vaccinated”
+-	Estimate (%) for Indicator Category = “Vaccinated (>=1 dose)”
 
+Where applicable, we can combine the dependent variables above into the following two options:
+
+-	Hesitant: Indicator Category = “Probably or definitely will not get vaccinated”
+
+-	Not hesitant or unsure: all other values in the 'Indicator Category'
 
 
 Independent variables
 
-
-
-
 The correlation between the hesitance and the following independent variables (segments of the samples) will be studied:
 
 Geography = National
-Group.Name = Segment
-Group.Category = Subsegments (no need to manually specify)
-
+Group Name = Each segment, as defined below:
 
 Demographics
 •	Gender 
@@ -76,6 +118,7 @@ Demographics
 •	Insurance
 •	SVI
 •	Political leaning
+
 Health condition
 •	Previous vaccination status
 •	Comorbidity
@@ -83,47 +126,280 @@ Health condition
 •	Pregnancy
 •	Past covid-19 contraction
 •	Reaction to previous dose of vaccine
+
 "Thinking & feeling"
 •	Concern about getting disease
 •	Vaccine safety concerns
 •	"Importance" of vaccine
+
 Social pressure
 •	Recommended by healthcare providers
 •	Family & friends' vaccination status
 •	Employer vaccine mandate
+
 Logistics
 •	Difficulty in accessing vaccine (general “difficulty”, distance to site, convenience, uncertainty about eligibility, cost, difficulty in getting an appointment) 
 
+Part 2: Analyse which segments showed the greatest reduction in covid vaccine hesitancy between 2021 and 2023
+#---#
 
-Time window
-As we want to study changes in hesitance at particular points in time and changes over a large period of time (2 years, from Apr/May 2021 to Jun 2023), we will use monthly data for our study. This is because we do not expect significant changes in hesitance on a weekly basis, and attempting to compare weekly data could be subject to sampling error due to the random-dialed study design
+In addition to looking at participant demographics as independent variables, we would also like to study changes in hesitance at particular points in time and changes over a large period of time (2 years, from Apr/May 2021 to Jun 2023). As such, we will use the Time Period field as another variable for this analysis. While the data is broken down between weekly and monthly samples, we will be focusing on monthly data for our study. This is because we do not expect significant changes in hesitance on a weekly basis, and attempting to compare weekly data could be subject to sampling error due to the random-dialed study design.
 
+Part 3: Propose high-level recommendations for segments of the population that need further public health interventions 
+#---#
 
-Approach:
-1.	Snapshot analysis - Study which segments of the population exhibited greatest covid vaccine hesitancy following the deployment of mass vaccinations in the US in early 2021
+We will draw this conclusion based on which segments of the populated showed the least change in covid vaccine hesitancy between 2021 and 2023.
 
--	Write R-code to auto rank every possible segment’s hesitance by statistical significance at a given point in time (i.e. using p-values and test-statistics from Chi-sq tests) 
--	Visually show top 10 using one of the following graph types: (x / indpt vars are cat: y / dep vars are numerical (% or n stating “Probably or definitely will not get vaccinated”)
+### Approach:
+Our analysis approach can be broken down into the following key activities:
+
+Part 1: Study which segments of the population exhibited greatest covid vaccine hesitancy following the deployment of mass vaccinations in the US in early 2021. 
+#---#
+
+This process will consist of the following steps:
+
+-	Writing R-code to auto rank every possible segment’s hesitance by statistical significance at a given point in time (i.e. using p-values and test-statistics from Chi-sq tests).
+
+-	Building visuals of the 10 segments with the strongest association to vaccine hesitance to draw additional insights. For this step, we are considering using the following graph types: (x / indpt vars are cat: y / dep vars are numerical (% or n stating “Probably or definitely will not get vaccinated”)
 o	Bars / stacked bars
-o	Mosaic
-o	spatial heatmap
-- w-average first 3 periods where overall hesitance ~18% 
+o	Mosaic plots
+o	Spatial heatmaps
 
-2.	Time series analysis - Analyse which segments showed the greatest reduction in covid vaccine hesitancy between 2021 and 2023 as:
+
+- The snapshot in time we will be using to measure associations will comprise the first three monthly periods of data available, where the average proportion of responses corresponding to vaccine hesitance was ~18%. To combine the three monthly periods, we will create a weighted average of the survey responses. 
+
+Part 2: Analyse which segments showed the greatest reduction in covid vaccine hesitancy between 2021 and 2023
+#---#
+Our next step will be to analyse which segments showed the greatest reduction in COVID vaccine hesitancy between 2021 and 2023. To perform this step, we will leverage several visuals that can provide insights into trends of hesitancy over time:
 - Cleveland dot plot - plot or annual snapshot of change in variable(s) of interest over time
 - Geographic heatmap (colours = changes)
 - Bar chart
 
+Part 3: Propose high-level recommendations for segments of the population that need further public health interventions 
+Based on our findings, our last step in our analysis approach will be to propose high-level recommendations for segments of the population that need further public health interventions.
 
-3. Propose high-level recommendations for segments of the population that need further public health interventions
 
+## 2.3 Missing value analysis
 
-2.3 Missing value analysis
+### Describe any patterns you discover in missing values. If no values are missing, graphs should still be included showing that. (suggested: 2 graphs plus commentary)
+
 Need to identify pattern of ~31.8k NA in Estimate(%). Clues:
 -	Suppression flag
 -	Small sample size / Wide 95% CI
 o	Draw 2 histograms of sample size for NA/non-NA
 -	Other patterns?
 
-Describe any patterns you discover in missing values. If no values are missing, graphs should still be included showing that.
-(suggested: 2 graphs plus commentary)
+### Import Libraries
+```{r}
+
+# install.packages("data.table")
+# install.packages("mi")
+
+library(tidyverse)
+library(data.table)
+library(mi)
+
+```
+
+
+### Import dataset
+```{r}
+
+# covid <- fread("National_Immunization_Survey_Adult_COVID_Module__NIS-ACM___COVIDVaxViews__Data___Centers_for_Disease_Control_and_Prevention__cdc.gov_.csv")
+
+covid <- fread("c:/temp/covid.csv")
+
+
+
+```
+
+
+```{r}
+
+missing_vals_matrix <- is.na(as.data.frame(covid))
+
+missing_col_count <- colSums(missing_vals_matrix)
+
+# Create a data frame with column names and NA counts
+missing_vals_count_df <- data.frame(Column = names(missing_col_count),
+                     NA_Count = missing_col_count)
+
+# Display bar chart of missing values
+ggplot(missing_vals_count_df,
+       aes(x = NA_Count, y = reorder(Column, NA_Count))) +
+  geom_bar(stat = "identity", fill = "cornflowerblue") +
+  labs(title = "Missing Values by Column",
+       x = "Count of NAs",
+       y = "Dataset Attributes") +
+  theme_bw()
+
+
+na_estimates <- covid |>
+  filter(is.na(`Estimate (%)`)) |>
+  mutate(`Sample Size` = as.numeric(`Sample Size`),
+         missing_count = 1) |>
+  group_by(`Indicator Name`) |>
+  mutate(missing_count_ind_name = sum(missing_count)) |>
+  ungroup()
+
+na_estimates = na_estimates |> filter(!grepl(":",Geography) & !grepl("-",Geography) & `Time Type` == "Monthly" ) #remove regions & sub-states & weekly
+
+
+
+
+
+
+
+
+
+na_estimates |> ggplot(aes(y = `Time Period`,x = Year,fill = sum(missing_count))) +
+  geom_tile() +
+  labs(title = "Missing Values by Group Name",
+       x = "Geography",
+       y = "Count of NA") +
+  scale_x_discrete(label=function(x) stringr::str_trunc(x, 20)) + 
+  theme_bw()
+
+
+na_estimates |> filter(`Group Name` == "Age") |>  
+  ggplot(aes(x = `Group Category`)) +
+  geom_bar(aes(y = (..count..)/sum(..count..))) +
+  labs(title = "Missing Values by Group Name",
+       x = "Group Name",
+       y = "Count of NA") +
+  scale_x_discrete(label=function(x) stringr::str_trunc(x, 20)) + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+ 
+  scale_y_continuous(labels = scales::percent)
+
+
+
+
+na_estimates |>  ggplot(aes(x = fct_infreq(`Group Name`))) +
+  geom_bar(aes(y = (..count..)/sum(..count..))) +
+  labs(title = "Missing Values by Group Name",
+       x = "Group Name",
+       y = "Count of NA") +
+  scale_x_discrete(label=function(x) stringr::str_trunc(x, 20)) + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+scale_y_continuous(labels = scales::percent)
+
+
+na_estimates |>  ggplot(aes(x = fct_infreq(Geography))) +
+  geom_bar(aes(y = (..count..)/sum(..count..))) +
+  labs(title = "Missing Values by Geography",
+       x = "Geography",
+       y = "Count of NA") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  scale_y_continuous(labels = scales::percent)
+
+
+NA_is_zero_proof1 = covid |> filter(Geography=="Wisconsin",`Time Period` == "April 22 - May 29",Year==2021,`Group Name`=="Age",`Indicator Name` == "Vaccination uptake and intention", `Group Category` == "65+ years") |> select(`Group Category`,`Indicator Category`,`Estimate (%)`, `Sample Size`,`95% CI (%)`)
+
+NA_is_zero_proof2 = covid |> group_by(`Estimate (%)`) |>  summarize(count = n())  |> filter(`Estimate (%)`<=0.2 | is.na(`Estimate (%)`))
+
+na_estimates |>  ggplot(aes(x = `95% CI (%)`)) +
+  geom_bar(aes(y = (..count..)/sum(..count..))) +
+  labs(title = "CI of NA values",
+       x = "95% CI of NA values",
+       y = "% of NA") +
+  theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust=0.5))+
+  scale_y_continuous(labels = scales::percent)
+
+
+
+
+
+
+
+
+```
+
+```{r}
+
+
+
+ggplot(na_estimates,
+       aes(x = missing_count, y = reorder(`Indicator Name`,
+                                          missing_count_ind_name))) +
+  geom_bar(stat = "identity", fill = "cornflowerblue") +
+  labs(title = "Missing Values by Indicator Names",
+       x = "Count of NAs",
+       y = "Indicator Names") +
+  theme_bw()
+
+```
+
+
+
+```{r}
+
+na_estimates_no_sample_outlier <- na_estimates |>
+  mutate(lower_outlier = quantile(`Sample Size`, 0.25) - 1.5 *
+           IQR(`Sample Size`),
+         upper_outlier = quantile(`Sample Size`, 0.75) + 1.5 *
+           IQR(`Sample Size`)) |>
+  filter(`Sample Size` >= lower_outlier & `Sample Size` <= upper_outlier)
+
+# Plot histogram of Sample Sizes
+ggplot(na_estimates_no_sample_outlier, aes(`Sample Size`)) +
+  geom_histogram(boundary = 0,
+                 color = "blue", fill = "white") +
+  labs(title = "Sample Sizes with Missing Vaccine Response Rates",
+       x = "Sample Sizes",
+       y = "Count of Samples") +
+  theme_bw()
+
+# Create boxplots
+ggplot(na_estimates, aes(x = `Sample Size`, y = `Time Type`)) + 
+    geom_boxplot()
+
+```
+The histogram above shows that missing values are more prevalent among segments with smaller sample sizes?
+
+```{r}
+
+na_estimates_analysis <- na_estimates |>
+  filter(`Time Type` == "Monthly" & `Indicator Name` == "Vaccination uptake and intention") |>
+  filter(Geography == "National") |>
+  group_by(`Group Name`) |>
+  mutate(missing_count_group_name = sum(missing_count)) |>
+  ungroup()
+
+
+ggplot(na_estimates_analysis,
+       aes(x = missing_count,
+           y = reorder(`Group Name`, missing_count_group_name))) +
+  geom_bar(stat = "identity", fill = "cornflowerblue") +
+  labs(title = "Missing Values by Group Name",
+       x = "Count of NAs",
+       y = "Group Names") +
+  theme_bw()
+
+
+ggplot(na_estimates_analysis,
+       aes(x = `Indicator Category`, y = `Group Name`)) +
+  geom_tile(aes(fill = `missing_count`), color = "white") +
+  coord_fixed() +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 60, hjust = 1)) +
+  labs(x = "Day", y = "Fire Indices", fill = "Fire Danger Level") +
+  ggtitle("Fire Danger Levels By Station & Day")
+
+
+covid_vacc_nation <- covid |>
+  filter(`Indicator Name` == "Vaccination uptake and intention") |>
+  filter(Geography == "National")
+
+# Pivot wider to pivot indicators to columns
+covid_vacc_nation_wide <- covid_vacc_nation |>
+  pivot_wider(id_cols = c(`Group Name`, `Group Category`, `Time Period`,
+                          Year, `Time Type`),
+              names_from = "Indicator Category",
+              values_from = "Estimate (%)")
+
+#miss_df <- missing_data.frame(covid_vacc_nation_wide)
+# 
+# image(miss_df)
+
+```
+
