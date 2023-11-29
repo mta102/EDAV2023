@@ -2,6 +2,8 @@
 
 ## 2.1 Technical Description 
 
+Min and Karl
+
 ### Identify one or more data sources:
 The data source which we will use for our study is the CDC’s National Immunization Survey Adult COVID Module (NIS-ACM). It provides information on COVID-19 vaccination status and intent, segmented by geography, age, ethnicity, socio-economic status, and other characteristics. The data can be found at: https://www.cdc.gov/vaccines/imz-managers/coverage/covidvaxview/interactive/adults.html
 
