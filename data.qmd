@@ -209,8 +209,6 @@ library(mi)
 
 covid <- fread("c:/temp/covid.csv")
 
-
-
 ```
 
 
@@ -224,7 +222,7 @@ missing_col_count <- colSums(missing_vals_matrix)
 missing_vals_count_df <- data.frame(Column = names(missing_col_count),
                      NA_Count = missing_col_count)
 
-# Display bar chart of missing values
+# All NAs are in the Estimate % column
 ggplot(missing_vals_count_df,
        aes(x = NA_Count, y = reorder(Column, NA_Count))) +
   geom_bar(stat = "identity", fill = "cornflowerblue") +
@@ -233,71 +231,19 @@ ggplot(missing_vals_count_df,
        y = "Dataset Attributes") +
   theme_bw()
 
-
-na_estimates <- covid |>
-  filter(is.na(`Estimate (%)`)) |>
-  mutate(`Sample Size` = as.numeric(`Sample Size`),
-         missing_count = 1) |>
-  group_by(`Indicator Name`) |>
-  mutate(missing_count_ind_name = sum(missing_count)) |>
-  ungroup()
-
-na_estimates = na_estimates |> filter(!grepl(":",Geography) & !grepl("-",Geography) & `Time Type` == "Monthly" ) #remove regions & sub-states & weekly
-
-
-
-
-
-
-
-
-
-na_estimates |> ggplot(aes(y = `Time Period`,x = Year,fill = sum(missing_count))) +
-  geom_tile() +
-  labs(title = "Missing Values by Group Name",
-       x = "Geography",
-       y = "Count of NA") +
-  scale_x_discrete(label=function(x) stringr::str_trunc(x, 20)) + 
+# Within the Indicator Name, NAs are in the Vaccination uptake & intention and received vaccination rows, indicating that Estimates for these are blank
+covid |>  filter(is.na(`Estimate (%)`)) |> ggplot(aes(y = fct_rev(fct_infreq(`Indicator Name`)))) +
+  geom_bar(fill = "cornflowerblue")+
+  labs(title = "Missing Values by Column",
+       x = "Count of NAs",
+       y = "Indicator Name") +
   theme_bw()
 
 
-na_estimates |> filter(`Group Name` == "Age") |>  
-  ggplot(aes(x = `Group Category`)) +
-  geom_bar(aes(y = (..count..)/sum(..count..))) +
-  labs(title = "Missing Values by Group Name",
-       x = "Group Name",
-       y = "Count of NA") +
-  scale_x_discrete(label=function(x) stringr::str_trunc(x, 20)) + 
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+ 
-  scale_y_continuous(labels = scales::percent)
+#To understand the NAs further, we made 3 observations which strongly indicates NA are in fact zero:
+#Observation 1: All NAs have a valid 95% confidence interval of between 0-0 to 0-0.3.
 
-
-
-
-na_estimates |>  ggplot(aes(x = fct_infreq(`Group Name`))) +
-  geom_bar(aes(y = (..count..)/sum(..count..))) +
-  labs(title = "Missing Values by Group Name",
-       x = "Group Name",
-       y = "Count of NA") +
-  scale_x_discrete(label=function(x) stringr::str_trunc(x, 20)) + 
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-scale_y_continuous(labels = scales::percent)
-
-
-na_estimates |>  ggplot(aes(x = fct_infreq(Geography))) +
-  geom_bar(aes(y = (..count..)/sum(..count..))) +
-  labs(title = "Missing Values by Geography",
-       x = "Geography",
-       y = "Count of NA") +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  scale_y_continuous(labels = scales::percent)
-
-
-NA_is_zero_proof1 = covid |> filter(Geography=="Wisconsin",`Time Period` == "April 22 - May 29",Year==2021,`Group Name`=="Age",`Indicator Name` == "Vaccination uptake and intention", `Group Category` == "65+ years") |> select(`Group Category`,`Indicator Category`,`Estimate (%)`, `Sample Size`,`95% CI (%)`)
-
-NA_is_zero_proof2 = covid |> group_by(`Estimate (%)`) |>  summarize(count = n())  |> filter(`Estimate (%)`<=0.2 | is.na(`Estimate (%)`))
-
-na_estimates |>  ggplot(aes(x = `95% CI (%)`)) +
+covid |>  filter(is.na(`Estimate (%)`)) |> ggplot(aes(x = `95% CI (%)`)) +
   geom_bar(aes(y = (..count..)/sum(..count..))) +
   labs(title = "CI of NA values",
        x = "95% CI of NA values",
@@ -305,30 +251,21 @@ na_estimates |>  ggplot(aes(x = `95% CI (%)`)) +
   theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust=0.5))+
   scale_y_continuous(labels = scales::percent)
 
+#Observation 2: Estimate (%) is rounded to 1dp, and the lowest possible non-NA value is 0.1
+covid |> group_by(`Estimate (%)`) |>  summarize(count = n())  |> filter(`Estimate (%)`<=0.2 | is.na(`Estimate (%)`)) |> arrange(desc(`Estimate (%)`))
+
+#Observation 3: Sense checks on subsets of the data where NAs are present are coherent, with a valid sample size, and the non-NA Estimate (%) summing up to 100
+NA_is_zero_proof1 = covid |> filter(Geography=="Wisconsin",`Time Period` == "April 22 - May 29",Year==2021,`Group Name`=="Age",`Indicator Name` == "Vaccination uptake and intention", `Group Category` == "65+ years") |> select(`Group Category`,`Indicator Category`,`Estimate (%)`, `Sample Size`,`95% CI (%)`)
 
 
+#Therefore, we will impute NAs as zeros
+covid[is.na(covid)] = 0
 
-
-
+#Check: This does remove all NAs
+colSums(is.na(covid))
 
 
 ```
-
-```{r}
-
-
-
-ggplot(na_estimates,
-       aes(x = missing_count, y = reorder(`Indicator Name`,
-                                          missing_count_ind_name))) +
-  geom_bar(stat = "identity", fill = "cornflowerblue") +
-  labs(title = "Missing Values by Indicator Names",
-       x = "Count of NAs",
-       y = "Indicator Names") +
-  theme_bw()
-
-```
-
 
 
 ```{r}
