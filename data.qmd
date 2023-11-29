@@ -10,6 +10,8 @@ The data was collected by the CDC through a series of telephone interviews condu
 
 The CDC estimated the weighted proportion of the sampled individuals giving a particular response in the survey, where the weighting attempts to correct any imbalances or biases in the sample that might arise due to the survey design or data collection methods.
 
+To correct any imbalances or biases in the sample that might arise due to the survey design or data collection methods, the CDC applied weights to the proportion of the sampled individuals giving a particular response in the survey.
+
 
 ### Format of the data:
 The data is presented as a CSV file in a “pivot longer” format that is downloadable from the CDC’s website provided above. The exact format can be seen without exporting the data using the following link: https://data.cdc.gov/Vaccinations/National-Immunization-Survey-Adult-COVID-Module-NI/udsf-9v7b
@@ -76,9 +78,61 @@ Below, we have outlined the fields we plan to leverage in order to explore poten
 
 Time Window:
 The beginning of the dataset where vaccine hesitance was stable: [Karl to add]
+
+
+### Import Libraries
 ```{r}
 
+# install.packages("data.table")
+# install.packages("mi")
 
+library(tidyverse)
+library(data.table)
+library(lubridate)
+library(mi)
+
+```
+
+
+### Import dataset
+```{r}
+
+covid <- fread("National_Immunization_Survey_Adult_COVID_Module__NIS-ACM___COVIDVaxViews__Data___Centers_for_Disease_Control_and_Prevention__cdc.gov_.csv")
+
+covid <- fread("c:/temp/covid.csv")
+
+```
+
+
+
+```{r}
+
+vacc_intention_time <- covid |>
+  filter(`Indicator Name` == 'Vaccination uptake and intention') |>
+  filter(`Indicator Category` == 'Probably or definitely will not get vaccinated') |>
+  filter(`Group Name` == 'All adults 18+') |>
+  filter(`Time Type` == 'Monthly') |>
+  filter(Geography == 'National') |>
+  arrange(`Geography Type`, Geography, `Time Period`)
+
+
+vacc_intention_time <- vacc_intention_time |>
+  mutate(month_split = paste0(str_split(`Time Period`, "-",
+                                        simplify = TRUE)[, 2],
+         ", ", Year))
+
+vacc_intention_time <- vacc_intention_time |>
+  mutate(month = mdy(month_split))
+
+
+ggplot(vacc_intention_time, aes(x = month, y = `Estimate (%)`,
+                                color = `Indicator Category`)) +
+  geom_line() +
+  labs(title = "U.S. Vaccination Response Rates Over Time",
+       x = "Month",
+       y = "Response Rate (%)") +
+  theme(legend.position = "bottom") +
+  guides(color = guide_legend(title = "Indicator Category:"))
 
 ```
 
@@ -189,28 +243,6 @@ Need to identify pattern of ~31.8k NA in Estimate(%). Clues:
 o	Draw 2 histograms of sample size for NA/non-NA
 -	Other patterns?
 
-### Import Libraries
-```{r}
-
-# install.packages("data.table")
-# install.packages("mi")
-
-library(tidyverse)
-library(data.table)
-library(mi)
-
-```
-
-
-### Import dataset
-```{r}
-
-# covid <- fread("National_Immunization_Survey_Adult_COVID_Module__NIS-ACM___COVIDVaxViews__Data___Centers_for_Disease_Control_and_Prevention__cdc.gov_.csv")
-
-covid <- fread("c:/temp/covid.csv")
-
-```
-
 
 ```{r}
 
@@ -231,14 +263,6 @@ ggplot(missing_vals_count_df,
        y = "Dataset Attributes") +
   theme_bw()
 
-# Within the Indicator Name, NAs are in the Vaccination uptake & intention and received vaccination rows, indicating that Estimates for these are blank
-covid |>  filter(is.na(`Estimate (%)`)) |> ggplot(aes(y = fct_rev(fct_infreq(`Indicator Name`)))) +
-  geom_bar(fill = "cornflowerblue")+
-  labs(title = "Missing Values by Column",
-       x = "Count of NAs",
-       y = "Indicator Name") +
-  theme_bw()
-
 
 #To understand the NAs further, we made 3 observations which strongly indicates NA are in fact zero:
 #Observation 1: All NAs have a valid 95% confidence interval of between 0-0 to 0-0.3.
@@ -255,88 +279,17 @@ covid |>  filter(is.na(`Estimate (%)`)) |> ggplot(aes(x = `95% CI (%)`)) +
 covid |> group_by(`Estimate (%)`) |>  summarize(count = n())  |> filter(`Estimate (%)`<=0.2 | is.na(`Estimate (%)`)) |> arrange(desc(`Estimate (%)`))
 
 #Observation 3: Sense checks on subsets of the data where NAs are present are coherent, with a valid sample size, and the non-NA Estimate (%) summing up to 100
-NA_is_zero_proof1 = covid |> filter(Geography=="Wisconsin",`Time Period` == "April 22 - May 29",Year==2021,`Group Name`=="Age",`Indicator Name` == "Vaccination uptake and intention", `Group Category` == "65+ years") |> select(`Group Category`,`Indicator Category`,`Estimate (%)`, `Sample Size`,`95% CI (%)`)
+NA_is_zero_proof1 <- covid |> filter(Geography=="Wisconsin",`Time Period` == "April 22 - May 29",Year==2021,`Group Name`=="Age",`Indicator Name` == "Vaccination uptake and intention", `Group Category` == "65+ years") |> select(`Group Category`,`Indicator Category`,`Estimate (%)`, `Sample Size`,`95% CI (%)`)
 
+covid_clean <- covid
 
 #Therefore, we will impute NAs as zeros
-covid[is.na(covid)] = 0
+covid_clean[is.na(covid_clean)] = 0
 
 #Check: This does remove all NAs
-colSums(is.na(covid))
+colSums(is.na(covid_clean))
 
 
 ```
 
-
-```{r}
-
-na_estimates_no_sample_outlier <- na_estimates |>
-  mutate(lower_outlier = quantile(`Sample Size`, 0.25) - 1.5 *
-           IQR(`Sample Size`),
-         upper_outlier = quantile(`Sample Size`, 0.75) + 1.5 *
-           IQR(`Sample Size`)) |>
-  filter(`Sample Size` >= lower_outlier & `Sample Size` <= upper_outlier)
-
-# Plot histogram of Sample Sizes
-ggplot(na_estimates_no_sample_outlier, aes(`Sample Size`)) +
-  geom_histogram(boundary = 0,
-                 color = "blue", fill = "white") +
-  labs(title = "Sample Sizes with Missing Vaccine Response Rates",
-       x = "Sample Sizes",
-       y = "Count of Samples") +
-  theme_bw()
-
-# Create boxplots
-ggplot(na_estimates, aes(x = `Sample Size`, y = `Time Type`)) + 
-    geom_boxplot()
-
-```
-The histogram above shows that missing values are more prevalent among segments with smaller sample sizes?
-
-```{r}
-
-na_estimates_analysis <- na_estimates |>
-  filter(`Time Type` == "Monthly" & `Indicator Name` == "Vaccination uptake and intention") |>
-  filter(Geography == "National") |>
-  group_by(`Group Name`) |>
-  mutate(missing_count_group_name = sum(missing_count)) |>
-  ungroup()
-
-
-ggplot(na_estimates_analysis,
-       aes(x = missing_count,
-           y = reorder(`Group Name`, missing_count_group_name))) +
-  geom_bar(stat = "identity", fill = "cornflowerblue") +
-  labs(title = "Missing Values by Group Name",
-       x = "Count of NAs",
-       y = "Group Names") +
-  theme_bw()
-
-
-ggplot(na_estimates_analysis,
-       aes(x = `Indicator Category`, y = `Group Name`)) +
-  geom_tile(aes(fill = `missing_count`), color = "white") +
-  coord_fixed() +
-  theme_classic() +
-  theme(axis.text.x = element_text(angle = 60, hjust = 1)) +
-  labs(x = "Day", y = "Fire Indices", fill = "Fire Danger Level") +
-  ggtitle("Fire Danger Levels By Station & Day")
-
-
-covid_vacc_nation <- covid |>
-  filter(`Indicator Name` == "Vaccination uptake and intention") |>
-  filter(Geography == "National")
-
-# Pivot wider to pivot indicators to columns
-covid_vacc_nation_wide <- covid_vacc_nation |>
-  pivot_wider(id_cols = c(`Group Name`, `Group Category`, `Time Period`,
-                          Year, `Time Type`),
-              names_from = "Indicator Category",
-              values_from = "Estimate (%)")
-
-#miss_df <- missing_data.frame(covid_vacc_nation_wide)
-# 
-# image(miss_df)
-
-```
 
