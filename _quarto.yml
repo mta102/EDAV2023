@@ -6,7 +6,7 @@ execute:
   echo: true
 
 book:
-  title: "Covid-19 Vaccine Hesitance"
+  title: "Covid-19 Vaccine Hesitance Analysis"
   author:
     - Min Aung (mta2151)
     - Karl Garcia-Meza (krg2150)
