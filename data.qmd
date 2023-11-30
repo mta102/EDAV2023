@@ -67,7 +67,7 @@ Through data exploration and reviews of the data source documentation, we identi
 ### Explain in detail how your data will enable you to answer your research questions from the introduction. 
 The dataset chosen provides a number of interesting factors to be examined in the context of vaccine hesitance. Below, we have outlined the fields we plan to leverage in order to explore potential relationships between our dependent variable - vaccine hesitance response rates - and various independent variables such as geography, age, and ethnicity.
 
-Dependent Variable(s)
+**Dependent Variable(s)**
 
 The data contains the following dependent variables of interest to our study, which can be identified by filtering our starting-point table for Indicator Name = “Vaccine uptake and intention”:
 
@@ -87,7 +87,7 @@ Where applicable, we can combine the dependent variables above into the followin
 -	Not hesitant or unsure: all other values in the 'Indicator Category'
 
 
-Independent variables
+**Independent variables**
 
 The correlation between the hesitance and the following independent variables (as defined by the column "Group Name") will be studied initially nationally (as defined by the column "Geography"), but any geographical disparities may be highlighted on a case by case basis:
 
@@ -154,7 +154,7 @@ Logistics
 - Difficulty in accessing vaccine (general “difficulty”, distance to site, convenience, uncertainty about eligibility, cost, difficulty in getting an appointment) 
 
 
-Time window
+**Time window**
 
 We would also like to study changes in hesitance at particular points in time and changes over a large period of time (2 years, from Apr/May 2021 to Jun 2023). As such, we we will use the Time Period field as another variable for this analysis. While the data is broken down between weekly and monthly samples, we will be focusing on monthly data for our study. This is because we do not expect significant changes in hesitance on a weekly basis, and attempting to compare weekly data could be subject to sampling error due to the random-dialed study design.
 
@@ -252,6 +252,8 @@ We will analyse which segments showed the greatest reduction in COVID vaccine he
 ## Missing value analysis
 
 ### Describe any patterns you discover in missing values. If no values are missing, graphs should still be included showing that. (suggested: 2 graphs plus commentary)
+
+Our missing value analysis analyzes where the missing data is, determines the meaning of the missing data in the specific context of our dataset; we then make appropriate corrections.
 
 ```{r message=FALSE, warning = FALSE}
 
