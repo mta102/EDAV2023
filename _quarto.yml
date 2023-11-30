@@ -6,7 +6,7 @@ execute:
   echo: true
 
 book:
-  title: "YOUR PROJECT TITLE"
+  title: "Covid-19 Vaccine Hesitance"
   author:
     - Min Aung (mta2151)
     - Karl Garcia-Meza (krg2150)
