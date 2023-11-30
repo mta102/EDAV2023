@@ -3,7 +3,7 @@
 ## Technical Description 
 
 ### Identify one or more data sources:
-The data source which we will use for our study is the CDC’s National Immunization Survey Adult COVID Module (NIS-ACM). It provides information on COVID-19 vaccination status and intent, segmented by geography, age, ethnicity, socio-economic status, and other characteristics. The data can be found at: https://www.cdc.gov/vaccines/imz-managers/coverage/covidvaxview/interactive/adults.html
+The data source which we will use for our study is the CDC’s National Immunization Survey Adult COVID Module (NIS-ACM). It provides information on COVID-19 vaccination status and intent, segmented by geography, age, ethnicity, socio-economic status, and other characteristics. The data can be found [here](https://www.cdc.gov/vaccines/imz-managers/coverage/covidvaxview/interactive/adults.html)
 
 ### How the data are collected and by whom:
 The data was collected by the CDC through a series of telephone interviews conducted between April 2021 and June 2023 (latest sample available). Each week, the CDC surveyed between 7,500 to 20,000 US adults aged 18 years and above using a random-digit-dialed sample of cell telephone numbers. These samples were stratified by state, the District of Columbia, and five local jurisdictions (Bexar County, TX; Chicago, IL; Houston, TX; New York City, NY; and Philadelphia County, PA). During some survey periods, Guam, the US Virgin Islands, and Puerto Rico were included as well.
@@ -70,6 +70,7 @@ The dataset chosen provides a number of interesting factors to be examined in th
 Dependent Variable(s)
 
 The data contains the following dependent variables of interest to our study, which can be identified by filtering our starting-point table for Indicator Name = “Vaccine uptake and intention”:
+
 -	Estimate (%) (i.e., response rate) for Indicator Category = “Probably or definitely will not get vaccinated”
 
 -	Estimate (%) for Indicator Category = “Probably will not get vaccinated or unsure”
@@ -91,6 +92,7 @@ Independent variables
 The correlation between the hesitance and the following independent variables (as defined by the column "Group Name") will be studied initially nationally (as defined by the column "Geography"), but any geographical disparities may be highlighted on a case by case basis:
 
 Demographics:
+
 - Gender
 
 - Age
@@ -118,6 +120,7 @@ Demographics:
 - Political leaning
 
 Health condition
+
 - Previous vaccination status
 
 - Comorbidity
@@ -131,6 +134,7 @@ Health condition
 - Reaction to previous dose of vaccine
 
 "Thinking & feeling"
+
 - Concern about getting disease
 
 - Vaccine safety concerns
@@ -138,6 +142,7 @@ Health condition
 - "Importance" of vaccine
 
 Social pressure
+
 - Recommended by healthcare providers
 
 - Family & friends' vaccination status
@@ -145,10 +150,12 @@ Social pressure
 - Employer vaccine mandate
 
 Logistics
+
 - Difficulty in accessing vaccine (general “difficulty”, distance to site, convenience, uncertainty about eligibility, cost, difficulty in getting an appointment) 
 
 
 Time window
+
 We would also like to study changes in hesitance at particular points in time and changes over a large period of time (2 years, from Apr/May 2021 to Jun 2023). As such, we we will use the Time Period field as another variable for this analysis. While the data is broken down between weekly and monthly samples, we will be focusing on monthly data for our study. This is because we do not expect significant changes in hesitance on a weekly basis, and attempting to compare weekly data could be subject to sampling error due to the random-dialed study design.
 
 
@@ -162,8 +169,11 @@ This process will consist of the following steps:
 -	Writing R-code to auto rank every possible segment’s hesitance by statistical significance (i.e. using p-values and test-statistics from Chi-sq tests) at a point in time specified below.
 
 -	Building visuals of the 10 segments with the strongest association to vaccine hesitance to draw additional insights. For this step, we are considering using the following graph types: (x / indpt vars are cat: y / dep vars are numerical (% or n stating “Probably or definitely will not get vaccinated”)
+
 - Bars / stacked bars
+
 - Mosaic plots
+
 - Spatial heatmaps
 
 - The snapshot in time we will be using to measure associations will comprise of the first three monthly periods of data available, where the average proportion of responses corresponding to vaccine hesitance was ~18%. To combine the three monthly periods, we will create a weighted average of the survey responses. For instance, if vaccine hesitance rates for a particular group were 20 out 100 (20%) in month 1, 20/150 (13%) in month 2, and 10/90 (11%) in month 3, the weighted average hesitance rate for that group would be 50/340 (14.7%).
