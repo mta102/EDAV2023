@@ -20,6 +20,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -142,8 +176,28 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#description" id="toc-description" class="nav-link active" data-scroll-target="#description"><span class="header-section-number">2.1</span> Description</a></li>
-  <li><a href="#missing-value-analysis" id="toc-missing-value-analysis" class="nav-link" data-scroll-target="#missing-value-analysis"><span class="header-section-number">2.2</span> Missing value analysis</a></li>
+  <li><a href="#technical-description" id="toc-technical-description" class="nav-link active" data-scroll-target="#technical-description"><span class="header-section-number">2.1</span> 2.1 Technical Description</a>
+  <ul class="collapse">
+  <li><a href="#identify-one-or-more-data-sources" id="toc-identify-one-or-more-data-sources" class="nav-link" data-scroll-target="#identify-one-or-more-data-sources"><span class="header-section-number">2.1.1</span> Identify one or more data sources:</a></li>
+  <li><a href="#how-the-data-are-collected-and-by-whom" id="toc-how-the-data-are-collected-and-by-whom" class="nav-link" data-scroll-target="#how-the-data-are-collected-and-by-whom"><span class="header-section-number">2.1.2</span> How the data are collected and by whom:</a></li>
+  <li><a href="#format-of-the-data" id="toc-format-of-the-data" class="nav-link" data-scroll-target="#format-of-the-data"><span class="header-section-number">2.1.3</span> Format of the data:</a></li>
+  <li><a href="#frequency-of-updates" id="toc-frequency-of-updates" class="nav-link" data-scroll-target="#frequency-of-updates"><span class="header-section-number">2.1.4</span> Frequency of updates:</a></li>
+  <li><a href="#dimensions" id="toc-dimensions" class="nav-link" data-scroll-target="#dimensions"><span class="header-section-number">2.1.5</span> Dimensions:</a></li>
+  <li><a href="#other-relevant-information" id="toc-other-relevant-information" class="nav-link" data-scroll-target="#other-relevant-information"><span class="header-section-number">2.1.6</span> Other relevant information:</a></li>
+  <li><a href="#potential-issuesconcerns-with-the-data" id="toc-potential-issuesconcerns-with-the-data" class="nav-link" data-scroll-target="#potential-issuesconcerns-with-the-data"><span class="header-section-number">2.1.7</span> Potential issues/concerns with the data:</a></li>
+  <li><a href="#how-to-import-the-data" id="toc-how-to-import-the-data" class="nav-link" data-scroll-target="#how-to-import-the-data"><span class="header-section-number">2.1.8</span> How to import the data:</a></li>
+  </ul></li>
+  <li><a href="#research-plan" id="toc-research-plan" class="nav-link" data-scroll-target="#research-plan"><span class="header-section-number">2.2</span> 2.2 Research plan</a>
+  <ul class="collapse">
+  <li><a href="#explain-in-detail-how-your-data-will-enable-you-to-answer-your-research-questions-from-the-introduction." id="toc-explain-in-detail-how-your-data-will-enable-you-to-answer-your-research-questions-from-the-introduction." class="nav-link" data-scroll-target="#explain-in-detail-how-your-data-will-enable-you-to-answer-your-research-questions-from-the-introduction."><span class="header-section-number">2.2.1</span> Explain in detail how your data will enable you to answer your research questions from the introduction.</a></li>
+  <li><a href="#approach" id="toc-approach" class="nav-link" data-scroll-target="#approach"><span class="header-section-number">2.2.2</span> Approach:</a></li>
+  <li><a href="#import-libraries" id="toc-import-libraries" class="nav-link" data-scroll-target="#import-libraries"><span class="header-section-number">2.2.3</span> Import Libraries</a></li>
+  <li><a href="#import-dataset" id="toc-import-dataset" class="nav-link" data-scroll-target="#import-dataset"><span class="header-section-number">2.2.4</span> Import dataset</a></li>
+  </ul></li>
+  <li><a href="#missing-value-analysis" id="toc-missing-value-analysis" class="nav-link" data-scroll-target="#missing-value-analysis"><span class="header-section-number">2.3</span> 2.3 Missing value analysis</a>
+  <ul class="collapse">
+  <li><a href="#describe-any-patterns-you-discover-in-missing-values.-if-no-values-are-missing-graphs-should-still-be-included-showing-that.-suggested-2-graphs-plus-commentary" id="toc-describe-any-patterns-you-discover-in-missing-values.-if-no-values-are-missing-graphs-should-still-be-included-showing-that.-suggested-2-graphs-plus-commentary" class="nav-link" data-scroll-target="#describe-any-patterns-you-discover-in-missing-values.-if-no-values-are-missing-graphs-should-still-be-included-showing-that.-suggested-2-graphs-plus-commentary"><span class="header-section-number">2.3.1</span> Describe any patterns you discover in missing values. If no values are missing, graphs should still be included showing that. (suggested: 2 graphs plus commentary)</a></li>
+  </ul></li>
   </ul>
 <div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/mta102/EDAV2023/edit/main/data.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/mta102/EDAV2023/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
@@ -167,13 +221,235 @@ ul.task-list li input[type="checkbox"] {
 
 </header>
 
-<section id="description" class="level2" data-number="2.1">
-<h2 data-number="2.1" class="anchored" data-anchor-id="description"><span class="header-section-number">2.1</span> Description</h2>
+<section id="technical-description" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="technical-description"><span class="header-section-number">2.1</span> 2.1 Technical Description</h2>
+<section id="identify-one-or-more-data-sources" class="level3" data-number="2.1.1">
+<h3 data-number="2.1.1" class="anchored" data-anchor-id="identify-one-or-more-data-sources"><span class="header-section-number">2.1.1</span> Identify one or more data sources:</h3>
+<p>The data source which we will use for our study is the CDC’s National Immunization Survey Adult COVID Module (NIS-ACM). It provides information on COVID-19 vaccination status and intent, segmented by geography, age, ethnicity, socio-economic status, and other characteristics. The data can be found at: https://www.cdc.gov/vaccines/imz-managers/coverage/covidvaxview/interactive/adults.html</p>
 </section>
-<section id="missing-value-analysis" class="level2" data-number="2.2">
-<h2 data-number="2.2" class="anchored" data-anchor-id="missing-value-analysis"><span class="header-section-number">2.2</span> Missing value analysis</h2>
+<section id="how-the-data-are-collected-and-by-whom" class="level3" data-number="2.1.2">
+<h3 data-number="2.1.2" class="anchored" data-anchor-id="how-the-data-are-collected-and-by-whom"><span class="header-section-number">2.1.2</span> How the data are collected and by whom:</h3>
+<p>The data was collected by the CDC through a series of telephone interviews conducted between April 2021 and June 2023 (latest sample available). Each week, the CDC surveyed between 7,500 to 20,000 US adults aged 18 years and above using a random-digit-dialed sample of cell telephone numbers. These samples were stratified by state, the District of Columbia, and five local jurisdictions (Bexar County, TX; Chicago, IL; Houston, TX; New York City, NY; and Philadelphia County, PA). During some survey periods, Guam, the US Virgin Islands, and Puerto Rico were included as well.</p>
+<p>To correct any imbalances or biases in the sample that might arise due to the survey design or data collection methods, the CDC applied weights to the proportion of the sampled individuals giving a particular response in the survey.</p>
+</section>
+<section id="format-of-the-data" class="level3" data-number="2.1.3">
+<h3 data-number="2.1.3" class="anchored" data-anchor-id="format-of-the-data"><span class="header-section-number">2.1.3</span> Format of the data:</h3>
+<p>The data is presented as a CSV file in a “pivot longer” format that is downloadable from the CDC’s website provided above. The exact format can be seen without exporting the data using the following link: https://data.cdc.gov/Vaccinations/National-Immunization-Survey-Adult-COVID-Module-NI/udsf-9v7b</p>
+<p>The first four columns (Geography Type, Geography, Group Name, and Group Category) are used to characterize the segments of individuals who were surveyed, where any given Geography may contain multiple Group Names and Group Categories. For example, the Geographies “Alabama” and “New York” will each have multiple Group Names, such as “Age by race/ethnicity” or “Pregnancy status (females age 18 – 49 years)”.</p>
+<p>The next two columns in the dataset, Indicator Name and Indicator Category, specify the vaccination status/intent variables being analyzed. Each Indicator Name is comprised of several Indicator Categories. For instance, the Indicator Name “Vaccination uptake and intention” has four possible responses such as “Probably or definitely will not get vaccinated” or “Definitely will get vaccinated”.</p>
+<p>In addition to the combinations of geographies, participant groups, and survey questions/answers, the data is further subdivided by time period and duration of data collection, which can either be weekly or monthly.</p>
+<p>For all the permutations mentioned above, the response rates/proportions and their corresponding confidence intervals and sample sizes are recorded in the columns Estimate (%), 95% CI (%), and Sample Size, respectively.</p>
+<p>A complete column-by-column description of all attributes in the dataset is available in the “Columns in This Dataset” section of the page linked below: list https://data.cdc.gov/Vaccinations/National-Immunization-Survey-Adult-COVID-Module-NI/udsf-9v7b</p>
+<p>Given that the participant demographics and combinations of survey questions and answers have been pivoted, each “row” of data represents a single observation for each segment/demographic.</p>
+</section>
+<section id="frequency-of-updates" class="level3" data-number="2.1.4">
+<h3 data-number="2.1.4" class="anchored" data-anchor-id="frequency-of-updates"><span class="header-section-number">2.1.4</span> Frequency of updates:</h3>
+<p>The data is updated weekly, with the first samples of data having been collected the week of Apr 22 – May 1 2021 and the latest samples corresponding to the week of June 25 – June 30 2023. The CDC also aggregates its weekly estimates to determine monthly estimates.</p>
+</section>
+<section id="dimensions" class="level3" data-number="2.1.5">
+<h3 data-number="2.1.5" class="anchored" data-anchor-id="dimensions"><span class="header-section-number">2.1.5</span> Dimensions:</h3>
+<p>The data contains 5.08M rows x 13 columns.</p>
+</section>
+<section id="other-relevant-information" class="level3" data-number="2.1.6">
+<h3 data-number="2.1.6" class="anchored" data-anchor-id="other-relevant-information"><span class="header-section-number">2.1.6</span> Other relevant information:</h3>
+<p>The dataset includes the following additional information, which we will not be studying, as it does not directly address the question of vaccine hesitance: • Vaccination coverage • Bivalent booster update &amp; intention</p>
+</section>
+<section id="potential-issuesconcerns-with-the-data" class="level3" data-number="2.1.7">
+<h3 data-number="2.1.7" class="anchored" data-anchor-id="potential-issuesconcerns-with-the-data"><span class="header-section-number">2.1.7</span> Potential issues/concerns with the data:</h3>
+<p>Through data exploration and reviews of the data source documentation, we identified the following potential concerns:</p>
+<ol type="1">
+<li><p>All responses are self-reported &amp; random dialed, making the data quality susceptible to misreporting by respondents.</p></li>
+<li><p>Due to the random sampling performed, the individuals being interviewed will differ from one period of time to another. While this limits our ability to track changes in perspective from the same people over time, it is likely not going to be an issue since we are concerned with population level statistics rather than individual statistics.</p></li>
+<li><p>The sample size in the dataset varies by demographic subgroup. Ideally, it would be stratified, but this is likely not possible due to the random-dialed survey design (i.e.&nbsp;the CDC cannot target phone calls to specific demographics). This is likely accounted for by the CDC’s estimate weighting technique.</p></li>
+<li><p>There appear to be rounding errors in the response rate estimates. For any given combination of geography, participant group, question, and time period, the sum of proportions do not exactly equal 100%. This is due to the response rates in the Estimate (%) column being rounded to just one decimal point. As a result, some sub-samples sum up to 101% across all the response options specified in the Indicator Category.</p></li>
+<li><p>The data contains NAs in the Estimate (%) column. According to the data source documentations, NAs should only be present in smaller sub-samples (&lt;30) for which the data was intentionally suppressed. However, our data exploration revealed that groups with larger sample sizes, even surpassing 10,000, contained NAs in the Estimate (%) column. Conversely, some groups with samples less than 30 do not have NA response rate values. A related concern is that the Suppression Flag (1 = suppressed) should only be set to 1 where sample sizes were smaller than 30; however, we see Suppression values of 1 for groups of larger sizes. In some instances, the Estimate (%) may not be NA, yet the Suppression Flag was still set to 1.</p></li>
+</ol>
+</section>
+<section id="how-to-import-the-data" class="level3" data-number="2.1.8">
+<h3 data-number="2.1.8" class="anchored" data-anchor-id="how-to-import-the-data"><span class="header-section-number">2.1.8</span> How to import the data:</h3>
+<ol type="1">
+<li><p>Select Download Data Table from the link provided at the beginning of the technical description.</p></li>
+<li><p>On the following page, select Export from the top right corner next to the Actions button.</p></li>
+<li><p>Keep the default Export Format as CSV and click Download.</p></li>
+<li><p>Once downloaded, import the dataset into RStudio for analysis. The function fread() from the data.table library is recommended to reduce load time.</p></li>
+</ol>
+</section>
+</section>
+<section id="research-plan" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="research-plan"><span class="header-section-number">2.2</span> 2.2 Research plan</h2>
+<section id="explain-in-detail-how-your-data-will-enable-you-to-answer-your-research-questions-from-the-introduction." class="level3" data-number="2.2.1">
+<h3 data-number="2.2.1" class="anchored" data-anchor-id="explain-in-detail-how-your-data-will-enable-you-to-answer-your-research-questions-from-the-introduction."><span class="header-section-number">2.2.1</span> Explain in detail how your data will enable you to answer your research questions from the introduction.</h3>
+<p>The dataset chosen provides a number of interesting factors to be examined in the context of vaccine hesitance. Below, we have outlined the fields we plan to leverage in order to explore potential relationships between our dependent variable - vaccine hesitance response rates - and various independent variables such as geography, age, and ethnicity.</p>
+<p>Dependent Variable(s)</p>
+<p>The data contains the following dependent variables of interest to our study, which can be identified by filtering our starting-point table for Indicator Name = “Vaccine uptake and intention”: - Estimate (%) (i.e., response rate) for Indicator Category = “Probably or definitely will not get vaccinated” - Estimate (%) for Indicator Category = “Probably will not get vaccinated or unsure” - Estimate (%) for Indicator Category = “Definitely will get vaccinated” - Estimate (%) for Indicator Category = “Vaccinated (&gt;=1 dose)”</p>
+<p>Where applicable, we can combine the dependent variables above into the following two options:</p>
+<ul>
+<li><p>Hesitant: Indicator Category = “Probably or definitely will not get vaccinated”</p></li>
+<li><p>Not hesitant or unsure: all other values in the ‘Indicator Category’</p></li>
+</ul>
+<p>Independent variables</p>
+<p>The correlation between the hesitance and the following independent variables (as defined by the column “Group Name”) will be studied initially nationally (as defined by the column “Geography”), but any geographical disparities may be highlighted on a case by case basis:</p>
+<p>Demographics • Gender • Age • Race<br>
+• Age &amp; race • Sexual orientation • Gender identity • Rural/urban • Birth • Interview language • Poverty • Insurance • SVI • Political leaning</p>
+<p>Health condition • Previous vaccination status • Comorbidity • Disability • Pregnancy • Past covid-19 contraction • Reaction to previous dose of vaccine</p>
+<p>“Thinking &amp; feeling” • Concern about getting disease • Vaccine safety concerns • “Importance” of vaccine</p>
+<p>Social pressure • Recommended by healthcare providers • Family &amp; friends’ vaccination status • Employer vaccine mandate</p>
+<p>Logistics • Difficulty in accessing vaccine (general “difficulty”, distance to site, convenience, uncertainty about eligibility, cost, difficulty in getting an appointment)</p>
+<p>Time window We would also like to study changes in hesitance at particular points in time and changes over a large period of time (2 years, from Apr/May 2021 to Jun 2023). As such, we we will use the Time Period field as another variable for this analysis. While the data is broken down between weekly and monthly samples, we will be focusing on monthly data for our study. This is because we do not expect significant changes in hesitance on a weekly basis, and attempting to compare weekly data could be subject to sampling error due to the random-dialed study design.</p>
+</section>
+<section id="approach" class="level3" data-number="2.2.2">
+<h3 data-number="2.2.2" class="anchored" data-anchor-id="approach"><span class="header-section-number">2.2.2</span> Approach:</h3>
+<p>Our analysis approach can be broken down into the following key activities:</p>
+<p>####Part 1: Study which segments of the population exhibited greatest covid vaccine hesitancy following the deployment of mass vaccinations in the US in early 2021.</p>
+<p>This process will consist of the following steps:</p>
+<ul>
+<li><p>Writing R-code to auto rank every possible segment’s hesitance by statistical significance (i.e.&nbsp;using p-values and test-statistics from Chi-sq tests) at a point in time specified below.</p></li>
+<li><p>Building visuals of the 10 segments with the strongest association to vaccine hesitance to draw additional insights. For this step, we are considering using the following graph types: (x / indpt vars are cat: y / dep vars are numerical (% or n stating “Probably or definitely will not get vaccinated”) o Bars / stacked bars o Mosaic plots o Spatial heatmaps</p></li>
+<li><p>The snapshot in time we will be using to measure associations will comprise the first three monthly periods of data available, where the average proportion of responses corresponding to vaccine hesitance was ~18%. To combine the three monthly periods, we will create a weighted average of the survey responses.</p></li>
+</ul>
+<p>We will visualize the hesitance graph over time to illustrate the rationale behind selecting the first three monthly periods of data due to its stability.</p>
+</section>
+<section id="import-libraries" class="level3" data-number="2.2.3">
+<h3 data-number="2.2.3" class="anchored" data-anchor-id="import-libraries"><span class="header-section-number">2.2.3</span> Import Libraries</h3>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("data.table")</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(data.table)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+<section id="import-dataset" class="level3" data-number="2.2.4">
+<h3 data-number="2.2.4" class="anchored" data-anchor-id="import-dataset"><span class="header-section-number">2.2.4</span> Import dataset</h3>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>covid <span class="ot">&lt;-</span> <span class="fu">fread</span>(<span class="st">"../covid_dataset/covid.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>vacc_intention_time <span class="ot">&lt;-</span> covid <span class="sc">|&gt;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="st">`</span><span class="at">Indicator Name</span><span class="st">`</span> <span class="sc">==</span> <span class="st">'Vaccination uptake and intention'</span>) <span class="sc">|&gt;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="st">`</span><span class="at">Indicator Category</span><span class="st">`</span> <span class="sc">==</span> <span class="st">'Probably or definitely will not get vaccinated'</span>) <span class="sc">|&gt;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="st">`</span><span class="at">Group Name</span><span class="st">`</span> <span class="sc">==</span> <span class="st">'All adults 18+'</span>) <span class="sc">|&gt;</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="st">`</span><span class="at">Time Type</span><span class="st">`</span> <span class="sc">==</span> <span class="st">'Monthly'</span>) <span class="sc">|&gt;</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Geography <span class="sc">==</span> <span class="st">'National'</span>) <span class="sc">|&gt;</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="st">`</span><span class="at">Geography Type</span><span class="st">`</span>, Geography, <span class="st">`</span><span class="at">Time Period</span><span class="st">`</span>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>vacc_intention_time <span class="ot">&lt;-</span> vacc_intention_time <span class="sc">|&gt;</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">month_split =</span> <span class="fu">paste0</span>(<span class="fu">str_split</span>(<span class="st">`</span><span class="at">Time Period</span><span class="st">`</span>, <span class="st">"-"</span>,</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>                                        <span class="at">simplify =</span> <span class="cn">TRUE</span>)[, <span class="dv">2</span>],</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>         <span class="st">", "</span>, Year))</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>vacc_intention_time <span class="ot">&lt;-</span> vacc_intention_time <span class="sc">|&gt;</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">month =</span> <span class="fu">mdy</span>(month_split))</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(vacc_intention_time, <span class="fu">aes</span>(<span class="at">x =</span> month, <span class="at">y =</span> <span class="st">`</span><span class="at">Estimate (%)</span><span class="st">`</span>,</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>                                <span class="at">color =</span> <span class="st">`</span><span class="at">Indicator Category</span><span class="st">`</span>)) <span class="sc">+</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"U.S. Vaccination Response Rates Over Time"</span>,</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Month"</span>,</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Response Rate (%)"</span>) <span class="sc">+</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>) <span class="sc">+</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">color =</span> <span class="fu">guide_legend</span>(<span class="at">title =</span> <span class="st">"Indicator Category:"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="data_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>####Part 2: Analyse which segments showed the greatest reduction in covid vaccine hesitancy between 2021 and 2023 We will analyse which segments showed the greatest reduction in COVID vaccine hesitancy between 2021 and 2023. To perform this step, we will leverage several visuals that can provide insights into trends of hesitancy over time: - Cleveland dot plot - plot or annual snapshot of change in variable(s) of interest over time - Geographic heatmap (colours = changes) - Bar chart</p>
+<p>####Part 3: Based on the findings above, we will propose high-level recommendations for segments of the population that need further public health interventions.</p>
+</section>
+</section>
+<section id="missing-value-analysis" class="level2" data-number="2.3">
+<h2 data-number="2.3" class="anchored" data-anchor-id="missing-value-analysis"><span class="header-section-number">2.3</span> 2.3 Missing value analysis</h2>
+<section id="describe-any-patterns-you-discover-in-missing-values.-if-no-values-are-missing-graphs-should-still-be-included-showing-that.-suggested-2-graphs-plus-commentary" class="level3" data-number="2.3.1">
+<h3 data-number="2.3.1" class="anchored" data-anchor-id="describe-any-patterns-you-discover-in-missing-values.-if-no-values-are-missing-graphs-should-still-be-included-showing-that.-suggested-2-graphs-plus-commentary"><span class="header-section-number">2.3.1</span> Describe any patterns you discover in missing values. If no values are missing, graphs should still be included showing that. (suggested: 2 graphs plus commentary)</h3>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>missing_vals_matrix <span class="ot">&lt;-</span> <span class="fu">is.na</span>(<span class="fu">as.data.frame</span>(covid))</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>missing_col_count <span class="ot">&lt;-</span> <span class="fu">colSums</span>(missing_vals_matrix)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a data frame with column names and NA counts</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>missing_vals_count_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">Column =</span> <span class="fu">names</span>(missing_col_count),</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>                     <span class="at">NA_Count =</span> missing_col_count)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co"># All NAs are in the Estimate % column</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(missing_vals_count_df,</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x =</span> NA_Count, <span class="at">y =</span> <span class="fu">reorder</span>(Column, NA_Count))) <span class="sc">+</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">fill =</span> <span class="st">"cornflowerblue"</span>) <span class="sc">+</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Missing Values by Column"</span>,</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Count of NAs"</span>,</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Dataset Attributes"</span>) <span class="sc">+</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="data_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="672"></p>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">#To understand the NAs further, we made 3 observations which strongly indicates NA are in fact zero:</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">#Observation 1: All NAs have a valid 95% confidence interval of between 0-0 to 0-0.3.</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>covid <span class="sc">|&gt;</span>  <span class="fu">filter</span>(<span class="fu">is.na</span>(<span class="st">`</span><span class="at">Estimate (%)</span><span class="st">`</span>)) <span class="sc">|&gt;</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="st">`</span><span class="at">95% CI (%)</span><span class="st">`</span>)) <span class="sc">+</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="fu">aes</span>(<span class="at">y =</span> (..count..)<span class="sc">/</span><span class="fu">sum</span>(..count..))) <span class="sc">+</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"CI of NA values"</span>,</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"95% CI of NA values"</span>,</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"% of NA"</span>) <span class="sc">+</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">0</span>, <span class="at">vjust =</span> <span class="fl">0.5</span>, <span class="at">hjust=</span><span class="fl">0.5</span>))<span class="sc">+</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">labels =</span> scales<span class="sc">::</span>percent)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="data_files/figure-html/unnamed-chunk-4-2.png" class="img-fluid" width="672"></p>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Observation 2: Estimate (%) is rounded to 1dp, and the lowest possible non-NA value is 0.1</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>covid <span class="sc">|&gt;</span> <span class="fu">group_by</span>(<span class="st">`</span><span class="at">Estimate (%)</span><span class="st">`</span>) <span class="sc">|&gt;</span>  <span class="fu">summarize</span>(<span class="at">count =</span> <span class="fu">n</span>())  <span class="sc">|&gt;</span> <span class="fu">filter</span>(<span class="st">`</span><span class="at">Estimate (%)</span><span class="st">`</span><span class="sc">&lt;=</span><span class="fl">0.2</span> <span class="sc">|</span> <span class="fu">is.na</span>(<span class="st">`</span><span class="at">Estimate (%)</span><span class="st">`</span>)) <span class="sc">|&gt;</span> <span class="fu">arrange</span>(<span class="fu">desc</span>(<span class="st">`</span><span class="at">Estimate (%)</span><span class="st">`</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 2
+  `Estimate (%)` count
+           &lt;dbl&gt; &lt;int&gt;
+1            0.2 25242
+2            0.1 30264
+3           NA   31788</code></pre>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Observation 3: Sense checks on subsets of the data where NAs are present are coherent, with a valid sample size, and the non-NA Estimate (%) summing up to 100</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>NA_is_zero_proof1 <span class="ot">&lt;-</span> covid <span class="sc">|&gt;</span> <span class="fu">filter</span>(Geography<span class="sc">==</span><span class="st">"Wisconsin"</span>,<span class="st">`</span><span class="at">Time Period</span><span class="st">`</span> <span class="sc">==</span> <span class="st">"April 22 - May 29"</span>,Year<span class="sc">==</span><span class="dv">2021</span>,<span class="st">`</span><span class="at">Group Name</span><span class="st">`</span><span class="sc">==</span><span class="st">"Age"</span>,<span class="st">`</span><span class="at">Indicator Name</span><span class="st">`</span> <span class="sc">==</span> <span class="st">"Vaccination uptake and intention"</span>, <span class="st">`</span><span class="at">Group Category</span><span class="st">`</span> <span class="sc">==</span> <span class="st">"65+ years"</span>) <span class="sc">|&gt;</span> <span class="fu">select</span>(<span class="st">`</span><span class="at">Group Category</span><span class="st">`</span>,<span class="st">`</span><span class="at">Indicator Category</span><span class="st">`</span>,<span class="st">`</span><span class="at">Estimate (%)</span><span class="st">`</span>, <span class="st">`</span><span class="at">Sample Size</span><span class="st">`</span>,<span class="st">`</span><span class="at">95% CI (%)</span><span class="st">`</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>covid_clean <span class="ot">&lt;-</span> covid</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co">#Therefore, we will impute NAs as zeros</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>covid_clean[<span class="fu">is.na</span>(covid_clean)] <span class="ot">=</span> <span class="dv">0</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co">#Check: This does remove all NAs</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="fu">colSums</span>(<span class="fu">is.na</span>(covid_clean))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>    Geography Type          Geography         Group Name     Group Category 
+                 0                  0                  0                  0 
+    Indicator Name Indicator Category        Time Period               Year 
+                 0                  0                  0                  0 
+         Time Type       Estimate (%)         95% CI (%)        Sample Size 
+                 0                  0                  0                  0 
+  Suppression Flag 
+                 0 </code></pre>
+</div>
+</div>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->

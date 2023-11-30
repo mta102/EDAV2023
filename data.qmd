@@ -8,8 +8,6 @@ The data source which we will use for our study is the CDC’s National Immuniza
 ### How the data are collected and by whom:
 The data was collected by the CDC through a series of telephone interviews conducted between April 2021 and June 2023 (latest sample available). Each week, the CDC surveyed between 7,500 to 20,000 US adults aged 18 years and above using a random-digit-dialed sample of cell telephone numbers. These samples were stratified by state, the District of Columbia, and five local jurisdictions (Bexar County, TX; Chicago, IL; Houston, TX; New York City, NY; and Philadelphia County, PA). During some survey periods, Guam, the US Virgin Islands, and Puerto Rico were included as well.
 
-The CDC estimated the weighted proportion of the sampled individuals giving a particular response in the survey, where the weighting attempts to correct any imbalances or biases in the sample that might arise due to the survey design or data collection methods.
-
 To correct any imbalances or biases in the sample that might arise due to the survey design or data collection methods, the CDC applied weights to the proportion of the sampled individuals giving a particular response in the survey.
 
 
@@ -67,74 +65,7 @@ Through data exploration and reviews of the data source documentation, we identi
 
 
 ### Explain in detail how your data will enable you to answer your research questions from the introduction. 
-The chosen dataset provides a number of interesting factors to be examined in the context of vaccine hesitance.
-
-The research questions can be divided into 3 parts:
-
-Part 1: Study which segments of the population exhibited greatest covid vaccine hesitancy following the deployment of mass vaccinations in the US in early 2021. 
-#---#
-
-Below, we have outlined the fields we plan to leverage in order to explore potential relationships between our dependent variable - vaccine hesitance response rates - and various independent variables such as geography, age, and ethnicity.
-
-Time Window:
-The beginning of the dataset where vaccine hesitance was stable: [Karl to add]
-
-
-### Import Libraries
-```{r}
-
-# install.packages("data.table")
-# install.packages("mi")
-
-library(tidyverse)
-library(data.table)
-library(lubridate)
-library(mi)
-
-```
-
-
-### Import dataset
-```{r}
-
-covid <- fread("National_Immunization_Survey_Adult_COVID_Module__NIS-ACM___COVIDVaxViews__Data___Centers_for_Disease_Control_and_Prevention__cdc.gov_.csv")
-
-covid <- fread("c:/temp/covid.csv")
-
-```
-
-
-
-```{r}
-
-vacc_intention_time <- covid |>
-  filter(`Indicator Name` == 'Vaccination uptake and intention') |>
-  filter(`Indicator Category` == 'Probably or definitely will not get vaccinated') |>
-  filter(`Group Name` == 'All adults 18+') |>
-  filter(`Time Type` == 'Monthly') |>
-  filter(Geography == 'National') |>
-  arrange(`Geography Type`, Geography, `Time Period`)
-
-
-vacc_intention_time <- vacc_intention_time |>
-  mutate(month_split = paste0(str_split(`Time Period`, "-",
-                                        simplify = TRUE)[, 2],
-         ", ", Year))
-
-vacc_intention_time <- vacc_intention_time |>
-  mutate(month = mdy(month_split))
-
-
-ggplot(vacc_intention_time, aes(x = month, y = `Estimate (%)`,
-                                color = `Indicator Category`)) +
-  geom_line() +
-  labs(title = "U.S. Vaccination Response Rates Over Time",
-       x = "Month",
-       y = "Response Rate (%)") +
-  theme(legend.position = "bottom") +
-  guides(color = guide_legend(title = "Indicator Category:"))
-
-```
+The dataset chosen provides a number of interesting factors to be examined in the context of vaccine hesitance. Below, we have outlined the fields we plan to leverage in order to explore potential relationships between our dependent variable - vaccine hesitance response rates - and various independent variables such as geography, age, and ethnicity.
 
 Dependent Variable(s)
 
@@ -153,10 +84,7 @@ Where applicable, we can combine the dependent variables above into the followin
 
 Independent variables
 
-The correlation between the hesitance and the following independent variables (segments of the samples) will be studied:
-
-Geography = National
-Group Name = Each segment, as defined below:
+The correlation between the hesitance and the following independent variables (as defined by the column "Group Name") will be studied initially nationally (as defined by the column "Geography"), but any geographical disparities may be highlighted on a case by case basis:
 
 Demographics
 •	Gender 
@@ -194,25 +122,19 @@ Social pressure
 Logistics
 •	Difficulty in accessing vaccine (general “difficulty”, distance to site, convenience, uncertainty about eligibility, cost, difficulty in getting an appointment) 
 
-Part 2: Analyse which segments showed the greatest reduction in covid vaccine hesitancy between 2021 and 2023
-#---#
 
-In addition to looking at participant demographics as independent variables, we would also like to study changes in hesitance at particular points in time and changes over a large period of time (2 years, from Apr/May 2021 to Jun 2023). As such, we will use the Time Period field as another variable for this analysis. While the data is broken down between weekly and monthly samples, we will be focusing on monthly data for our study. This is because we do not expect significant changes in hesitance on a weekly basis, and attempting to compare weekly data could be subject to sampling error due to the random-dialed study design.
+Time window
+We would also like to study changes in hesitance at particular points in time and changes over a large period of time (2 years, from Apr/May 2021 to Jun 2023). As such, we we will use the Time Period field as another variable for this analysis. While the data is broken down between weekly and monthly samples, we will be focusing on monthly data for our study. This is because we do not expect significant changes in hesitance on a weekly basis, and attempting to compare weekly data could be subject to sampling error due to the random-dialed study design.
 
-Part 3: Propose high-level recommendations for segments of the population that need further public health interventions 
-#---#
-
-We will draw this conclusion based on which segments of the populated showed the least change in covid vaccine hesitancy between 2021 and 2023.
 
 ### Approach:
 Our analysis approach can be broken down into the following key activities:
 
-Part 1: Study which segments of the population exhibited greatest covid vaccine hesitancy following the deployment of mass vaccinations in the US in early 2021. 
-#---#
+####Part 1: Study which segments of the population exhibited greatest covid vaccine hesitancy following the deployment of mass vaccinations in the US in early 2021. 
 
 This process will consist of the following steps:
 
--	Writing R-code to auto rank every possible segment’s hesitance by statistical significance at a given point in time (i.e. using p-values and test-statistics from Chi-sq tests).
+-	Writing R-code to auto rank every possible segment’s hesitance by statistical significance (i.e. using p-values and test-statistics from Chi-sq tests) at a point in time specified below.
 
 -	Building visuals of the 10 segments with the strongest association to vaccine hesitance to draw additional insights. For this step, we are considering using the following graph types: (x / indpt vars are cat: y / dep vars are numerical (% or n stating “Probably or definitely will not get vaccinated”)
 o	Bars / stacked bars
@@ -220,31 +142,79 @@ o	Mosaic plots
 o	Spatial heatmaps
 
 
-- The snapshot in time we will be using to measure associations will comprise the first three monthly periods of data available, where the average proportion of responses corresponding to vaccine hesitance was ~18%. To combine the three monthly periods, we will create a weighted average of the survey responses. 
+- The snapshot in time we will be using to measure associations will comprise the first three monthly periods of data available, where the average proportion of responses corresponding to vaccine hesitance was ~18%. To combine the three monthly periods, we will create a weighted average of the survey responses.
 
-Part 2: Analyse which segments showed the greatest reduction in covid vaccine hesitancy between 2021 and 2023
-#---#
-Our next step will be to analyse which segments showed the greatest reduction in COVID vaccine hesitancy between 2021 and 2023. To perform this step, we will leverage several visuals that can provide insights into trends of hesitancy over time:
+We will visualize the hesitance graph over time to illustrate the rationale behind selecting the first three monthly periods of data due to its stability.
+
+
+### Import Libraries
+```{r message=FALSE, warning = FALSE}
+
+# install.packages("data.table")
+library(tidyverse)
+library(data.table)
+library(lubridate)
+
+```
+
+
+### Import dataset
+```{r message=FALSE, warning = FALSE}
+
+covid <- fread("../covid_dataset/covid.csv")
+
+```
+
+
+
+```{r message=FALSE, warning = FALSE}
+
+vacc_intention_time <- covid |>
+  filter(`Indicator Name` == 'Vaccination uptake and intention') |>
+  filter(`Indicator Category` == 'Probably or definitely will not get vaccinated') |>
+  filter(`Group Name` == 'All adults 18+') |>
+  filter(`Time Type` == 'Monthly') |>
+  filter(Geography == 'National') |>
+  arrange(`Geography Type`, Geography, `Time Period`)
+
+
+vacc_intention_time <- vacc_intention_time |>
+  mutate(month_split = paste0(str_split(`Time Period`, "-",
+                                        simplify = TRUE)[, 2],
+         ", ", Year))
+
+vacc_intention_time <- vacc_intention_time |>
+  mutate(month = mdy(month_split))
+
+
+ggplot(vacc_intention_time, aes(x = month, y = `Estimate (%)`,
+                                color = `Indicator Category`)) +
+  geom_line() +
+  labs(title = "U.S. Vaccination Response Rates Over Time",
+       x = "Month",
+       y = "Response Rate (%)") +
+  theme(legend.position = "bottom") +
+  guides(color = guide_legend(title = "Indicator Category:"))
+
+```
+
+
+
+####Part 2: Analyse which segments showed the greatest reduction in covid vaccine hesitancy between 2021 and 2023
+We will analyse which segments showed the greatest reduction in COVID vaccine hesitancy between 2021 and 2023. To perform this step, we will leverage several visuals that can provide insights into trends of hesitancy over time:
 - Cleveland dot plot - plot or annual snapshot of change in variable(s) of interest over time
 - Geographic heatmap (colours = changes)
 - Bar chart
 
-Part 3: Propose high-level recommendations for segments of the population that need further public health interventions 
-Based on our findings, our last step in our analysis approach will be to propose high-level recommendations for segments of the population that need further public health interventions.
+####Part 3: Based on the findings above, we will propose high-level recommendations for segments of the population that need further public health interventions.
+
 
 
 ## 2.3 Missing value analysis
 
 ### Describe any patterns you discover in missing values. If no values are missing, graphs should still be included showing that. (suggested: 2 graphs plus commentary)
 
-Need to identify pattern of ~31.8k NA in Estimate(%). Clues:
--	Suppression flag
--	Small sample size / Wide 95% CI
-o	Draw 2 histograms of sample size for NA/non-NA
--	Other patterns?
-
-
-```{r}
+```{r message=FALSE, warning = FALSE}
 
 missing_vals_matrix <- is.na(as.data.frame(covid))
 
