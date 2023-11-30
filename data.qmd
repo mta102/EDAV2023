@@ -130,7 +130,7 @@ We would also like to study changes in hesitance at particular points in time an
 ### Approach:
 Our analysis approach can be broken down into the following key activities:
 
-####Part 1: Study which segments of the population exhibited greatest covid vaccine hesitancy following the deployment of mass vaccinations in the US in early 2021. 
+#### Part 1: Study which segments of the population exhibited greatest covid vaccine hesitancy following the deployment of mass vaccinations in the US in early 2021. 
 
 This process will consist of the following steps:
 
@@ -141,13 +141,11 @@ o	Bars / stacked bars
 o	Mosaic plots
 o	Spatial heatmaps
 
+- The snapshot in time we will be using to measure associations will comprise of the first three monthly periods of data available, where the average proportion of responses corresponding to vaccine hesitance was ~18%. To combine the three monthly periods, we will create a weighted average of the survey responses. For instance, if vaccine hesitance rates for a particular group were 20 out 100 (20%) in month 1, 20/150 (13%) in month 2, and 10/90 (11%) in month 3, the weighted average hesitance rate for that group would be 50/340 (14.7%).
 
-- The snapshot in time we will be using to measure associations will comprise the first three monthly periods of data available, where the average proportion of responses corresponding to vaccine hesitance was ~18%. To combine the three monthly periods, we will create a weighted average of the survey responses.
+The rationale for choosing the first three monthly periods of data is due to the prevalence and relative stability of hesitance during that time frame. Below, we will visualize vaccine hesitance over time to illustrate this.
 
-We will visualize the hesitance graph over time to illustrate the rationale behind selecting the first three monthly periods of data due to its stability.
-
-
-### Import Libraries
+##### Import Libraries
 ```{r message=FALSE, warning = FALSE}
 
 # install.packages("data.table")
@@ -158,17 +156,22 @@ library(lubridate)
 ```
 
 
-### Import dataset
+##### Import dataset
 ```{r message=FALSE, warning = FALSE}
 
+# Load dataset
 covid <- fread("../covid_dataset/covid.csv")
 
 ```
 
 
-
+##### Plot vaccine hesitance over time
 ```{r message=FALSE, warning = FALSE}
 
+# Filter for the vaccination uptake and intent indicator
+# Filter for responses corresponding to vaccine hesitancy
+# Include all adults 18+
+# Set time period to monthly (excluding weekly samples) and filter for nationwide samples
 vacc_intention_time <- covid |>
   filter(`Indicator Name` == 'Vaccination uptake and intention') |>
   filter(`Indicator Category` == 'Probably or definitely will not get vaccinated') |>
@@ -177,16 +180,14 @@ vacc_intention_time <- covid |>
   filter(Geography == 'National') |>
   arrange(`Geography Type`, Geography, `Time Period`)
 
-
+# Derive month of data collection
 vacc_intention_time <- vacc_intention_time |>
   mutate(month_split = paste0(str_split(`Time Period`, "-",
                                         simplify = TRUE)[, 2],
-         ", ", Year))
+         ", ", Year),
+         month = mdy(month_split))
 
-vacc_intention_time <- vacc_intention_time |>
-  mutate(month = mdy(month_split))
-
-
+# Plot hesitancy over time
 ggplot(vacc_intention_time, aes(x = month, y = `Estimate (%)`,
                                 color = `Indicator Category`)) +
   geom_line() +
@@ -200,13 +201,13 @@ ggplot(vacc_intention_time, aes(x = month, y = `Estimate (%)`,
 
 
 
-####Part 2: Analyse which segments showed the greatest reduction in covid vaccine hesitancy between 2021 and 2023
+#### Part 2: Analyze which segments showed the greatest reduction in covid vaccine hesitancy between 2021 and 2023
 We will analyse which segments showed the greatest reduction in COVID vaccine hesitancy between 2021 and 2023. To perform this step, we will leverage several visuals that can provide insights into trends of hesitancy over time:
 - Cleveland dot plot - plot or annual snapshot of change in variable(s) of interest over time
 - Geographic heatmap (colours = changes)
 - Bar chart
 
-####Part 3: Based on the findings above, we will propose high-level recommendations for segments of the population that need further public health interventions.
+#### Part 3: Based on the findings above, we will propose high-level recommendations for segments of the population that need further public health interventions.
 
 
 
@@ -216,15 +217,18 @@ We will analyse which segments showed the greatest reduction in COVID vaccine he
 
 ```{r message=FALSE, warning = FALSE}
 
+# Flag whether a data point is NA
 missing_vals_matrix <- is.na(as.data.frame(covid))
 
+# Count NAs per column
 missing_col_count <- colSums(missing_vals_matrix)
 
 # Create a data frame with column names and NA counts
 missing_vals_count_df <- data.frame(Column = names(missing_col_count),
                      NA_Count = missing_col_count)
 
-# All NAs are in the Estimate % column
+# Plot NA counts per column
+# All NAs are in the Estimate (%) column
 ggplot(missing_vals_count_df,
        aes(x = NA_Count, y = reorder(Column, NA_Count))) +
   geom_bar(stat = "identity", fill = "cornflowerblue") +
@@ -234,32 +238,48 @@ ggplot(missing_vals_count_df,
   theme_bw()
 
 
-#To understand the NAs further, we made 3 observations which strongly indicates NA are in fact zero:
-#Observation 1: All NAs have a valid 95% confidence interval of between 0-0 to 0-0.3.
+# To understand the NAs further, we made 3 observations which strongly indicates NA are in fact zero:
 
-covid |>  filter(is.na(`Estimate (%)`)) |> ggplot(aes(x = `95% CI (%)`)) +
-  geom_bar(aes(y = (..count..)/sum(..count..))) +
-  labs(title = "CI of NA values",
-       x = "95% CI of NA values",
-       y = "% of NA") +
+# Observation 1: All NAs have a valid 95% confidence interval of between 0-0 to 0-0.3.
+
+covid |> filter(is.na(`Estimate (%)`)) |>
+  ggplot(aes(x = `95% CI (%)`)) +
+  geom_bar(aes(y = (..count..)/sum(..count..)), color = "black", fill = "orange") +
+  labs(title = "Confidence Intervals (CI) for NA Values",
+       x = "95% CI for NA Values",
+       y = "Proportion of Total NA Values") +
   theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust=0.5))+
   scale_y_continuous(labels = scales::percent)
 
-#Observation 2: Estimate (%) is rounded to 1dp, and the lowest possible non-NA value is 0.1
+# Observation 2: Estimate (%) is rounded to 1 decimal point, and the lowest possible non-NA value is 0.1
 covid |> group_by(`Estimate (%)`) |>  summarize(count = n())  |> filter(`Estimate (%)`<=0.2 | is.na(`Estimate (%)`)) |> arrange(desc(`Estimate (%)`))
 
-#Observation 3: Sense checks on subsets of the data where NAs are present are coherent, with a valid sample size, and the non-NA Estimate (%) summing up to 100
-NA_is_zero_proof1 <- covid |> filter(Geography=="Wisconsin",`Time Period` == "April 22 - May 29",Year==2021,`Group Name`=="Age",`Indicator Name` == "Vaccination uptake and intention", `Group Category` == "65+ years") |> select(`Group Category`,`Indicator Category`,`Estimate (%)`, `Sample Size`,`95% CI (%)`)
+# Observation 3: Sense checks on subsets of the data where NAs are present are coherent, with a valid sample size, and the non-NA Estimate (%) summing up to 100
+NA_is_zero_proof1 <- covid |>
+  filter(Geography=="Wisconsin", `Time Period` == "April 22 - May 29",
+         Year==2021, `Group Name`=="Age",
+         `Indicator Name` == "Vaccination uptake and intention",
+         `Group Category` == "65+ years") |>
+  select(`Group Category`,`Indicator Category`,`Estimate (%)`,
+         `Sample Size`,`95% CI (%)`)
 
-covid_clean <- covid
 
-#Therefore, we will impute NAs as zeros
-covid_clean[is.na(covid_clean)] = 0
+# Therefore, we will impute NAs as zeros 
+covid[is.na(covid)] = 0
 
-#Check: This does remove all NAs
-colSums(is.na(covid_clean))
-
+# Check: This does remove all NAs
+colSums(is.na(covid))
 
 ```
 
+Our exploration of NAs in the dataset revealed the following findings:
 
+- NAs are isolated to the Estimated (%) column in our dataset.
+
+- The pattern of NAs across various response rate confidence intervals suggests that these NAs should correspond to a response rate of 0%.
+
+- This is further supported by another finding: there are 0 rows in the entire dataset showing a true 0% response rate. The lowest values that can be seen are 0.1%.
+
+- Moreover, within each group and indicator containing at least one NA, the sum of response rates across the non-NA values adds up to 100%.
+
+Based on the findings above, we can safely conclude that the NAs in our dataset represent true 0% response rates. As such, we will impute NAs with 0s for our analysis purposes.
