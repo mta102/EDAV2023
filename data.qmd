@@ -71,9 +71,13 @@ Dependent Variable(s)
 
 The data contains the following dependent variables of interest to our study, which can be identified by filtering our starting-point table for Indicator Name = “Vaccine uptake and intention”:
 -	Estimate (%) (i.e., response rate) for Indicator Category = “Probably or definitely will not get vaccinated”
+
 -	Estimate (%) for Indicator Category = “Probably will not get vaccinated or unsure”
+
 -	Estimate (%) for Indicator Category = “Definitely will get vaccinated”
+
 -	Estimate (%) for Indicator Category = “Vaccinated (>=1 dose)”
+
 
 Where applicable, we can combine the dependent variables above into the following two options:
 
@@ -86,37 +90,58 @@ Independent variables
 
 The correlation between the hesitance and the following independent variables (as defined by the column "Group Name") will be studied initially nationally (as defined by the column "Geography"), but any geographical disparities may be highlighted on a case by case basis:
 
-Demographics
-- Gender 
+Demographics:
+- Gender
+
 - Age
+
 - Race  
+
 - Age & race
+
 - Sexual orientation
+
 - Gender identity
+
 - Rural/urban
+
 - Birth
+
 - Interview language
+
 - Poverty
+
 - Insurance
-- SVI
+
+- Social vulnerability index (SVI)
+
 - Political leaning
 
 Health condition
 - Previous vaccination status
+
 - Comorbidity
+
 - Disability
+
 - Pregnancy
+
 - Past covid-19 contraction
+
 - Reaction to previous dose of vaccine
 
 "Thinking & feeling"
 - Concern about getting disease
+
 - Vaccine safety concerns
+
 - "Importance" of vaccine
 
 Social pressure
 - Recommended by healthcare providers
+
 - Family & friends' vaccination status
+
 - Employer vaccine mandate
 
 Logistics
