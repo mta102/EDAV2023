@@ -35,8 +35,8 @@ The data contains 5.08M rows x 13 columns.
 
 ### Other relevant information:
 The dataset includes the following additional information, which we will not be studying, as it does not directly address the question of vaccine hesitance:
-•	Vaccination coverage
-•	Bivalent booster update & intention
+- Vaccination coverage
+- Bivalent booster update & intention
 
 ### Potential issues/concerns with the data:
 Through data exploration and reviews of the data source documentation, we identified the following potential concerns:
@@ -87,40 +87,40 @@ Independent variables
 The correlation between the hesitance and the following independent variables (as defined by the column "Group Name") will be studied initially nationally (as defined by the column "Geography"), but any geographical disparities may be highlighted on a case by case basis:
 
 Demographics
-•	Gender 
-•	Age
-•	Race  
-•	Age & race
-•	Sexual orientation
-•	Gender identity
-•	Rural/urban
-•	Birth
-•	Interview language
-•	Poverty
-•	Insurance
-•	SVI
-•	Political leaning
+- Gender 
+- Age
+- Race  
+- Age & race
+- Sexual orientation
+- Gender identity
+- Rural/urban
+- Birth
+- Interview language
+- Poverty
+- Insurance
+- SVI
+- Political leaning
 
 Health condition
-•	Previous vaccination status
-•	Comorbidity
-•	Disability
-•	Pregnancy
-•	Past covid-19 contraction
-•	Reaction to previous dose of vaccine
+- Previous vaccination status
+- Comorbidity
+- Disability
+- Pregnancy
+- Past covid-19 contraction
+- Reaction to previous dose of vaccine
 
 "Thinking & feeling"
-•	Concern about getting disease
-•	Vaccine safety concerns
-•	"Importance" of vaccine
+- Concern about getting disease
+- Vaccine safety concerns
+- "Importance" of vaccine
 
 Social pressure
-•	Recommended by healthcare providers
-•	Family & friends' vaccination status
-•	Employer vaccine mandate
+- Recommended by healthcare providers
+- Family & friends' vaccination status
+- Employer vaccine mandate
 
 Logistics
-•	Difficulty in accessing vaccine (general “difficulty”, distance to site, convenience, uncertainty about eligibility, cost, difficulty in getting an appointment) 
+- Difficulty in accessing vaccine (general “difficulty”, distance to site, convenience, uncertainty about eligibility, cost, difficulty in getting an appointment) 
 
 
 Time window
@@ -137,9 +137,9 @@ This process will consist of the following steps:
 -	Writing R-code to auto rank every possible segment’s hesitance by statistical significance (i.e. using p-values and test-statistics from Chi-sq tests) at a point in time specified below.
 
 -	Building visuals of the 10 segments with the strongest association to vaccine hesitance to draw additional insights. For this step, we are considering using the following graph types: (x / indpt vars are cat: y / dep vars are numerical (% or n stating “Probably or definitely will not get vaccinated”)
-o	Bars / stacked bars
-o	Mosaic plots
-o	Spatial heatmaps
+- Bars / stacked bars
+- Mosaic plots
+- Spatial heatmaps
 
 - The snapshot in time we will be using to measure associations will comprise of the first three monthly periods of data available, where the average proportion of responses corresponding to vaccine hesitance was ~18%. To combine the three monthly periods, we will create a weighted average of the survey responses. For instance, if vaccine hesitance rates for a particular group were 20 out 100 (20%) in month 1, 20/150 (13%) in month 2, and 10/90 (11%) in month 3, the weighted average hesitance rate for that group would be 50/340 (14.7%).
 

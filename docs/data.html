@@ -250,7 +250,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="other-relevant-information" class="level3" data-number="2.1.6">
 <h3 data-number="2.1.6" class="anchored" data-anchor-id="other-relevant-information"><span class="header-section-number">2.1.6</span> Other relevant information:</h3>
-<p>The dataset includes the following additional information, which we will not be studying, as it does not directly address the question of vaccine hesitance: • Vaccination coverage • Bivalent booster update &amp; intention</p>
+<p>The dataset includes the following additional information, which we will not be studying, as it does not directly address the question of vaccine hesitance: - Vaccination coverage - Bivalent booster update &amp; intention</p>
 </section>
 <section id="potential-issuesconcerns-with-the-data" class="level3" data-number="2.1.7">
 <h3 data-number="2.1.7" class="anchored" data-anchor-id="potential-issuesconcerns-with-the-data"><span class="header-section-number">2.1.7</span> Potential issues/concerns with the data:</h3>
@@ -287,12 +287,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ul>
 <p>Independent variables</p>
 <p>The correlation between the hesitance and the following independent variables (as defined by the column “Group Name”) will be studied initially nationally (as defined by the column “Geography”), but any geographical disparities may be highlighted on a case by case basis:</p>
-<p>Demographics • Gender • Age • Race<br>
-• Age &amp; race • Sexual orientation • Gender identity • Rural/urban • Birth • Interview language • Poverty • Insurance • SVI • Political leaning</p>
-<p>Health condition • Previous vaccination status • Comorbidity • Disability • Pregnancy • Past covid-19 contraction • Reaction to previous dose of vaccine</p>
-<p>“Thinking &amp; feeling” • Concern about getting disease • Vaccine safety concerns • “Importance” of vaccine</p>
-<p>Social pressure • Recommended by healthcare providers • Family &amp; friends’ vaccination status • Employer vaccine mandate</p>
-<p>Logistics • Difficulty in accessing vaccine (general “difficulty”, distance to site, convenience, uncertainty about eligibility, cost, difficulty in getting an appointment)</p>
+<p>Demographics - Gender - Age - Race<br>
+- Age &amp; race - Sexual orientation - Gender identity - Rural/urban - Birth - Interview language - Poverty - Insurance - SVI - Political leaning</p>
+<p>Health condition - Previous vaccination status - Comorbidity - Disability - Pregnancy - Past covid-19 contraction - Reaction to previous dose of vaccine</p>
+<p>“Thinking &amp; feeling” - Concern about getting disease - Vaccine safety concerns - “Importance” of vaccine</p>
+<p>Social pressure - Recommended by healthcare providers - Family &amp; friends’ vaccination status - Employer vaccine mandate</p>
+<p>Logistics - Difficulty in accessing vaccine (general “difficulty”, distance to site, convenience, uncertainty about eligibility, cost, difficulty in getting an appointment)</p>
 <p>Time window We would also like to study changes in hesitance at particular points in time and changes over a large period of time (2 years, from Apr/May 2021 to Jun 2023). As such, we we will use the Time Period field as another variable for this analysis. While the data is broken down between weekly and monthly samples, we will be focusing on monthly data for our study. This is because we do not expect significant changes in hesitance on a weekly basis, and attempting to compare weekly data could be subject to sampling error due to the random-dialed study design.</p>
 </section>
 <section id="approach" class="level3" data-number="2.2.2">
@@ -303,7 +303,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>This process will consist of the following steps:</p>
 <ul>
 <li><p>Writing R-code to auto rank every possible segment’s hesitance by statistical significance (i.e.&nbsp;using p-values and test-statistics from Chi-sq tests) at a point in time specified below.</p></li>
-<li><p>Building visuals of the 10 segments with the strongest association to vaccine hesitance to draw additional insights. For this step, we are considering using the following graph types: (x / indpt vars are cat: y / dep vars are numerical (% or n stating “Probably or definitely will not get vaccinated”) o Bars / stacked bars o Mosaic plots o Spatial heatmaps</p></li>
+<li><p>Building visuals of the 10 segments with the strongest association to vaccine hesitance to draw additional insights. For this step, we are considering using the following graph types: (x / indpt vars are cat: y / dep vars are numerical (% or n stating “Probably or definitely will not get vaccinated”)</p></li>
+<li><p>Bars / stacked bars</p></li>
+<li><p>Mosaic plots</p></li>
+<li><p>Spatial heatmaps</p></li>
 <li><p>The snapshot in time we will be using to measure associations will comprise of the first three monthly periods of data available, where the average proportion of responses corresponding to vaccine hesitance was ~18%. To combine the three monthly periods, we will create a weighted average of the survey responses. For instance, if vaccine hesitance rates for a particular group were 20 out 100 (20%) in month 1, 20/150 (13%) in month 2, and 10/90 (11%) in month 3, the weighted average hesitance rate for that group would be 50/340 (14.7%).</p></li>
 </ul>
 <p>The rationale for choosing the first three monthly periods of data is due to the prevalence and relative stability of hesitance during that time frame. Below, we will visualize vaccine hesitance over time to illustrate this.</p>
