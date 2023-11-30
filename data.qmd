@@ -1,6 +1,6 @@
 # Data
 
-## 2.1 Technical Description 
+## Technical Description 
 
 ### Identify one or more data sources:
 The data source which we will use for our study is the CDC’s National Immunization Survey Adult COVID Module (NIS-ACM). It provides information on COVID-19 vaccination status and intent, segmented by geography, age, ethnicity, socio-economic status, and other characteristics. The data can be found at: https://www.cdc.gov/vaccines/imz-managers/coverage/covidvaxview/interactive/adults.html
@@ -61,7 +61,7 @@ Through data exploration and reviews of the data source documentation, we identi
 4. Once downloaded, import the dataset into RStudio for analysis. The function fread() from the data.table library is recommended to reduce load time.
 
 
-## 2.2 Research plan
+## Research plan
 
 
 ### Explain in detail how your data will enable you to answer your research questions from the introduction. 
@@ -236,7 +236,7 @@ We will analyse which segments showed the greatest reduction in COVID vaccine he
 
 
 
-## 2.3 Missing value analysis
+## Missing value analysis
 
 ### Describe any patterns you discover in missing values. If no values are missing, graphs should still be included showing that. (suggested: 2 graphs plus commentary)
 
