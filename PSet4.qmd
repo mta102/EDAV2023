@@ -4,109 +4,132 @@ server: shiny
 ---
 
 ```{r}
+installed.packages("data.table")
 library(tidyverse)
+library(data.table)
+library(vcd)
 ```
 
 ```{r}
-data = read.csv("covid.csv")
+#data = read.csv("covid.csv")
 
+covid <- fread("../covid_dataset/covid.csv")
+covid[is.na(covid)] = 0
 ```
 
 ```{r}
+#Functions
 
-#boxplot of sample size - conclusion - OK - weekly max ~21k (higher than spec but not sig out of line), monthly max ~90k
-
-data |> filter(Time.Type == "Weekly") |> 
-  ggplot(aes(Sample.Size)) +
-  geom_boxplot(outlier.colour="black", outlier.shape=16) +
-  ggtitle("boxplot") +
-  labs(x = "sample size") +
-  theme_bw() +
-  theme(plot.title = element_text(hjust = 0.5))
-```
-
-```{r}
-
-#missing data analysis
-
-data |> filter(Time.Type == "Weekly") |> mutate(missing_estimate = is.na(Estimate....)) |> 
-  ggplot(aes(x = Sample.Size)) +
-  geom_histogram(binwidth = 10) +
-  ggtitle("x") +
-  labs(x = "sample size", y = "freq") +
-  theme_bw() +
-  theme(plot.title = element_text(hjust = 0.5)) + 
-  facet_wrap(~missing_estimate,scales = "free_y")
+see_raw_data<-function(df,geography,time_period,year,group_name) {
+output = df |> filter(Geography == geography,`Indicator Name`=="Vaccination uptake and intention",`Time Period` == time_period,Year == year, `Group Name`==group_name) |> select(`Group Category`,`Indicator Category`,`Estimate (%)`,`Sample Size`)
+   return(output)
+}
 
 
+see_hesitance_summary<-function(df,geography,time_period,year,group_name,hesitant_group) {
+output = df |> filter(Geography == geography,`Indicator Name`=="Vaccination uptake and intention",`Time Period` == time_period,Year == year, `Group Name`==group_name)  |> mutate(hesitant = ifelse(`Indicator Category` %in% hesitant_group,1,0)) |> group_by(`Group Category`,hesitant) |> summarise(hesitance_rate = sum(`Estimate (%)`),sample_size = first(`Sample Size`)) |> mutate(n_hesitance = round(hesitance_rate/100 * sample_size,0)) |> filter(hesitant == 1) |> select(`Group Category`,hesitance_rate,n_hesitance,sample_size) 
+   return(output)
+}
+
+
+get_chi_sq<-function(df,geography,time_period,year,group_name,hesitant_group) {
+  
+  temp = df |> filter(Geography == geography,`Indicator Name`=="Vaccination uptake and intention", `Time Period` == time_period,Year == year, `Group Name`==group_name)  |> mutate(hesitant = ifelse(`Indicator Category` %in% hesitant_group,1,0)) |> group_by(`Group Category`,hesitant) |> summarise(hesitance_rate = sum(`Estimate (%)`),sample_size = first(`Sample Size`)) |> mutate(n_hesitance = round(hesitance_rate/100 * sample_size,0)) |> filter(hesitant == 1) |> select(`Group Category`,n_hesitance,sample_size) 
+  if (nrow(temp) > 0) {
+    expected_proportion = sum(temp$n_hesitance)/sum(temp$sample_size)
+
+  temp = temp |> mutate(expected = sample_size*expected_proportion)
+  
+  res = chisq.test(x=temp$n_hesitance,p=temp$expected/sum(temp$expected))
+   output<-list(round(res$statistic,digits = 0),res$p.value)
+    
+  }
+  else {
+    output<-list(0,0)
+    
+  }
+  
+  
+   return(output)
+}
 ```
 
 ```{r}
 
 #exploration
 
-see_raw_data<-function(geography,time_period,year,group_name) {
-output = data |> filter(Geography == geography,Indicator.Name=="Vaccination uptake and intention",Time.Period == time_period,Year == year, Group.Name==group_name) |> select(Group.Category,Indicator.Category,Estimate....,Sample.Size)
-   return(output)
-}
+
+temp = see_raw_data(covid, geography="National",time_period = "Apr 22 - May 1",year=2021,group_name="Sex")
+
+temp2 = see_hesitance_summary(covid, geography="National",time_period = "Apr 22 - May 1",year=2021,group_name="Age by race/ethnicity",hesitant_group = c("Probably or definitely will not get vaccinated")) 
+```
+
+```{r}
+# chi sq test - using original time periods
+
+#unique(covid$`Group Name`)
+group_name_toloop = c("Sex","Age","Race/Ethnicity (7 level)","Age by race/ethnicity","Sexual orientation","Gender identity","Metropolitan statistical area","Born in the U.S.", "Language of interview","Poverty status", "Insurance status","Social Vulnerability Index (SVI) of county of residence", "Political leaning of county of residence", "Received non-COVID-19 vaccine(s) in past two years", "Health condition associated with higher risk for COVID-19 (any)","Disability status (any)", "Pregnancy status (females age 18 – 49 years)", "Ever had COVID-19 disease (self-report)","Concern about getting COVID-19 disease", "Confidence in COVID-19 vaccine safety",  "Confidence that COVID-19 vaccine is important", "Healthcare provider recommended I get a COVID-19 vaccine",  "COVID-19 vaccination status of friends and family","Work or school requires COVID-19 vaccination" )
 
 
-see_hesitance_summary<-function(geography,time_period,year,group_name,hesitant_group) {
-output = data |> filter(Geography == geography,Indicator.Name=="Vaccination uptake and intention",Time.Period == time_period,Year == year, Group.Name==group_name)  |> mutate(hesitant = ifelse(Indicator.Category %in% hesitant_group,1,0)) |> group_by(Group.Category,hesitant) |> summarise(hesitance_rate = sum(Estimate....),sample_size = first(Sample.Size)) |> mutate(n_hesitance = round(hesitance_rate/100 * sample_size,0)) |> filter(hesitant == 1) |> select(Group.Category,hesitance_rate,n_hesitance,sample_size) 
-   return(output)
-}
-
-
-get_chi_sq<-function(geography,time_period,year,group_name,hesitant_group) {
-  
-  temp = data |> filter(Geography == geography,Indicator.Name=="Vaccination uptake and intention",Time.Period == time_period,Year == year, Group.Name==group_name)  |> mutate(hesitant = ifelse(Indicator.Category %in% hesitant_group,1,0)) |> group_by(Group.Category,hesitant) |> summarise(hesitance_rate = sum(Estimate....),sample_size = first(Sample.Size)) |> mutate(n_hesitance = round(hesitance_rate/100 * sample_size,0)) |> filter(hesitant == 1) |> select(Group.Category,n_hesitance,sample_size) 
-  
-  expected_proportion = sum(temp$n_hesitance)/sum(temp$sample_size)
-
-  temp = temp |> mutate(expected = sample_size*expected_proportion)
-  
-  res = chisq.test(x=temp$n_hesitance,p=temp$expected/sum(temp$expected))
-   output<-list(res$statistic,res$p.value)
-   return(output)
-}
-
-temp = see_raw_data(geography="National",time_period = "June 25 - June 30",year=2023,group_name="Age")
-
-
-# 
-temp2 = see_hesitance_summary(geography="National",time_period = "June 25 - June 30",year=2023,group_name="Age",hesitant_group = c("Probably or definitely will not get vaccinated"))
-
-unique(data$Group.Name)
-
-group_name_toloop = c("Sex","Age","Race/Ethnicity (7 level)")
+#group_name_toloop = c("Sex","Age","Race/Ethnicity (7 level)")
 result_df <- data.frame(matrix(ncol = 3, nrow = 0))
 colnames(result_df) <- c("group_name", "X2_test_stat", "p_value")
 
 for (x in group_name_toloop) {
-  res = get_chi_sq(geography="National",time_period = "June 25 - June 30",year=2023,group_name=x,hesitant_group = c("Probably or definitely will not get vaccinated"))
+  res = get_chi_sq(covid, geography="National",time_period = "Apr 22 - May 1",year=2021,group_name=x,hesitant_group = c("Probably or definitely will not get vaccinated"))
   result_df[nrow(result_df) + 1,] = c(x,res[1],res[2])
 
 }
 result_df = arrange(result_df,desc(X2_test_stat))
 
+```
+
+```{r}
+# chi sq test - using 2021 first 3 monthly time periods
+periods_to_combine_2021 = c("April 22 - May 29","May 30 - June 26","June 27 - July 31")
+group_name_toloop = c("Sex","Age","Race/Ethnicity (7 level)","Age by race/ethnicity","Sexual orientation","Gender identity","Metropolitan statistical area","Born in the U.S.", "Language of interview","Poverty status", "Insurance status","Social Vulnerability Index (SVI) of county of residence", "Political leaning of county of residence", "Received non-COVID-19 vaccine(s) in past two years", "Health condition associated with higher risk for COVID-19 (any)","Disability status (any)", "Pregnancy status (females age 18 – 49 years)", "Ever had COVID-19 disease (self-report)","Concern about getting COVID-19 disease", "Confidence in COVID-19 vaccine safety",  "Confidence that COVID-19 vaccine is important", "Healthcare provider recommended I get a COVID-19 vaccine",  "COVID-19 vaccination status of friends and family","Work or school requires COVID-19 vaccination" )
+
+
+covid_2021_analysis = covid%>% filter(`Year` == 2021, `Time Period` %in% periods_to_combine_2021, `Group Name` %in% group_name_toloop, `Geography Type` %in% c("Jurisdictional Estimates","National Estimates"), `Indicator Category` == "Probably or definitely will not get vaccinated", !grepl("-",Geography)) %>% mutate(n_hesitant = round(`Estimate (%)`/100 * `Sample Size`,0)) %>% group_by(pick(c(1:6))) %>% summarise(`Sample Size` = sum(`Sample Size`), n_hesitant = sum(n_hesitant)) %>% filter(Geography == "National") %>% mutate(`Estimate (%)` = n_hesitant / `Sample Size` * 100, `Time Period` = "2021 analysis period",Year = 2021)
+
+result_df2 <- data.frame(matrix(ncol = 3, nrow = 0))
+colnames(result_df2) <- c("group_name", "X2_test_stat", "p_value")
+
+for (x in group_name_toloop) {
+  res = get_chi_sq(covid_2021_analysis,geography="National",time_period = "2021 analysis period",year=2021,group_name=x,hesitant_group = c("Probably or definitely will not get vaccinated"))
+  result_df2[nrow(result_df2) + 1,] = c(x,res[1],res[2])
+
+}
+result_df2 = arrange(result_df2,desc(X2_test_stat))
 
 
 ```
 
 ```{r}
 
-output = data |> filter(grepl("TX",Geography)|Geography=="Texas",Indicator.Category=="Unvaccinated",Time.Period == "April 22 - May 29",Year == 2021, Group.Name=="All adults 18+" ) |> select(Geography,Sample.Size)
+#mosaic plot function
+
+
+
+localnews <- data.frame(age = c("18-29", "30-49", "50-64", "65+"),
+                        followers = c(428, 2791, 4242, 4583),
+                        nonfollowers = c(2423, 7176, 6921, 6328)) |> 
+  mutate(total = followers + nonfollowers)
+
+tidylocal <- localnews |>
+  pivot_longer(cols = followers:nonfollowers, names_to = "group", values_to = "Freq") |> 
+  mutate(group = fct_relevel(group, "nonfollowers"))
+
+mosaic(group ~ age, direction = c("v", "h"), tidylocal,
+       highlighting_fill = c("grey80", "cornflowerblue"))
+
+
 
 ```
 
 ```{r}
-unique(data$Geography)
 
-
-
-
-
-
+#clevenat dot plot function
 
 
 
