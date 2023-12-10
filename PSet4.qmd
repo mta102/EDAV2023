@@ -106,11 +106,7 @@ result_df2 = arrange(result_df2,desc(X2_test_stat))
 ```
 
 ```{r}
-
-#mosaic plot function
-
-
-
+#mosaic example
 localnews <- data.frame(age = c("18-29", "30-49", "50-64", "65+"),
                         followers = c(428, 2791, 4242, 4583),
                         nonfollowers = c(2423, 7176, 6921, 6328)) |> 
@@ -122,14 +118,59 @@ tidylocal <- localnews |>
 
 mosaic(group ~ age, direction = c("v", "h"), tidylocal,
        highlighting_fill = c("grey80", "cornflowerblue"))
+```
 
+```{r}
 
+#mosaic plot function
+
+mosaic_2var <-function(df,indep_var_group_name,n_chars) {
+  
+  truncate_string <- function(x) {
+  str_sub(x, 1, n_chars)}
+
+indep_var_group_name_no_spaces = gsub("[()\\[/\\\\ ]", ".", indep_var_group_name)
+indep_var_group_name_no_spaces = truncate_string(indep_var_group_name_no_spaces)
+
+temp = df %>% ungroup %>% filter(`Group Name` == indep_var_group_name) %>% mutate(n_not_hesitant = `Sample Size` - n_hesitant) %>%  select(`Group Category`, n_hesitant, n_not_hesitant,`Sample Size`) %>%  rename(
+    !!indep_var_group_name_no_spaces := `Group Category`,hesitant = `n_hesitant`, `not hesitant` = n_not_hesitant) %>% 
+  pivot_longer(cols = hesitant:`not hesitant`,names_to = "group", values_to = "Freq" )
+
+temp[[indep_var_group_name_no_spaces]] =  substr(temp[[indep_var_group_name_no_spaces]], 1, n_chars)
+
+formula = as.formula(paste("group", "~", indep_var_group_name_no_spaces))
+
+mosaic(formula, direction = c("v", "h"), temp,
+       highlighting_fill = c("grey80", "cornflowerblue"),gp_varnames = gpar(fontsize = 10, fontface = 1), gp_labels = gpar(fontsize = 6))
+return(temp)
+}
+
+mosaic_2var(covid_2021_analysis,"Concern about getting COVID-19 disease",12)
 
 ```
 
 ```{r}
 
-#clevenat dot plot function
+#time series analysis
+#cleveland dot plot
+
+annual_monthly_snapshots = c("April 22 - May 29","May 1 - May 28","April 30 - May 27")
+
+snapshots = covid %>% filter(`Time Period` %in% annual_monthly_snapshots,`Group Name` %in% group_name_toloop,  ) %>% distinct(`Time Period`)
+
+
+
+
+ `Geography Type` %in% c("Jurisdictional Estimates","National Estimates"), `Indicator Category` == "Probably or definitely will not get vaccinated", !grepl("-",Geography)) 
+
+ggplot(counts2, aes(x = Age, y = Freq, color = Favorite)) +
+  geom_point(size = 3) +
+  coord_flip() +
+  scale_color_manual(values = icecreamcolors) +
+  theme_dotplot +
+  theme(legend.position = "bottom")
+
+
 
 
 
