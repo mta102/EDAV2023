@@ -55,6 +55,23 @@ get_chi_sq<-function(df,geography,time_period,year,group_name,hesitant_group) {
 ```
 
 ```{r}
+#shorten group names and group indicators
+
+group_name_shortening <- c(
+"Sex" = "Sex","Age" = "Age","Race/Ethnicity (7 level)" = "Race","Age by race/ethnicity" = "Age.Race","Sexual orientation" = "S.Orientation","Gender identity" = "G.Identity","Metropolitan statistical area" = "Rural.Urban","Born in the U.S." = "US.Born","Language of interview" = "Language","Poverty status" = "Pov.Status","Insurance status" = "Insurance","Social Vulnerability Index (SVI) of county of residence" = "SVI","Political leaning of county of residence" = "Political","Received non-COVID-19 vaccine(s) in past two years" = "Past.Vaccin","Health condition associated with higher risk for COVID-19 (any)" = "Comorbidity","Disability status (any)" = "Disability","Pregnancy status (females age 18 – 49 years)" = "Pregnancy","Ever had COVID-19 disease (self-report)" = "Past.Covid","Concern about getting COVID-19 disease" = "Covid.Concern","Confidence in COVID-19 vaccine safety" = "Vaccine.Confiden","Confidence that COVID-19 vaccine is important" = "Vaccine.Imprtnt","Healthcare provider recommended I get a COVID-19 vaccine" = "Dr.Recommend","COVID-19 vaccination status of friends and family" = "Fr.Fam.Vaccd","Work or school requires COVID-19 vaccination" = "Work.School"
+)
+
+group_cat_shortening = c("18 – 49 years" = "18 – 49","50 – 64 years" = "50 – 64","65+ years" = "65+","18 – 49 years, Black, non-Hispanic" = "18 – 49, Black","18 – 49 years, Hispanic" = "18 – 49, Hispanic","18 – 49 years, Other or multiple races, non-Hispanic" = "18 – 49, Other","18 – 49 years, White, non-Hispanic" = "18 – 49, White","50 – 64 years, Black, non-Hispanic" = "50 – 64, Black","50 – 64 years, Hispanic" = "50 – 64, Hispanic","50 – 64 years, Other or multiple races, non-Hispanic" = "50 – 64, Other","50 – 64 years, White, non-Hispanic" = "50 – 64, White","65+ years, Black, non-Hispanic" = "65+, Black","65+ years, Hispanic" = "65+, Hispanic","65+ years, Other or multiple races, non-Hispanic" = "65+, Other","65+ years, White, non-Hispanic" = "65+, White","Born in the U.S." = "US Born","Not born in the U.S." = "Not US Born","Many or almost all family or friends have received vaccine" = "Many","Some or no family or friends have been vaccinated" = "No_some","A little or not at all concerned" = "A little_not","Very or moderately concerned" = "Very_Moderately","Somewhat or not at all safe for me" = "Not at all_Somewhat","Very or completely safe for me" = "Very","A little or not at all important to protect me from COVID-19" = "A little_not at all","Somewhat or very important to protect me from COVID-19" = "Somewhat_very","No" = "No","Yes" = "Yes","Cisgender" = "Cisgender","Don't know/refused" = "Dont know","Transgender/Non-binary" = "TG/Non bin","Insured" = "Insured","Not insured" = "Not insured","English" = "English","Other" = "Other","Spanish" = "Spanish","Rural" = "Rural","Suburban" = "Suburban","Urban" = "Urban","Democrat-leaning" = "Democrat","Not Democrat-leaning or Republican-leaning" = "None","Republican-leaning" = "Republican","Above poverty, income <$75k" = "<$75k","Above poverty, income >=$75k" = ">=$75k","Below poverty" = "Below poverty","Unknown income" = "Unknown","Breastfeeding" = "Breastfeeding","Not pregnant, trying to get pregnant, or breastfeeding" = "Not pregnant","Pregnant" = "Pregnant","Trying to get pregnant" = "Trying to get pregnant","American Indian/Alaska Native, non-Hispanic" = "Native","Asian, non-Hispanic" = "Asian","Black, non-Hispanic" = "Black","Hispanic" = "Hispanic","Native Hawaiian/Pacific Islander, non-Hispanic" = "Pacific","Other or multiple races, non-Hispanic" = "Other","White, non-Hispanic" = "White","Female" = "Female","Male" = "Male","Gay/Lesbian/Bisexual/Other" = "LGB","Heterosexual/Straight" = "Hetero","High SVI" = "High","Low SVI" = "Low","Moderate SVI" = "Moderate","SVI unknown" = "Unknown","Not applicable/unemployed" = "Unemployed")
+
+group_name_toloop = c("Sex","Age","Race/Ethnicity (7 level)","Age by race/ethnicity","Sexual orientation","Gender identity","Metropolitan statistical area","Born in the U.S.", "Language of interview","Poverty status", "Insurance status","Social Vulnerability Index (SVI) of county of residence", "Political leaning of county of residence", "Received non-COVID-19 vaccine(s) in past two years", "Health condition associated with higher risk for COVID-19 (any)","Disability status (any)", "Pregnancy status (females age 18 – 49 years)", "Ever had COVID-19 disease (self-report)","Concern about getting COVID-19 disease", "Confidence in COVID-19 vaccine safety",  "Confidence that COVID-19 vaccine is important", "Healthcare provider recommended I get a COVID-19 vaccine",  "COVID-19 vaccination status of friends and family","Work or school requires COVID-19 vaccination" )
+
+group_name_toloop_short = lapply(group_name_toloop, function(x) ifelse(x %in% names(group_name_shortening), group_name_shortening[[x]], x))
+  
+
+
+```
+
+```{r}
 
 #exploration
 
@@ -68,7 +85,6 @@ temp2 = see_hesitance_summary(covid, geography="National",time_period = "Apr 22 
 # chi sq test - using original time periods
 
 #unique(covid$`Group Name`)
-group_name_toloop = c("Sex","Age","Race/Ethnicity (7 level)","Age by race/ethnicity","Sexual orientation","Gender identity","Metropolitan statistical area","Born in the U.S.", "Language of interview","Poverty status", "Insurance status","Social Vulnerability Index (SVI) of county of residence", "Political leaning of county of residence", "Received non-COVID-19 vaccine(s) in past two years", "Health condition associated with higher risk for COVID-19 (any)","Disability status (any)", "Pregnancy status (females age 18 – 49 years)", "Ever had COVID-19 disease (self-report)","Concern about getting COVID-19 disease", "Confidence in COVID-19 vaccine safety",  "Confidence that COVID-19 vaccine is important", "Healthcare provider recommended I get a COVID-19 vaccine",  "COVID-19 vaccination status of friends and family","Work or school requires COVID-19 vaccination" )
 
 
 #group_name_toloop = c("Sex","Age","Race/Ethnicity (7 level)")
@@ -87,15 +103,23 @@ result_df = arrange(result_df,desc(X2_test_stat))
 ```{r}
 # chi sq test - using 2021 first 3 monthly time periods
 periods_to_combine_2021 = c("April 22 - May 29","May 30 - June 26","June 27 - July 31")
-group_name_toloop = c("Sex","Age","Race/Ethnicity (7 level)","Age by race/ethnicity","Sexual orientation","Gender identity","Metropolitan statistical area","Born in the U.S.", "Language of interview","Poverty status", "Insurance status","Social Vulnerability Index (SVI) of county of residence", "Political leaning of county of residence", "Received non-COVID-19 vaccine(s) in past two years", "Health condition associated with higher risk for COVID-19 (any)","Disability status (any)", "Pregnancy status (females age 18 – 49 years)", "Ever had COVID-19 disease (self-report)","Concern about getting COVID-19 disease", "Confidence in COVID-19 vaccine safety",  "Confidence that COVID-19 vaccine is important", "Healthcare provider recommended I get a COVID-19 vaccine",  "COVID-19 vaccination status of friends and family","Work or school requires COVID-19 vaccination" )
 
 
 covid_2021_analysis = covid%>% filter(`Year` == 2021, `Time Period` %in% periods_to_combine_2021, `Group Name` %in% group_name_toloop, `Geography Type` %in% c("Jurisdictional Estimates","National Estimates"), `Indicator Category` == "Probably or definitely will not get vaccinated", !grepl("-",Geography)) %>% mutate(n_hesitant = round(`Estimate (%)`/100 * `Sample Size`,0)) %>% group_by(pick(c(1:6))) %>% summarise(`Sample Size` = sum(`Sample Size`), n_hesitant = sum(n_hesitant)) %>% filter(Geography == "National") %>% mutate(`Estimate (%)` = n_hesitant / `Sample Size` * 100, `Time Period` = "2021 analysis period",Year = 2021)
 
+#shorten group names
+covid_2021_analysis = covid_2021_analysis %>%
+  mutate_at(vars(`Group Name`), ~recode(., !!!group_name_shortening))
+
+covid_2021_analysis = covid_2021_analysis %>%
+  mutate_at(vars(`Group Category`), ~recode(., !!!group_cat_shortening))
+
+
+
 result_df2 <- data.frame(matrix(ncol = 3, nrow = 0))
 colnames(result_df2) <- c("group_name", "X2_test_stat", "p_value")
 
-for (x in group_name_toloop) {
+for (x in group_name_toloop_short) {
   res = get_chi_sq(covid_2021_analysis,geography="National",time_period = "2021 analysis period",year=2021,group_name=x,hesitant_group = c("Probably or definitely will not get vaccinated"))
   result_df2[nrow(result_df2) + 1,] = c(x,res[1],res[2])
 
@@ -103,21 +127,6 @@ for (x in group_name_toloop) {
 result_df2 = arrange(result_df2,desc(X2_test_stat))
 
 
-```
-
-```{r}
-#mosaic example
-localnews <- data.frame(age = c("18-29", "30-49", "50-64", "65+"),
-                        followers = c(428, 2791, 4242, 4583),
-                        nonfollowers = c(2423, 7176, 6921, 6328)) |> 
-  mutate(total = followers + nonfollowers)
-
-tidylocal <- localnews |>
-  pivot_longer(cols = followers:nonfollowers, names_to = "group", values_to = "Freq") |> 
-  mutate(group = fct_relevel(group, "nonfollowers"))
-
-mosaic(group ~ age, direction = c("v", "h"), tidylocal,
-       highlighting_fill = c("grey80", "cornflowerblue"))
 ```
 
 ```{r}
@@ -145,7 +154,7 @@ mosaic(formula, direction = c("v", "h"), temp,
 return(temp)
 }
 
-mosaic_2var(covid_2021_analysis,"Concern about getting COVID-19 disease",12)
+mosaic_2var(covid_2021_analysis,"Vaccine.Confiden",100)
 
 ```
 
@@ -156,22 +165,33 @@ mosaic_2var(covid_2021_analysis,"Concern about getting COVID-19 disease",12)
 
 annual_monthly_snapshots = c("April 22 - May 29","May 1 - May 28","April 30 - May 27")
 
-snapshots = covid %>% filter(`Time Period` %in% annual_monthly_snapshots,`Group Name` %in% group_name_toloop,  ) %>% distinct(`Time Period`)
+snapshots = covid %>% filter(`Time Period` %in% annual_monthly_snapshots,`Group Name` %in% group_name_toloop, Geography == "National",`Indicator Category` == "Probably or definitely will not get vaccinated" ) %>% mutate(Year = as.factor(Year)) %>% mutate_at(vars(`Group Name`), ~recode(., !!!group_name_shortening)) %>% mutate_at(vars(`Group Category`), ~recode(., !!!group_cat_shortening)) %>%   mutate(rows = paste(`Group Name`, `Group Category`, sep = " - ")) %>% select(rows,Year,`Estimate (%)`) %>% arrange(rows, Year) 
+
+row_order = snapshots %>% pivot_wider(names_from = Year, values_from = `Estimate (%)`) %>% drop_na(`2021`) %>% drop_na(`2023`) %>% mutate(decline_21_23 = `2021` - `2023`) %>% arrange((decline_21_23))
+
+row_order_list_chg_21_23 = c(row_order$rows)
+
+row_order_list_2021 = c(row_order %>% arrange((`2021`)) %>% select(rows))
+
+row_order_list_2023 = c(row_order %>% arrange((`2023`)) %>% select(rows))
 
 
 
+snapshots  = snapshots[snapshots$rows %in% row_order_list, ]
 
- `Geography Type` %in% c("Jurisdictional Estimates","National Estimates"), `Indicator Category` == "Probably or definitely will not get vaccinated", !grepl("-",Geography)) 
+ggplot(snapshots, aes(x = `Estimate (%)`, y = fct_relevel(rows,(row_order_list_chg_21_23)), color = Year)) +
+  geom_point(size = 1) +
+  labs(title = "Add title", x = "Vaccine hesitance (%)", y = "Sample segments") +
+  theme(legend.position = "bottom",axis.text.x = element_text(size = 10), axis.text.y = element_text(size = 6), plot.title = element_text(size = 10))
 
-ggplot(counts2, aes(x = Age, y = Freq, color = Favorite)) +
-  geom_point(size = 3) +
-  coord_flip() +
-  scale_color_manual(values = icecreamcolors) +
-  theme_dotplot +
-  theme(legend.position = "bottom")
+ggplot(snapshots, aes(x = `Estimate (%)`, y = fct_relevel(rows,rev(row_order_list_2021)), color = Year)) +
+  geom_point(size = 1) +
+  labs(title = "Add title", x = "Vaccine hesitance (%)", y = "Sample segments") +
+  theme(legend.position = "bottom",axis.text.x = element_text(size = 10), axis.text.y = element_text(size = 6), plot.title = element_text(size = 10))
 
-
-
-
+ggplot(snapshots, aes(x = `Estimate (%)`, y = fct_relevel(rows,rev(row_order_list_2023)), color = Year)) +
+  geom_point(size = 1) +
+  labs(title = "Add title", x = "Vaccine hesitance (%)", y = "Sample segments") +
+  theme(legend.position = "bottom",axis.text.x = element_text(size = 10), axis.text.y = element_text(size = 6), plot.title = element_text(size = 10))
 
 ```
