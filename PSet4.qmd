@@ -67,6 +67,7 @@ group_name_toloop = c("Sex","Age","Race/Ethnicity (7 level)","Age by race/ethnic
 
 group_name_toloop_short = lapply(group_name_toloop, function(x) ifelse(x %in% names(group_name_shortening), group_name_shortening[[x]], x))
   
+periods_to_combine_2021 = c("April 22 - May 29","May 30 - June 26","June 27 - July 31")
 
 
 ```
@@ -102,7 +103,6 @@ result_df = arrange(result_df,desc(X2_test_stat))
 
 ```{r}
 # chi sq test - using 2021 first 3 monthly time periods
-periods_to_combine_2021 = c("April 22 - May 29","May 30 - June 26","June 27 - July 31")
 
 
 covid_2021_analysis = covid%>% filter(`Year` == 2021, `Time Period` %in% periods_to_combine_2021, `Group Name` %in% group_name_toloop, `Geography Type` %in% c("Jurisdictional Estimates","National Estimates"), `Indicator Category` == "Probably or definitely will not get vaccinated", !grepl("-",Geography)) %>% mutate(n_hesitant = round(`Estimate (%)`/100 * `Sample Size`,0)) %>% group_by(pick(c(1:6))) %>% summarise(`Sample Size` = sum(`Sample Size`), n_hesitant = sum(n_hesitant)) %>% filter(Geography == "National") %>% mutate(`Estimate (%)` = n_hesitant / `Sample Size` * 100, `Time Period` = "2021 analysis period",Year = 2021)
@@ -175,9 +175,7 @@ row_order_list_2021 = c(row_order %>% arrange((`2021`)) %>% select(rows))
 
 row_order_list_2023 = c(row_order %>% arrange((`2023`)) %>% select(rows))
 
-
-
-snapshots  = snapshots[snapshots$rows %in% row_order_list, ]
+snapshots  = snapshots[snapshots$rows %in% row_order_list_chg_21_23, ]
 
 ggplot(snapshots, aes(x = `Estimate (%)`, y = fct_relevel(rows,(row_order_list_chg_21_23)), color = Year)) +
   geom_point(size = 1) +
@@ -193,5 +191,57 @@ ggplot(snapshots, aes(x = `Estimate (%)`, y = fct_relevel(rows,rev(row_order_lis
   geom_point(size = 1) +
   labs(title = "Add title", x = "Vaccine hesitance (%)", y = "Sample segments") +
   theme(legend.position = "bottom",axis.text.x = element_text(size = 10), axis.text.y = element_text(size = 6), plot.title = element_text(size = 10))
+
+
+#barplot of change
+library(stringr)
+row_order$rows = str_wrap(row_order$rows, width = 10)
+
+row_order %>% top_n (10, decline_21_23)  %>% ggplot(aes(x = fct_reorder(rows,rev(decline_21_23)), y = decline_21_23)) +  geom_bar(stat = "identity")+
+labs(title = "Top 10 categories with the largest 2021-23 changes", x = "Group categories", y = "2021-23 change in hesitance") +
+  theme_minimal() + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,size=6),
+        axis.text.y = element_text(size=8),
+        axis.title = element_text(size = 8),
+        plot.title = element_text(size = 8))
+        
+
+
+```
+
+```{r}
+#histogram of hesitance by state
+
+covid_2021_analysis_allstates = covid%>% filter(`Year` == 2021, `Time Period` %in% periods_to_combine_2021, `Group Category`== "All adults age 18+ years", `Geography Type` %in% c("Jurisdictional Estimates"), `Indicator Category` == "Probably or definitely will not get vaccinated", !grepl("-",Geography)) %>% mutate(n_hesitant = round(`Estimate (%)`/100 * `Sample Size`,0)) %>% group_by(Geography) %>% summarise(`Sample Size` = sum(`Sample Size`), n_hesitant = sum(n_hesitant)) %>% mutate(`Estimate (%)` = n_hesitant / `Sample Size` * 100, `Time Period` = "2021 analysis period",Year = 2021) 
+
+ggplot(covid_2021_analysis_allstates, aes(x = `Estimate (%)`)) +
+  geom_histogram(binwidth = 5, fill = "blue", color = "black", alpha = 0.7) +
+  labs(title = "State distribution of hesitance", x = "Hesitance %", y = "No. of states")
+  
+
+```
+
+```{r}
+install.packages("maps")
+library(maps)
+usamap <- map_data("usa")
+
+covid_2021_analysis_allstates = covid_2021_analysis_allstates %>% mutate(state = state.abb[match(Geography,state.name)] )
+
+map_data <- merge(usamap, covid_2021_analysis_allstates, by = "region")
+
+ggplot(map_data, aes(x = long, y = lat, group = group, fill = value)) +
+  geom_polygon(color = "white") +
+  scale_fill_gradient(low = "lightblue", high = "darkblue", name = "Heatmap Legend") +
+  theme_void() +
+  labs(title = "USA Heatmap Example")
+
+install.packages("tidycensus")
+library(tidycensus)
+us_state_pop <- get_acs(
+  geography = "state", 
+  year = 2019,
+  variables = c("population" = "B01001_001"), 
+  geometry = TRUE)
 
 ```
