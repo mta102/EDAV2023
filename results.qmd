@@ -21,9 +21,56 @@ national_hesitance_rate = covid%>% filter(`Year` == 2021, `Time Period` %in% per
 There were significant differences of hesitance by state during this period, from 7.9% in Hawaii, to 33.3% in Wyoming, as illustrated in the map below.
 
 ```{r}
-covid_2021_analysis_allstates = covid%>% filter(`Year` == 2021, `Time Period` %in% periods_to_combine_2021, `Group Category`== "All adults age 18+ years", `Geography Type` %in% c("Jurisdictional Estimates"), `Indicator Category` == "Probably or definitely will not get vaccinated", !grepl("-",Geography)) %>% mutate(n_hesitant = round(`Estimate (%)`/100 * `Sample Size`,0)) %>% group_by(Geography) %>% summarise(`Sample Size` = sum(`Sample Size`), n_hesitant = sum(n_hesitant)) %>% mutate(`Estimate (%)` = n_hesitant / `Sample Size` * 100, `Time Period` = "2021 analysis period",Year = 2021) 
+
+covid_2021_analysis_allstates <- covid %>%
+  filter(`Year` == 2021, `Time Period` %in% periods_to_combine_2021,
+         `Group Category`== "All adults age 18+ years",
+         `Geography Type` %in% c("Jurisdictional Estimates"),
+         `Indicator Category` == "Probably or definitely will not get vaccinated",
+         !grepl("-",Geography)) %>%
+  mutate(n_hesitant = round(`Estimate (%)`/100 * `Sample Size`,0)) %>%
+  group_by(Geography) %>%
+  summarise(`Sample Size` = sum(`Sample Size`), n_hesitant = sum(n_hesitant)) %>%
+  mutate(`Estimate (%)` = n_hesitant / `Sample Size` * 100,
+         `Time Period` = "2021 analysis period", Year = 2021) 
 
 #Karl to add map code here, using covid_2021_analysis_allstates%`Estimate (%)` for heatmap
+x <- covid |>
+  distinct(`Geography Type`, Geography)
+
+covid_2021_analysis_allstates <- covid %>%
+  filter(`Year` == 2021, `Time Period` %in% periods_to_combine_2021,
+         `Group Category`== "All adults age 18+ years",
+         `Geography Type` == "Jurisdictional Estimates",
+         `Indicator Category` == "Probably or definitely will not get vaccinated") %>%
+  mutate(first_two_char = str_sub(Geography, 1, 2),
+         state_clean = ifelse(first_two_char == "PA", "Pennsylvania", ifelse(
+            first_two_char == "TX", "Texas", ifelse(
+            first_two_char == "NY", "New York", ifelse(
+            first_two_char == "IL", "Illinois", Geography)))),
+         n_hesitant = round(`Estimate (%)`/100 * `Sample Size`, 0)) %>%
+  group_by(state_clean) %>%
+  summarise(`Sample Size` = sum(`Sample Size`),
+            n_hesitant = sum(n_hesitant)) %>%
+  mutate(`Estimate (%)` = n_hesitant / `Sample Size` * 100,
+         `Time Period` = "2021 analysis period",
+         Year = 2021) 
+
+
+covid_2021_analysis_allstates_map <- covid_2021_analysis_allstates %>%
+  select(state_clean, `Estimate (%)`) |>
+  #rownames_to_column("state_clean") %>% 
+  transmute(region = tolower(state_clean), value = `Estimate (%)`)
+
+my_palette <- brewer.pal(n = 8, name = "YlGnBu")
+
+p <- state_choropleth(covid_2021_analysis_allstates_map,
+                 title = "   April-July 2021 COVID-19 Vaccine Hesitance Rates by State",
+                 legend = "Hesitancy Rates")
+
+p + scale_fill_manual(values = my_palette)
+
+
 
 ```
 
@@ -84,9 +131,117 @@ top_10_highest_hesitance_cat_list = c(covid_2021_analysis %>% ungroup %>% top_n 
 
 
 
-Analysing 10 states with the highest and lowest hesitance, the parallel coordinate plots below will review geographical patterns in segments of the population with the highest hesitance.
+Analyzing 10 states with the highest and lowest hesitance, the parallel coordinate plots below will review geographical patterns in segments of the population with the highest hesitance.
 
 #Karl to add parallel coordinate plots here and commentary using top_10_highest_hesitance_cat_list
+```{r}
+
+# Calculate hesitance over three months in 2021 by state and group category
+# Clean state column
+state_group_analysis <- covid |>
+  filter(`Year` == 2021,
+         `Time Period` %in% periods_to_combine_2021,
+         `Geography Type` == "Jurisdictional Estimates",
+         `Indicator Category` == "Probably or definitely will not get vaccinated") |>
+  mutate(first_two_char = str_sub(Geography, 1, 2),
+         state_clean = ifelse(first_two_char == "PA", "Pennsylvania", ifelse(
+            first_two_char == "TX", "Texas", ifelse(
+            first_two_char == "NY", "New York", ifelse(
+            first_two_char == "IL", "Illinois", Geography)))),
+         n_hesitant = round(`Estimate (%)`/100 * `Sample Size`, 0)) |>
+  group_by(state_clean, `Group Name`, `Group Category`) |>
+  summarise(`Sample Size` = sum(`Sample Size`),
+            n_hesitant = sum(n_hesitant)) |>
+  mutate(`Estimate (%)` = n_hesitant / `Sample Size` * 100,
+         `Time Period` = "2021 analysis period",
+         Year = 2021) |>
+  ungroup()
+
+
+# Shorten group names
+state_group_analysis <- state_group_analysis %>%
+  mutate_at(vars(`Group Name`), ~recode(., !!!group_name_shortening))
+
+state_group_analysis <- state_group_analysis %>%
+  mutate_at(vars(`Group Category`), ~recode(., !!!group_cat_shortening))
+
+state_group_analysis <- state_group_analysis %>% mutate(concat = paste(`Group Name`, `Group Category`, sep = " - "))
+
+state_group_analysis$concat_wrap <- str_wrap(state_group_analysis$concat, width = 10)
+
+
+# top_5_highest_hesitance_cat_list <- covid_2021_analysis %>%
+#                                          ungroup %>%
+#                                          top_n(5, `Estimate (%)`) %>%
+#                                          select(concat_wrap)
+
+# Filter groups for top most hesitant
+# Pivot wider to convert row-level categories to columns containing hesitancy rates
+state_group_analysis_pivot <- state_group_analysis |>
+  filter(concat %in% top_10_highest_hesitance_cat_list$concat) |>
+  select(state_clean, `Estimate (%)`, concat) |>
+  pivot_wider(id_cols = state_clean, names_from = "concat",
+              values_from = "Estimate (%)")
+
+# Pregnancy - pregnant is not available at the state level during the filtered timeframe
+state_not_in_top_10 <- top_10_highest_hesitance_cat_list |>
+  filter(!concat %in% state_group_analysis$concat)
+
+pregnancy_check <- covid |>
+  filter(`Group Category` == "Pregnant") |>
+  distinct(`Geography Type`, Geography, `Group Name`, `Group Category`,
+           `Time Period`, Year)
+
+# Identify top most hesitant states
+top_10_hesistant_states <- covid_2021_analysis_allstates |>
+  arrange(desc(`Estimate (%)`)) |>
+  filter(!state_clean %in% c("Guam")) |>
+  slice(1:10)
+  
+# Identify top least hesitant states
+# Filtering out Guam and other small territories. Keep PR?
+bottom_10_hesistant_states <- covid_2021_analysis_allstates |>
+  arrange(`Estimate (%)`)|>
+  filter(!state_clean %in% c("Guam")) |>
+  slice(1:10)
+
+# Filter pivoted data on most hesitant states
+top_10_parallel_analaysis <- state_group_analysis_pivot |>
+  filter(state_clean %in% top_10_hesistant_states$state_clean)
+
+
+# Display parallel coordinates plot for most hesitant states
+ggparcoord(top_10_parallel_analaysis, columns = c(2:8),
+           scale = "globalminmax",
+           alpha = 0.4) +
+    labs(title = "Top categories with the highest hesitance in 2021",
+       x = "Group categories", y = "2021 hesitance (%)")
+
+# Maybe go with the iteractive version?
+top_10_parallel_analaysis |>
+  select(-c(`Age.Race - 18 – 49, Other`, `Pregnancy - Trying to get pregnant`)) |>
+  parcoords(rownames = F, brushMode = "1D-axes", reorderable = T, queue = T)
+
+# Filter pivoted data on least hesitant states
+bottom_10_parallel_analaysis <- state_group_analysis_pivot |>
+  filter(state_clean %in% bottom_10_hesistant_states$state_clean)
+
+
+# Display parallel coordinates plot for least hesitant states
+ggparcoord(top_10_parallel_analaysis, columns = c(2:8),
+           scale = "globalminmax",
+           alpha = 0.4) +
+    labs(title = "Top categories with the highest hesitance in 2021",
+       x = "Group categories", y = "2021 hesitance (%)")
+
+
+# Maybe go with the iteractive version?
+bottom_10_parallel_analaysis |>
+  select(-c(`Age.Race - 18 – 49, Other`, `Pregnancy - Trying to get pregnant`)) |>
+  parcoords(rownames = F, brushMode = "1D-axes", reorderable = T, queue = T)
+
+```
+
 
 Given the inconsistent trends seen across states and group categories with the highest hesitance, we proceeded to conduct chi squared tests on every group name defined within the scope of this exercise [link back to data.qmd] to determine those with the highest statistical significance.
 
