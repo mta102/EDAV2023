@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.450">
+<meta name="generator" content="quarto-1.3.433">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -19,6 +19,40 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -160,8 +194,423 @@ ul.task-list li input[type="checkbox"] {
 
 </header>
 
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.1.4     ✔ readr     2.1.4
+✔ forcats   1.0.0     ✔ stringr   1.5.1
+✔ ggplot2   3.4.4     ✔ tibble    3.2.1
+✔ lubridate 1.9.3     ✔ tidyr     1.3.0
+✔ purrr     1.0.2     
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(data.table)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'data.table'
+
+The following objects are masked from 'package:lubridate':
+
+    hour, isoweek, mday, minute, month, quarter, second, wday, week,
+    yday, year
+
+The following objects are masked from 'package:dplyr':
+
+    between, first, last
+
+The following object is masked from 'package:purrr':
+
+    transpose</code></pre>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(vcd)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: grid</code></pre>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>covid <span class="ot">&lt;-</span> <span class="fu">fread</span>(<span class="st">"../covid_dataset/covid.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<section id="part-1-study-which-segments-of-the-population-exhibited-greatest-covid-vaccine-hesitancy-following-the-deployment-of-mass-vaccinations-in-the-us-in-early-2021." class="level4" data-number="3.0.0.1">
+<h4 data-number="3.0.0.1" class="anchored" data-anchor-id="part-1-study-which-segments-of-the-population-exhibited-greatest-covid-vaccine-hesitancy-following-the-deployment-of-mass-vaccinations-in-the-us-in-early-2021."><span class="header-section-number">3.0.0.1</span> Part 1: Study which segments of the population exhibited greatest covid vaccine hesitancy following the deployment of mass vaccinations in the US in early 2021.</h4>
+<p>The national average reported covid hesitance rate during the first quarter of the data collection period (April - June 2021) was 17.7%.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>periods_to_combine_2021 <span class="ot">=</span> <span class="fu">c</span>(<span class="st">"April 22 - May 29"</span>,<span class="st">"May 30 - June 26"</span>,<span class="st">"June 27 - July 31"</span>) </span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>national_hesitance_rate <span class="ot">=</span> covid<span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="st">`</span><span class="at">Year</span><span class="st">`</span> <span class="sc">==</span> <span class="dv">2021</span>, <span class="st">`</span><span class="at">Time Period</span><span class="st">`</span> <span class="sc">%in%</span> periods_to_combine_2021, <span class="st">`</span><span class="at">Group Category</span><span class="st">`</span><span class="sc">==</span> <span class="st">"All adults age 18+ years"</span>, Geography <span class="sc">==</span> <span class="st">"National"</span>, <span class="st">`</span><span class="at">Indicator Category</span><span class="st">`</span> <span class="sc">==</span> <span class="st">"Probably or definitely will not get vaccinated"</span>) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">n_hesitant =</span> <span class="fu">round</span>(<span class="st">`</span><span class="at">Estimate (%)</span><span class="st">`</span><span class="sc">/</span><span class="dv">100</span> <span class="sc">*</span> <span class="st">`</span><span class="at">Sample Size</span><span class="st">`</span>,<span class="dv">0</span>)) <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(Geography) <span class="sc">%&gt;%</span> <span class="fu">summarise</span>(<span class="st">`</span><span class="at">Sample Size</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sum</span>(<span class="st">`</span><span class="at">Sample Size</span><span class="st">`</span>), <span class="at">n_hesitant =</span> <span class="fu">sum</span>(n_hesitant)) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="st">`</span><span class="at">Estimate (%)</span><span class="st">`</span> <span class="ot">=</span> n_hesitant <span class="sc">/</span> <span class="st">`</span><span class="at">Sample Size</span><span class="st">`</span> <span class="sc">*</span> <span class="dv">100</span>, <span class="st">`</span><span class="at">Time Period</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"2021 analysis period"</span>,<span class="at">Year =</span> <span class="dv">2021</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>There were significant differences of hesitance by state during this period, from 7.9% in Hawaii, to 33.3% in Wyoming, as illustrated in the map below.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>covid_2021_analysis_allstates <span class="ot">=</span> covid<span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="st">`</span><span class="at">Year</span><span class="st">`</span> <span class="sc">==</span> <span class="dv">2021</span>, <span class="st">`</span><span class="at">Time Period</span><span class="st">`</span> <span class="sc">%in%</span> periods_to_combine_2021, <span class="st">`</span><span class="at">Group Category</span><span class="st">`</span><span class="sc">==</span> <span class="st">"All adults age 18+ years"</span>, <span class="st">`</span><span class="at">Geography Type</span><span class="st">`</span> <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Jurisdictional Estimates"</span>), <span class="st">`</span><span class="at">Indicator Category</span><span class="st">`</span> <span class="sc">==</span> <span class="st">"Probably or definitely will not get vaccinated"</span>, <span class="sc">!</span><span class="fu">grepl</span>(<span class="st">"-"</span>,Geography)) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">n_hesitant =</span> <span class="fu">round</span>(<span class="st">`</span><span class="at">Estimate (%)</span><span class="st">`</span><span class="sc">/</span><span class="dv">100</span> <span class="sc">*</span> <span class="st">`</span><span class="at">Sample Size</span><span class="st">`</span>,<span class="dv">0</span>)) <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(Geography) <span class="sc">%&gt;%</span> <span class="fu">summarise</span>(<span class="st">`</span><span class="at">Sample Size</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sum</span>(<span class="st">`</span><span class="at">Sample Size</span><span class="st">`</span>), <span class="at">n_hesitant =</span> <span class="fu">sum</span>(n_hesitant)) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="st">`</span><span class="at">Estimate (%)</span><span class="st">`</span> <span class="ot">=</span> n_hesitant <span class="sc">/</span> <span class="st">`</span><span class="at">Sample Size</span><span class="st">`</span> <span class="sc">*</span> <span class="dv">100</span>, <span class="st">`</span><span class="at">Time Period</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"2021 analysis period"</span>,<span class="at">Year =</span> <span class="dv">2021</span>) </span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co">#Karl to add map code here, using covid_2021_analysis_allstates%`Estimate (%)` for heatmap</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>The histogram and boxplot below shows that there are no clear outliers, even though over 50% of states fall outside the 1st and 3rd quartile.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(covid_2021_analysis_allstates, <span class="fu">aes</span>(<span class="at">x =</span> <span class="st">`</span><span class="at">Estimate (%)</span><span class="st">`</span>)) <span class="sc">+</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">binwidth =</span> <span class="dv">5</span>, <span class="at">fill =</span> <span class="st">"blue"</span>, <span class="at">color =</span> <span class="st">"black"</span>, <span class="at">alpha =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"State distribution of hesitance"</span>, <span class="at">x =</span> <span class="st">"Hesitance %"</span>, <span class="at">y =</span> <span class="st">"No. of states"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="results_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="672"></p>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>quartiles_1_3 <span class="ot">=</span> <span class="fu">quantile</span>(covid_2021_analysis_allstates<span class="sc">$</span><span class="st">`</span><span class="at">Estimate (%)</span><span class="st">`</span>, <span class="fu">c</span>(<span class="fl">0.25</span>, <span class="fl">0.75</span>))</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>n_outside_IQR <span class="ot">=</span> <span class="fu">sum</span>(covid_2021_analysis_allstates<span class="sc">$</span><span class="st">`</span><span class="at">Estimate (%)</span><span class="st">`</span> <span class="sc">&lt;</span> quartiles_1_3[<span class="dv">1</span>] <span class="sc">|</span> covid_2021_analysis_allstates<span class="sc">$</span><span class="st">`</span><span class="at">Estimate (%)</span><span class="st">`</span> <span class="sc">&gt;</span> quartiles_1_3[<span class="dv">2</span>])<span class="sc">/</span><span class="fu">nrow</span>(covid_2021_analysis_allstates) <span class="sc">*</span> <span class="dv">100</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Nationally, it can be seen that the following 10 segments demonstrated the highest vaccine hesitance rates in the period in question.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>group_name_shortening <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="st">"Sex"</span> <span class="ot">=</span> <span class="st">"Sex"</span>,<span class="st">"Age"</span> <span class="ot">=</span> <span class="st">"Age"</span>,<span class="st">"Race/Ethnicity (7 level)"</span> <span class="ot">=</span> <span class="st">"Race"</span>,<span class="st">"Age by race/ethnicity"</span> <span class="ot">=</span> <span class="st">"Age.Race"</span>,<span class="st">"Sexual orientation"</span> <span class="ot">=</span> <span class="st">"S.Orientation"</span>,<span class="st">"Gender identity"</span> <span class="ot">=</span> <span class="st">"G.Identity"</span>,<span class="st">"Metropolitan statistical area"</span> <span class="ot">=</span> <span class="st">"Rural.Urban"</span>,<span class="st">"Born in the U.S."</span> <span class="ot">=</span> <span class="st">"US.Born"</span>,<span class="st">"Language of interview"</span> <span class="ot">=</span> <span class="st">"Language"</span>,<span class="st">"Poverty status"</span> <span class="ot">=</span> <span class="st">"Pov.Status"</span>,<span class="st">"Insurance status"</span> <span class="ot">=</span> <span class="st">"Insurance"</span>,<span class="st">"Social Vulnerability Index (SVI) of county of residence"</span> <span class="ot">=</span> <span class="st">"SVI"</span>,<span class="st">"Political leaning of county of residence"</span> <span class="ot">=</span> <span class="st">"Political"</span>,<span class="st">"Received non-COVID-19 vaccine(s) in past two years"</span> <span class="ot">=</span> <span class="st">"Past.Vaccin"</span>,<span class="st">"Health condition associated with higher risk for COVID-19 (any)"</span> <span class="ot">=</span> <span class="st">"Comorbidity"</span>,<span class="st">"Disability status (any)"</span> <span class="ot">=</span> <span class="st">"Disability"</span>,<span class="st">"Pregnancy status (females age 18 – 49 years)"</span> <span class="ot">=</span> <span class="st">"Pregnancy"</span>,<span class="st">"Ever had COVID-19 disease (self-report)"</span> <span class="ot">=</span> <span class="st">"Past.Covid"</span>,<span class="st">"Concern about getting COVID-19 disease"</span> <span class="ot">=</span> <span class="st">"Covid.Concern"</span>,<span class="st">"Confidence in COVID-19 vaccine safety"</span> <span class="ot">=</span> <span class="st">"Vaccine.Confiden"</span>,<span class="st">"Confidence that COVID-19 vaccine is important"</span> <span class="ot">=</span> <span class="st">"Vaccine.Imprtnt"</span>,<span class="st">"Healthcare provider recommended I get a COVID-19 vaccine"</span> <span class="ot">=</span> <span class="st">"Dr.Recommend"</span>,<span class="st">"COVID-19 vaccination status of friends and family"</span> <span class="ot">=</span> <span class="st">"Fr.Fam.Vaccd"</span>,<span class="st">"Work or school requires COVID-19 vaccination"</span> <span class="ot">=</span> <span class="st">"Work.School"</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>group_cat_shortening <span class="ot">=</span> <span class="fu">c</span>(<span class="st">"18 – 49 years"</span> <span class="ot">=</span> <span class="st">"18 – 49"</span>,<span class="st">"50 – 64 years"</span> <span class="ot">=</span> <span class="st">"50 – 64"</span>,<span class="st">"65+ years"</span> <span class="ot">=</span> <span class="st">"65+"</span>,<span class="st">"18 – 49 years, Black, non-Hispanic"</span> <span class="ot">=</span> <span class="st">"18 – 49, Black"</span>,<span class="st">"18 – 49 years, Hispanic"</span> <span class="ot">=</span> <span class="st">"18 – 49, Hispanic"</span>,<span class="st">"18 – 49 years, Other or multiple races, non-Hispanic"</span> <span class="ot">=</span> <span class="st">"18 – 49, Other"</span>,<span class="st">"18 – 49 years, White, non-Hispanic"</span> <span class="ot">=</span> <span class="st">"18 – 49, White"</span>,<span class="st">"50 – 64 years, Black, non-Hispanic"</span> <span class="ot">=</span> <span class="st">"50 – 64, Black"</span>,<span class="st">"50 – 64 years, Hispanic"</span> <span class="ot">=</span> <span class="st">"50 – 64, Hispanic"</span>,<span class="st">"50 – 64 years, Other or multiple races, non-Hispanic"</span> <span class="ot">=</span> <span class="st">"50 – 64, Other"</span>,<span class="st">"50 – 64 years, White, non-Hispanic"</span> <span class="ot">=</span> <span class="st">"50 – 64, White"</span>,<span class="st">"65+ years, Black, non-Hispanic"</span> <span class="ot">=</span> <span class="st">"65+, Black"</span>,<span class="st">"65+ years, Hispanic"</span> <span class="ot">=</span> <span class="st">"65+, Hispanic"</span>,<span class="st">"65+ years, Other or multiple races, non-Hispanic"</span> <span class="ot">=</span> <span class="st">"65+, Other"</span>,<span class="st">"65+ years, White, non-Hispanic"</span> <span class="ot">=</span> <span class="st">"65+, White"</span>,<span class="st">"Born in the U.S."</span> <span class="ot">=</span> <span class="st">"US Born"</span>,<span class="st">"Not born in the U.S."</span> <span class="ot">=</span> <span class="st">"Not US Born"</span>,<span class="st">"Many or almost all family or friends have received vaccine"</span> <span class="ot">=</span> <span class="st">"Many"</span>,<span class="st">"Some or no family or friends have been vaccinated"</span> <span class="ot">=</span> <span class="st">"No_some"</span>,<span class="st">"A little or not at all concerned"</span> <span class="ot">=</span> <span class="st">"A little_not"</span>,<span class="st">"Very or moderately concerned"</span> <span class="ot">=</span> <span class="st">"Very_Moderately"</span>,<span class="st">"Somewhat or not at all safe for me"</span> <span class="ot">=</span> <span class="st">"Not at all_Somewhat"</span>,<span class="st">"Very or completely safe for me"</span> <span class="ot">=</span> <span class="st">"Very"</span>,<span class="st">"A little or not at all important to protect me from COVID-19"</span> <span class="ot">=</span> <span class="st">"A little_not at all"</span>,<span class="st">"Somewhat or very important to protect me from COVID-19"</span> <span class="ot">=</span> <span class="st">"Somewhat_very"</span>,<span class="st">"No"</span> <span class="ot">=</span> <span class="st">"No"</span>,<span class="st">"Yes"</span> <span class="ot">=</span> <span class="st">"Yes"</span>,<span class="st">"Cisgender"</span> <span class="ot">=</span> <span class="st">"Cisgender"</span>,<span class="st">"Don't know/refused"</span> <span class="ot">=</span> <span class="st">"Dont know"</span>,<span class="st">"Transgender/Non-binary"</span> <span class="ot">=</span> <span class="st">"TG/Non bin"</span>,<span class="st">"Insured"</span> <span class="ot">=</span> <span class="st">"Insured"</span>,<span class="st">"Not insured"</span> <span class="ot">=</span> <span class="st">"Not insured"</span>,<span class="st">"English"</span> <span class="ot">=</span> <span class="st">"English"</span>,<span class="st">"Other"</span> <span class="ot">=</span> <span class="st">"Other"</span>,<span class="st">"Spanish"</span> <span class="ot">=</span> <span class="st">"Spanish"</span>,<span class="st">"Rural"</span> <span class="ot">=</span> <span class="st">"Rural"</span>,<span class="st">"Suburban"</span> <span class="ot">=</span> <span class="st">"Suburban"</span>,<span class="st">"Urban"</span> <span class="ot">=</span> <span class="st">"Urban"</span>,<span class="st">"Democrat-leaning"</span> <span class="ot">=</span> <span class="st">"Democrat"</span>,<span class="st">"Not Democrat-leaning or Republican-leaning"</span> <span class="ot">=</span> <span class="st">"None"</span>,<span class="st">"Republican-leaning"</span> <span class="ot">=</span> <span class="st">"Republican"</span>,<span class="st">"Above poverty, income &lt;$75k"</span> <span class="ot">=</span> <span class="st">"&lt;$75k"</span>,<span class="st">"Above poverty, income &gt;=$75k"</span> <span class="ot">=</span> <span class="st">"&gt;=$75k"</span>,<span class="st">"Below poverty"</span> <span class="ot">=</span> <span class="st">"Below poverty"</span>,<span class="st">"Unknown income"</span> <span class="ot">=</span> <span class="st">"Unknown"</span>,<span class="st">"Breastfeeding"</span> <span class="ot">=</span> <span class="st">"Breastfeeding"</span>,<span class="st">"Not pregnant, trying to get pregnant, or breastfeeding"</span> <span class="ot">=</span> <span class="st">"Not pregnant"</span>,<span class="st">"Pregnant"</span> <span class="ot">=</span> <span class="st">"Pregnant"</span>,<span class="st">"Trying to get pregnant"</span> <span class="ot">=</span> <span class="st">"Trying to get pregnant"</span>,<span class="st">"American Indian/Alaska Native, non-Hispanic"</span> <span class="ot">=</span> <span class="st">"Native"</span>,<span class="st">"Asian, non-Hispanic"</span> <span class="ot">=</span> <span class="st">"Asian"</span>,<span class="st">"Black, non-Hispanic"</span> <span class="ot">=</span> <span class="st">"Black"</span>,<span class="st">"Hispanic"</span> <span class="ot">=</span> <span class="st">"Hispanic"</span>,<span class="st">"Native Hawaiian/Pacific Islander, non-Hispanic"</span> <span class="ot">=</span> <span class="st">"Pacific"</span>,<span class="st">"Other or multiple races, non-Hispanic"</span> <span class="ot">=</span> <span class="st">"Other"</span>,<span class="st">"White, non-Hispanic"</span> <span class="ot">=</span> <span class="st">"White"</span>,<span class="st">"Female"</span> <span class="ot">=</span> <span class="st">"Female"</span>,<span class="st">"Male"</span> <span class="ot">=</span> <span class="st">"Male"</span>,<span class="st">"Gay/Lesbian/Bisexual/Other"</span> <span class="ot">=</span> <span class="st">"LGB"</span>,<span class="st">"Heterosexual/Straight"</span> <span class="ot">=</span> <span class="st">"Hetero"</span>,<span class="st">"High SVI"</span> <span class="ot">=</span> <span class="st">"High"</span>,<span class="st">"Low SVI"</span> <span class="ot">=</span> <span class="st">"Low"</span>,<span class="st">"Moderate SVI"</span> <span class="ot">=</span> <span class="st">"Moderate"</span>,<span class="st">"SVI unknown"</span> <span class="ot">=</span> <span class="st">"Unknown"</span>,<span class="st">"Not applicable/unemployed"</span> <span class="ot">=</span> <span class="st">"Unemployed"</span>)</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>group_name_toloop <span class="ot">=</span> <span class="fu">c</span>(<span class="st">"Sex"</span>,<span class="st">"Age"</span>,<span class="st">"Race/Ethnicity (7 level)"</span>,<span class="st">"Age by race/ethnicity"</span>,<span class="st">"Sexual orientation"</span>,<span class="st">"Gender identity"</span>,<span class="st">"Metropolitan statistical area"</span>,<span class="st">"Born in the U.S."</span>, <span class="st">"Language of interview"</span>,<span class="st">"Poverty status"</span>, <span class="st">"Insurance status"</span>,<span class="st">"Social Vulnerability Index (SVI) of county of residence"</span>, <span class="st">"Political leaning of county of residence"</span>, <span class="st">"Received non-COVID-19 vaccine(s) in past two years"</span>, <span class="st">"Health condition associated with higher risk for COVID-19 (any)"</span>,<span class="st">"Disability status (any)"</span>, <span class="st">"Pregnancy status (females age 18 – 49 years)"</span>, <span class="st">"Ever had COVID-19 disease (self-report)"</span>,<span class="st">"Concern about getting COVID-19 disease"</span>, <span class="st">"Confidence in COVID-19 vaccine safety"</span>,  <span class="st">"Confidence that COVID-19 vaccine is important"</span>, <span class="st">"Healthcare provider recommended I get a COVID-19 vaccine"</span>,  <span class="st">"COVID-19 vaccination status of friends and family"</span>,<span class="st">"Work or school requires COVID-19 vaccination"</span> )</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>group_name_toloop_short <span class="ot">=</span> <span class="fu">lapply</span>(group_name_toloop, <span class="cf">function</span>(x) <span class="fu">ifelse</span>(x <span class="sc">%in%</span> <span class="fu">names</span>(group_name_shortening), group_name_shortening[[x]], x))</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>covid_2021_analysis <span class="ot">=</span> covid<span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="st">`</span><span class="at">Year</span><span class="st">`</span> <span class="sc">==</span> <span class="dv">2021</span>, <span class="st">`</span><span class="at">Time Period</span><span class="st">`</span> <span class="sc">%in%</span> periods_to_combine_2021, <span class="st">`</span><span class="at">Group Name</span><span class="st">`</span> <span class="sc">%in%</span> group_name_toloop, <span class="st">`</span><span class="at">Geography Type</span><span class="st">`</span> <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Jurisdictional Estimates"</span>,<span class="st">"National Estimates"</span>), <span class="st">`</span><span class="at">Indicator Category</span><span class="st">`</span> <span class="sc">==</span> <span class="st">"Probably or definitely will not get vaccinated"</span>, <span class="sc">!</span><span class="fu">grepl</span>(<span class="st">"-"</span>,Geography)) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">n_hesitant =</span> <span class="fu">round</span>(<span class="st">`</span><span class="at">Estimate (%)</span><span class="st">`</span><span class="sc">/</span><span class="dv">100</span> <span class="sc">*</span> <span class="st">`</span><span class="at">Sample Size</span><span class="st">`</span>,<span class="dv">0</span>)) <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(<span class="fu">pick</span>(<span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>))) <span class="sc">%&gt;%</span> <span class="fu">summarise</span>(<span class="st">`</span><span class="at">Sample Size</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sum</span>(<span class="st">`</span><span class="at">Sample Size</span><span class="st">`</span>), <span class="at">n_hesitant =</span> <span class="fu">sum</span>(n_hesitant)) <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Geography <span class="sc">==</span> <span class="st">"National"</span>) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="st">`</span><span class="at">Estimate (%)</span><span class="st">`</span> <span class="ot">=</span> n_hesitant <span class="sc">/</span> <span class="st">`</span><span class="at">Sample Size</span><span class="st">`</span> <span class="sc">*</span> <span class="dv">100</span>, <span class="st">`</span><span class="at">Time Period</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"2021 analysis period"</span>,<span class="at">Year =</span> <span class="dv">2021</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>`summarise()` has grouped output by 'Geography Type', 'Geography', 'Group
+Name', 'Group Category', 'Indicator Name'. You can override using the `.groups`
+argument.</code></pre>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co">#shorten group names</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>covid_2021_analysis <span class="ot">=</span> covid_2021_analysis <span class="sc">%&gt;%</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate_at</span>(<span class="fu">vars</span>(<span class="st">`</span><span class="at">Group Name</span><span class="st">`</span>), <span class="sc">~</span><span class="fu">recode</span>(., <span class="sc">!!!</span>group_name_shortening))</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>covid_2021_analysis <span class="ot">=</span> covid_2021_analysis <span class="sc">%&gt;%</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate_at</span>(<span class="fu">vars</span>(<span class="st">`</span><span class="at">Group Category</span><span class="st">`</span>), <span class="sc">~</span><span class="fu">recode</span>(., <span class="sc">!!!</span>group_cat_shortening))</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>covid_2021_analysis <span class="ot">=</span> covid_2021_analysis <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">concat =</span> <span class="fu">paste</span>(<span class="st">`</span><span class="at">Group Name</span><span class="st">`</span>, <span class="st">`</span><span class="at">Group Category</span><span class="st">`</span>, <span class="at">sep =</span> <span class="st">" - "</span>))</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>covid_2021_analysis<span class="sc">$</span>concat_wrap <span class="ot">=</span> <span class="fu">str_wrap</span>(covid_2021_analysis<span class="sc">$</span>concat, <span class="at">width =</span> <span class="dv">10</span>)</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>covid_2021_analysis <span class="sc">%&gt;%</span> ungroup <span class="sc">%&gt;%</span> <span class="fu">top_n</span> (<span class="dv">10</span>, <span class="st">`</span><span class="at">Estimate (%)</span><span class="st">`</span>) <span class="sc">%&gt;%</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">fct_reorder</span>(concat_wrap,<span class="sc">-</span>(<span class="st">`</span><span class="at">Estimate (%)</span><span class="st">`</span>)), <span class="at">y =</span> <span class="st">`</span><span class="at">Estimate (%)</span><span class="st">`</span>)) <span class="sc">+</span>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>)<span class="sc">+</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a><span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Top 10 categories with the highest hesitance in 2021"</span>, <span class="at">x =</span> <span class="st">"Group categories"</span>, <span class="at">y =</span> <span class="st">"2021 hesitance (%)"</span>) <span class="sc">+</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span> </span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>, <span class="at">vjust =</span> <span class="fl">0.5</span>, <span class="at">hjust=</span><span class="dv">1</span>,<span class="at">size=</span><span class="dv">6</span>),</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.text.y =</span> <span class="fu">element_text</span>(<span class="at">size=</span><span class="dv">8</span>),</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">8</span>),</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>        <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="results_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>top_10_highest_hesitance_cat_list <span class="ot">=</span> <span class="fu">c</span>(covid_2021_analysis <span class="sc">%&gt;%</span> ungroup <span class="sc">%&gt;%</span> <span class="fu">top_n</span> (<span class="dv">10</span>, <span class="st">`</span><span class="at">Estimate (%)</span><span class="st">`</span>) <span class="sc">%&gt;%</span> <span class="fu">select</span>(concat))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Analysing 10 states with the highest and lowest hesitance, the parallel coordinate plots below will review geographical patterns in segments of the population with the highest hesitance.</p>
+<p>#Karl to add parallel coordinate plots here and commentary using top_10_highest_hesitance_cat_list</p>
+<p>Given the inconsistent trends seen across states and group categories with the highest hesitance, we proceeded to conduct chi squared tests on every group name defined within the scope of this exercise [link back to data.qmd] to determine those with the highest statistical significance.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>get_chi_sq<span class="ot">&lt;-</span><span class="cf">function</span>(df,geography,time_period,year,group_name,hesitant_group) {</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  temp <span class="ot">=</span> df <span class="sc">|&gt;</span> <span class="fu">filter</span>(Geography <span class="sc">==</span> geography,<span class="st">`</span><span class="at">Indicator Name</span><span class="st">`</span><span class="sc">==</span><span class="st">"Vaccination uptake and intention"</span>, <span class="st">`</span><span class="at">Time Period</span><span class="st">`</span> <span class="sc">==</span> time_period,Year <span class="sc">==</span> year, <span class="st">`</span><span class="at">Group Name</span><span class="st">`</span><span class="sc">==</span>group_name)  <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">hesitant =</span> <span class="fu">ifelse</span>(<span class="st">`</span><span class="at">Indicator Category</span><span class="st">`</span> <span class="sc">%in%</span> hesitant_group,<span class="dv">1</span>,<span class="dv">0</span>)) <span class="sc">|&gt;</span> <span class="fu">group_by</span>(<span class="st">`</span><span class="at">Group Category</span><span class="st">`</span>,hesitant) <span class="sc">|&gt;</span> <span class="fu">summarise</span>(<span class="at">hesitance_rate =</span> <span class="fu">sum</span>(<span class="st">`</span><span class="at">Estimate (%)</span><span class="st">`</span>),<span class="at">sample_size =</span> <span class="fu">first</span>(<span class="st">`</span><span class="at">Sample Size</span><span class="st">`</span>)) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">n_hesitance =</span> <span class="fu">round</span>(hesitance_rate<span class="sc">/</span><span class="dv">100</span> <span class="sc">*</span> sample_size,<span class="dv">0</span>)) <span class="sc">|&gt;</span> <span class="fu">filter</span>(hesitant <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">|&gt;</span> <span class="fu">select</span>(<span class="st">`</span><span class="at">Group Category</span><span class="st">`</span>,n_hesitance,sample_size) </span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">nrow</span>(temp) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    expected_proportion <span class="ot">=</span> <span class="fu">sum</span>(temp<span class="sc">$</span>n_hesitance)<span class="sc">/</span><span class="fu">sum</span>(temp<span class="sc">$</span>sample_size)</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  temp <span class="ot">=</span> temp <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">expected =</span> sample_size<span class="sc">*</span>expected_proportion)</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">=</span> <span class="fu">chisq.test</span>(<span class="at">x=</span>temp<span class="sc">$</span>n_hesitance,<span class="at">p=</span>temp<span class="sc">$</span>expected<span class="sc">/</span><span class="fu">sum</span>(temp<span class="sc">$</span>expected))</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>   output<span class="ot">&lt;-</span><span class="fu">list</span>(<span class="fu">round</span>(res<span class="sc">$</span>statistic,<span class="at">digits =</span> <span class="dv">0</span>),res<span class="sc">$</span>p.value)</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>  <span class="cf">else</span> {</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>    output<span class="ot">&lt;-</span><span class="fu">list</span>(<span class="dv">0</span>,<span class="dv">0</span>)</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>   <span class="fu">return</span>(output)</span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>group_name_toloop <span class="ot">=</span> <span class="fu">c</span>(<span class="st">"Sex"</span>,<span class="st">"Age"</span>,<span class="st">"Race/Ethnicity (7 level)"</span>,<span class="st">"Age by race/ethnicity"</span>,<span class="st">"Sexual orientation"</span>,<span class="st">"Gender identity"</span>,<span class="st">"Metropolitan statistical area"</span>,<span class="st">"Born in the U.S."</span>, <span class="st">"Language of interview"</span>,<span class="st">"Poverty status"</span>, <span class="st">"Insurance status"</span>,<span class="st">"Social Vulnerability Index (SVI) of county of residence"</span>, <span class="st">"Political leaning of county of residence"</span>, <span class="st">"Received non-COVID-19 vaccine(s) in past two years"</span>, <span class="st">"Health condition associated with higher risk for COVID-19 (any)"</span>,<span class="st">"Disability status (any)"</span>, <span class="st">"Pregnancy status (females age 18 – 49 years)"</span>, <span class="st">"Ever had COVID-19 disease (self-report)"</span>,<span class="st">"Concern about getting COVID-19 disease"</span>, <span class="st">"Confidence in COVID-19 vaccine safety"</span>,  <span class="st">"Confidence that COVID-19 vaccine is important"</span>, <span class="st">"Healthcare provider recommended I get a COVID-19 vaccine"</span>,  <span class="st">"COVID-19 vaccination status of friends and family"</span>,<span class="st">"Work or school requires COVID-19 vaccination"</span> )</span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>group_name_toloop_short <span class="ot">=</span> <span class="fu">lapply</span>(group_name_toloop, <span class="cf">function</span>(x) <span class="fu">ifelse</span>(x <span class="sc">%in%</span> <span class="fu">names</span>(group_name_shortening), group_name_shortening[[x]], x))</span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>result_df2 <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="fu">matrix</span>(<span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">nrow =</span> <span class="dv">0</span>))</span>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(result_df2) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"group_name"</span>, <span class="st">"X2_test_stat"</span>, <span class="st">"p_value"</span>)</span>
+<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (x <span class="cf">in</span> group_name_toloop_short) {</span>
+<span id="cb16-31"><a href="#cb16-31" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">=</span> <span class="fu">get_chi_sq</span>(covid_2021_analysis,<span class="at">geography=</span><span class="st">"National"</span>,<span class="at">time_period =</span> <span class="st">"2021 analysis period"</span>,<span class="at">year=</span><span class="dv">2021</span>,<span class="at">group_name=</span>x,<span class="at">hesitant_group =</span> <span class="fu">c</span>(<span class="st">"Probably or definitely will not get vaccinated"</span>))</span>
+<span id="cb16-32"><a href="#cb16-32" aria-hidden="true" tabindex="-1"></a>  result_df2[<span class="fu">nrow</span>(result_df2) <span class="sc">+</span> <span class="dv">1</span>,] <span class="ot">=</span> <span class="fu">c</span>(x,res[<span class="dv">1</span>],res[<span class="dv">2</span>])</span>
+<span id="cb16-33"><a href="#cb16-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-34"><a href="#cb16-34" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>`summarise()` has grouped output by 'Group Category'. You can override using
+the `.groups` argument.
+`summarise()` has grouped output by 'Group Category'. You can override using
+the `.groups` argument.
+`summarise()` has grouped output by 'Group Category'. You can override using
+the `.groups` argument.
+`summarise()` has grouped output by 'Group Category'. You can override using
+the `.groups` argument.
+`summarise()` has grouped output by 'Group Category'. You can override using
+the `.groups` argument.
+`summarise()` has grouped output by 'Group Category'. You can override using
+the `.groups` argument.
+`summarise()` has grouped output by 'Group Category'. You can override using
+the `.groups` argument.
+`summarise()` has grouped output by 'Group Category'. You can override using
+the `.groups` argument.
+`summarise()` has grouped output by 'Group Category'. You can override using
+the `.groups` argument.
+`summarise()` has grouped output by 'Group Category'. You can override using
+the `.groups` argument.
+`summarise()` has grouped output by 'Group Category'. You can override using
+the `.groups` argument.
+`summarise()` has grouped output by 'Group Category'. You can override using
+the `.groups` argument.
+`summarise()` has grouped output by 'Group Category'. You can override using
+the `.groups` argument.
+`summarise()` has grouped output by 'Group Category'. You can override using
+the `.groups` argument.
+`summarise()` has grouped output by 'Group Category'. You can override using
+the `.groups` argument.
+`summarise()` has grouped output by 'Group Category'. You can override using
+the `.groups` argument.
+`summarise()` has grouped output by 'Group Category'. You can override using
+the `.groups` argument.
+`summarise()` has grouped output by 'Group Category'. You can override using
+the `.groups` argument.
+`summarise()` has grouped output by 'Group Category'. You can override using
+the `.groups` argument.
+`summarise()` has grouped output by 'Group Category'. You can override using
+the `.groups` argument.
+`summarise()` has grouped output by 'Group Category'. You can override using
+the `.groups` argument.
+`summarise()` has grouped output by 'Group Category'. You can override using
+the `.groups` argument.
+`summarise()` has grouped output by 'Group Category'. You can override using
+the `.groups` argument.
+`summarise()` has grouped output by 'Group Category'. You can override using
+the `.groups` argument.</code></pre>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>result_df2 <span class="ot">=</span> <span class="fu">arrange</span>(result_df2,<span class="fu">desc</span>(X2_test_stat))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>The top 10 most statistically significant group names are shown below:</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>result_df2 <span class="sc">%&gt;%</span> ungroup <span class="sc">%&gt;%</span> <span class="fu">top_n</span>(<span class="dv">10</span>,X2_test_stat)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>         group_name X2_test_stat p_value
+1   Vaccine.Imprtnt        78443       0
+2  Vaccine.Confiden        45851       0
+3      Fr.Fam.Vaccd        33687       0
+4       Past.Vaccin        12886       0
+5     Covid.Concern         7882       0
+6          Age.Race         6893       0
+7               Age         5585       0
+8         Political         4616       0
+9       Work.School         3969       0
+10     Dr.Recommend         3823       0</code></pre>
+</div>
+</div>
+<p>Two illustrative mosaic plots are shown below to confirm the chi square test result above - one for the group name with the higest X2 score (the segment that felt vaccines were important), and one for the lowest (gender identity).</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>mosaic_2var <span class="ot">&lt;-</span><span class="cf">function</span>(df,indep_var_group_name,n_chars) {</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(vcd)</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  truncate_string <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">str_sub</span>(x, <span class="dv">1</span>, n_chars)}</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>indep_var_group_name_no_spaces <span class="ot">=</span> <span class="fu">gsub</span>(<span class="st">"[()</span><span class="sc">\\</span><span class="st">[/</span><span class="sc">\\\\</span><span class="st"> ]"</span>, <span class="st">"."</span>, indep_var_group_name)</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>indep_var_group_name_no_spaces <span class="ot">=</span> <span class="fu">truncate_string</span>(indep_var_group_name_no_spaces)</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>temp <span class="ot">=</span> df <span class="sc">%&gt;%</span> ungroup <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="st">`</span><span class="at">Group Name</span><span class="st">`</span> <span class="sc">==</span> indep_var_group_name) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">n_not_hesitant =</span> <span class="st">`</span><span class="at">Sample Size</span><span class="st">`</span> <span class="sc">-</span> n_hesitant) <span class="sc">%&gt;%</span>  <span class="fu">select</span>(<span class="st">`</span><span class="at">Group Category</span><span class="st">`</span>, n_hesitant, n_not_hesitant,<span class="st">`</span><span class="at">Sample Size</span><span class="st">`</span>) <span class="sc">%&gt;%</span>  <span class="fu">rename</span>(</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>    <span class="sc">!!</span><span class="at">indep_var_group_name_no_spaces :=</span> <span class="st">`</span><span class="at">Group Category</span><span class="st">`</span>,<span class="at">hesitant =</span> <span class="st">`</span><span class="at">n_hesitant</span><span class="st">`</span>, <span class="st">`</span><span class="at">not hesitant</span><span class="st">`</span> <span class="ot">=</span> n_not_hesitant) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> hesitant<span class="sc">:</span><span class="st">`</span><span class="at">not hesitant</span><span class="st">`</span>,<span class="at">names_to =</span> <span class="st">"group"</span>, <span class="at">values_to =</span> <span class="st">"Freq"</span> )</span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>temp[[indep_var_group_name_no_spaces]] <span class="ot">=</span>  <span class="fu">substr</span>(temp[[indep_var_group_name_no_spaces]], <span class="dv">1</span>, n_chars)</span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>formula <span class="ot">=</span> <span class="fu">as.formula</span>(<span class="fu">paste</span>(<span class="st">"group"</span>, <span class="st">"~"</span>, indep_var_group_name_no_spaces))</span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a><span class="fu">mosaic</span>(formula, <span class="at">direction =</span> <span class="fu">c</span>(<span class="st">"v"</span>, <span class="st">"h"</span>), temp,</span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>       <span class="at">highlighting_fill =</span> <span class="fu">c</span>(<span class="st">"grey80"</span>, <span class="st">"cornflowerblue"</span>),<span class="at">gp_varnames =</span> <span class="fu">gpar</span>(<span class="at">fontsize =</span> <span class="dv">10</span>, <span class="at">fontface =</span> <span class="dv">1</span>), <span class="at">gp_labels =</span> <span class="fu">gpar</span>(<span class="at">fontsize =</span> <span class="dv">6</span>))</span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a><span class="fu">return</span>(temp)</span>
+<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a><span class="fu">mosaic_2var</span>(covid_2021_analysis,<span class="st">"Vaccine.Imprtnt"</span>,<span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="results_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 4
+  Vaccine.Imprtnt     `Sample Size` group          Freq
+  &lt;chr&gt;                       &lt;int&gt; &lt;chr&gt;         &lt;dbl&gt;
+1 A little_not at all         28357 hesitant      19088
+2 A little_not at all         28357 not hesitant   9269
+3 Somewhat_very              175006 hesitant       6501
+4 Somewhat_very              175006 not hesitant 168505</code></pre>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mosaic_2var</span>(covid_2021_analysis,<span class="st">"G.Identity"</span>,<span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="results_files/figure-html/unnamed-chunk-8-2.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 4
+  G.Identity `Sample Size` group          Freq
+  &lt;chr&gt;              &lt;int&gt; &lt;chr&gt;         &lt;dbl&gt;
+1 Cisgender         186524 hesitant      33215
+2 Cisgender         186524 not hesitant 153309
+3 Dont know          11179 hesitant       1864
+4 Dont know          11179 not hesitant   9315
+5 TG/Non bin          8087 hesitant       1371
+6 TG/Non bin          8087 not hesitant   6716</code></pre>
+</div>
+</div>
+<p>It can be clearly seen that those that saw a vaccine as important had significantly lower hesitance than those that did not. However, for the group name with the lowest X2 score (gender identity), the observed and expected mosaic plots are nearly identical, thus confirming the X2 test result.</p>
+<p>[add commentary on results]</p>
+</section>
+<section id="part-2-analyze-which-segments-showed-the-greatest-reduction-in-covid-vaccine-hesitancy-between-2021-and-2023" class="level4" data-number="3.0.0.2">
+<h4 data-number="3.0.0.2" class="anchored" data-anchor-id="part-2-analyze-which-segments-showed-the-greatest-reduction-in-covid-vaccine-hesitancy-between-2021-and-2023"><span class="header-section-number">3.0.0.2</span> Part 2: Analyze which segments showed the greatest reduction in covid vaccine hesitancy between 2021 and 2023</h4>
+<p>We have already illustrated that national vaccine hesitance declined from around 18% in April/May 2021 to around 11% in June/July 2023.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter for the vaccination uptake and intent indicator</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter for responses corresponding to vaccine hesitancy</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Include all adults 18+</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Set time period to monthly (excluding weekly samples) and filter for nationwide samples</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>vacc_intention_time <span class="ot">&lt;-</span> covid <span class="sc">|&gt;</span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="st">`</span><span class="at">Indicator Name</span><span class="st">`</span> <span class="sc">==</span> <span class="st">'Vaccination uptake and intention'</span>) <span class="sc">|&gt;</span></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="st">`</span><span class="at">Indicator Category</span><span class="st">`</span> <span class="sc">==</span> <span class="st">'Probably or definitely will not get vaccinated'</span>) <span class="sc">|&gt;</span></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="st">`</span><span class="at">Group Name</span><span class="st">`</span> <span class="sc">==</span> <span class="st">'All adults 18+'</span>) <span class="sc">|&gt;</span></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="st">`</span><span class="at">Time Type</span><span class="st">`</span> <span class="sc">==</span> <span class="st">'Monthly'</span>) <span class="sc">|&gt;</span></span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Geography <span class="sc">==</span> <span class="st">'National'</span>) <span class="sc">|&gt;</span></span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="st">`</span><span class="at">Geography Type</span><span class="st">`</span>, Geography, <span class="st">`</span><span class="at">Time Period</span><span class="st">`</span>)</span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Derive month of data collection</span></span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>vacc_intention_time <span class="ot">&lt;-</span> vacc_intention_time <span class="sc">|&gt;</span></span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">month_split =</span> <span class="fu">paste0</span>(<span class="fu">str_split</span>(<span class="st">`</span><span class="at">Time Period</span><span class="st">`</span>, <span class="st">"-"</span>,</span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>                                        <span class="at">simplify =</span> <span class="cn">TRUE</span>)[, <span class="dv">2</span>],</span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>         <span class="st">", "</span>, Year),</span>
+<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a>         <span class="at">month =</span> <span class="fu">mdy</span>(month_split))</span>
+<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot hesitancy over time</span></span>
+<span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(vacc_intention_time, <span class="fu">aes</span>(<span class="at">x =</span> month, <span class="at">y =</span> <span class="st">`</span><span class="at">Estimate (%)</span><span class="st">`</span>,</span>
+<span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a>                                <span class="at">color =</span> <span class="st">`</span><span class="at">Indicator Category</span><span class="st">`</span>)) <span class="sc">+</span></span>
+<span id="cb25-23"><a href="#cb25-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb25-24"><a href="#cb25-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"U.S. Vaccination Response Rates Over Time"</span>,</span>
+<span id="cb25-25"><a href="#cb25-25" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Month"</span>,</span>
+<span id="cb25-26"><a href="#cb25-26" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Response Rate (%)"</span>) <span class="sc">+</span></span>
+<span id="cb25-27"><a href="#cb25-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>) <span class="sc">+</span></span>
+<span id="cb25-28"><a href="#cb25-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">color =</span> <span class="fu">guide_legend</span>(<span class="at">title =</span> <span class="st">"Indicator Category:"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="results_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>However, some segments of the population demonstrated more decline in hesitance than others. The Cleveland dot plot below shows the change in hesitance by population segment, for the 20 most hesitant segments in 2021.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>annual_monthly_snapshots <span class="ot">=</span> <span class="fu">c</span>(<span class="st">"April 22 - May 29"</span>,<span class="st">"May 1 - May 28"</span>,<span class="st">"April 30 - May 27"</span>)</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>snapshots <span class="ot">=</span> covid <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="st">`</span><span class="at">Time Period</span><span class="st">`</span> <span class="sc">%in%</span> annual_monthly_snapshots,<span class="st">`</span><span class="at">Group Name</span><span class="st">`</span> <span class="sc">%in%</span> group_name_toloop, Geography <span class="sc">==</span> <span class="st">"National"</span>,<span class="st">`</span><span class="at">Indicator Category</span><span class="st">`</span> <span class="sc">==</span> <span class="st">"Probably or definitely will not get vaccinated"</span> ) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">Year =</span> <span class="fu">as.factor</span>(Year)) <span class="sc">%&gt;%</span> <span class="fu">mutate_at</span>(<span class="fu">vars</span>(<span class="st">`</span><span class="at">Group Name</span><span class="st">`</span>), <span class="sc">~</span><span class="fu">recode</span>(., <span class="sc">!!!</span>group_name_shortening)) <span class="sc">%&gt;%</span> <span class="fu">mutate_at</span>(<span class="fu">vars</span>(<span class="st">`</span><span class="at">Group Category</span><span class="st">`</span>), <span class="sc">~</span><span class="fu">recode</span>(., <span class="sc">!!!</span>group_cat_shortening)) <span class="sc">%&gt;%</span>   <span class="fu">mutate</span>(<span class="at">rows =</span> <span class="fu">paste</span>(<span class="st">`</span><span class="at">Group Name</span><span class="st">`</span>, <span class="st">`</span><span class="at">Group Category</span><span class="st">`</span>, <span class="at">sep =</span> <span class="st">" - "</span>)) <span class="sc">%&gt;%</span> <span class="fu">select</span>(rows,Year,<span class="st">`</span><span class="at">Estimate (%)</span><span class="st">`</span>) <span class="sc">%&gt;%</span> <span class="fu">arrange</span>(rows, Year) </span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>row_order <span class="ot">=</span> snapshots <span class="sc">%&gt;%</span> <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> Year, <span class="at">values_from =</span> <span class="st">`</span><span class="at">Estimate (%)</span><span class="st">`</span>) <span class="sc">%&gt;%</span> <span class="fu">drop_na</span>(<span class="st">`</span><span class="at">2021</span><span class="st">`</span>) <span class="sc">%&gt;%</span> <span class="fu">drop_na</span>(<span class="st">`</span><span class="at">2023</span><span class="st">`</span>) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">decline_21_23 =</span> <span class="st">`</span><span class="at">2021</span><span class="st">`</span> <span class="sc">-</span> <span class="st">`</span><span class="at">2023</span><span class="st">`</span>) <span class="sc">%&gt;%</span> <span class="fu">arrange</span>((decline_21_23))</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>row_order_list_chg_21_23 <span class="ot">=</span> <span class="fu">c</span>(row_order<span class="sc">$</span>rows)</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>row_order_list_2021 <span class="ot">=</span> row_order  <span class="sc">%&gt;%</span> <span class="fu">arrange</span>(<span class="st">`</span><span class="at">2021</span><span class="st">`</span>) <span class="sc">%&gt;%</span> <span class="fu">top_n</span>(<span class="dv">20</span>,<span class="st">`</span><span class="at">2021</span><span class="st">`</span>) <span class="sc">%&gt;%</span> <span class="fu">select</span>(rows)</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>row_order_list_2021 <span class="ot">=</span> row_order_list_2021<span class="sc">$</span>rows               </span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>row_order_list_2023 <span class="ot">=</span> <span class="fu">c</span>(row_order <span class="sc">%&gt;%</span> <span class="fu">arrange</span>((<span class="st">`</span><span class="at">2023</span><span class="st">`</span>)) <span class="sc">%&gt;%</span> <span class="fu">select</span>(rows))</span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>snapshots  <span class="ot">=</span> snapshots[snapshots<span class="sc">$</span>rows <span class="sc">%in%</span> row_order_list_chg_21_23, ]</span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a>snapshots  <span class="sc">%&gt;%</span>  <span class="fu">filter</span>(rows <span class="sc">%in%</span> row_order_list_2021) <span class="sc">%&gt;%</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="st">`</span><span class="at">Estimate (%)</span><span class="st">`</span>, <span class="at">y =</span> <span class="fu">fct_relevel</span>(rows,(row_order_list_2021)), <span class="at">color =</span> Year)) <span class="sc">+</span></span>
+<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"20 most hesitant segments in 2021, and changes in 2022-23"</span>, <span class="at">x =</span> <span class="st">"Vaccine hesitance (%)"</span>, <span class="at">y =</span> <span class="st">"Sample segments"</span>) <span class="sc">+</span></span>
+<span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>,<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">10</span>), <span class="at">axis.text.y =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">6</span>), <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">10</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="results_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>It can be seen from the cleveland dot plot below that the change in hesitance of the top 20 most hesitant segments in 2021 varies by group. The bar graph below shows the 10 segments that demonstrated the largest changes in hesitance.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co">#barplot of change</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringr)</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>row_order<span class="sc">$</span>rows <span class="ot">=</span> <span class="fu">str_wrap</span>(row_order<span class="sc">$</span>rows, <span class="at">width =</span> <span class="dv">10</span>)</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>row_order <span class="sc">%&gt;%</span> <span class="fu">top_n</span> (<span class="dv">10</span>, decline_21_23)  <span class="sc">%&gt;%</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">fct_reorder</span>(rows,<span class="fu">rev</span>(decline_21_23)), <span class="at">y =</span> decline_21_23)) <span class="sc">+</span>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>)<span class="sc">+</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a><span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Top 10 categories with the largest 2021-23 changes"</span>, <span class="at">x =</span> <span class="st">"Group categories"</span>, <span class="at">y =</span> <span class="st">"2021-23 change in hesitance"</span>) <span class="sc">+</span></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span> </span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>, <span class="at">vjust =</span> <span class="fl">0.5</span>, <span class="at">hjust=</span><span class="dv">1</span>,<span class="at">size=</span><span class="dv">6</span>),</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.text.y =</span> <span class="fu">element_text</span>(<span class="at">size=</span><span class="dv">8</span>),</span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">8</span>),</span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">8</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="results_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>The change in hesitance also varies by state:</p>
+<p>#Karl to add</p>
+</section>
+<section id="part-3-based-on-the-findings-above-we-will-propose-high-level-recommendations-for-segments-of-the-population-that-need-further-public-health-interventions." class="level4" data-number="3.0.0.3">
+<h4 data-number="3.0.0.3" class="anchored" data-anchor-id="part-3-based-on-the-findings-above-we-will-propose-high-level-recommendations-for-segments-of-the-population-that-need-further-public-health-interventions."><span class="header-section-number">3.0.0.3</span> Part 3: Based on the findings above, we will propose high-level recommendations for segments of the population that need further public health interventions.</h4>
+<p>Provide a short nontechnical summary of the most revealing findings of your analysis written for a nontechnical audience. Take extra care to clean up your graphs, ensuring that best practices for presentation are followed, as described in the audience ready style section below.</p>
+<p>Use subheadings (##) as appropriate. See Todd Schneider’s blog posts for examples of thoughtful, informative subheadings. An approach that works well is to create a subheading for each of your research questions.</p>
+<p>The number of graphs will vary by project; we suggest a target of 10. (A plot with multiple facets counts as 1 graph). If you go over, make sure they are high quality and include commentary. A project with 10 good graphs plus commentary will receive a better grade than a project with 10 good graphs and 10 mediocre ones.</p>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

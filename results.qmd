@@ -3,6 +3,7 @@
 library(tidyverse)
 library(data.table)
 library(vcd)
+covid <- fread("../covid_dataset/covid.csv")
 
 ```
 
