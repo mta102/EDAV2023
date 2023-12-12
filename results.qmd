@@ -3,7 +3,23 @@
 library(tidyverse)
 library(data.table)
 library(vcd)
-covid <- fread("../covid_dataset/covid.csv")
+
+# install.packages("choroplethr")
+# install.packages("RColorBrewer")
+# install.packages("GGally")
+# install.packages("devtools")
+# install.packages("remotes")
+# install.packages("choroplethrMaps")
+# devtools::install_github("timelyportfolio/parcoords")
+
+library(choroplethrMaps)
+library(GGally)
+library(parcoords)
+library(RColorBrewer)
+library(choroplethr)
+
+
+# covid <- fread("../covid_dataset/covid.csv")
 
 ```
 
@@ -32,35 +48,34 @@ covid_2021_analysis_allstates <- covid %>%
   group_by(Geography) %>%
   summarise(`Sample Size` = sum(`Sample Size`), n_hesitant = sum(n_hesitant)) %>%
   mutate(`Estimate (%)` = n_hesitant / `Sample Size` * 100,
-         `Time Period` = "2021 analysis period", Year = 2021) 
-
-#Karl to add map code here, using covid_2021_analysis_allstates%`Estimate (%)` for heatmap
-x <- covid |>
-  distinct(`Geography Type`, Geography)
-
-covid_2021_analysis_allstates <- covid %>%
-  filter(`Year` == 2021, `Time Period` %in% periods_to_combine_2021,
-         `Group Category`== "All adults age 18+ years",
-         `Geography Type` == "Jurisdictional Estimates",
-         `Indicator Category` == "Probably or definitely will not get vaccinated") %>%
-  mutate(first_two_char = str_sub(Geography, 1, 2),
-         state_clean = ifelse(first_two_char == "PA", "Pennsylvania", ifelse(
-            first_two_char == "TX", "Texas", ifelse(
-            first_two_char == "NY", "New York", ifelse(
-            first_two_char == "IL", "Illinois", Geography)))),
-         n_hesitant = round(`Estimate (%)`/100 * `Sample Size`, 0)) %>%
-  group_by(state_clean) %>%
-  summarise(`Sample Size` = sum(`Sample Size`),
-            n_hesitant = sum(n_hesitant)) %>%
-  mutate(`Estimate (%)` = n_hesitant / `Sample Size` * 100,
-         `Time Period` = "2021 analysis period",
-         Year = 2021) 
+         `Time Period` = "2021 analysis period", Year = 2021)
+# 
+# x <- covid |>
+#   distinct(`Geography Type`, Geography)
+# 
+# covid_2021_analysis_allstates <- covid %>%
+#   filter(`Year` == 2021, `Time Period` %in% periods_to_combine_2021,
+#          `Group Category`== "All adults age 18+ years",
+#          `Geography Type` == "Jurisdictional Estimates",
+#          `Indicator Category` == "Probably or definitely will not get vaccinated") %>%
+#   mutate(first_two_char = str_sub(Geography, 1, 2),
+#           = ifelse(first_two_char == "PA", "Pennsylvania", ifelse(
+#             first_two_char == "TX", "Texas", ifelse(
+#             first_two_char == "NY", "New York", ifelse(
+#             first_two_char == "IL", "Illinois", Geography)))),
+#          n_hesitant = round(`Estimate (%)`/100 * `Sample Size`, 0)) %>%
+#   group_by(Geography) %>%
+#   summarise(`Sample Size` = sum(`Sample Size`),
+#             n_hesitant = sum(n_hesitant)) %>%
+#   mutate(`Estimate (%)` = n_hesitant / `Sample Size` * 100,
+#          `Time Period` = "2021 analysis period",
+#          Year = 2021) 
 
 
 covid_2021_analysis_allstates_map <- covid_2021_analysis_allstates %>%
-  select(state_clean, `Estimate (%)`) |>
-  #rownames_to_column("state_clean") %>% 
-  transmute(region = tolower(state_clean), value = `Estimate (%)`)
+  select(Geography, `Estimate (%)`) |>
+  #rownames_to_column("Geography") %>% 
+  transmute(region = tolower(Geography), value = `Estimate (%)`)
 
 my_palette <- brewer.pal(n = 8, name = "YlGnBu")
 
@@ -68,9 +83,7 @@ p <- state_choropleth(covid_2021_analysis_allstates_map,
                  title = "   April-July 2021 COVID-19 Vaccine Hesitance Rates by State",
                  legend = "Hesitancy Rates")
 
-p + scale_fill_manual(values = my_palette)
-
-
+p
 
 ```
 
@@ -78,12 +91,18 @@ The histogram and boxplot below shows that there are no clear outliers, even tho
 
 ```{r}
 ggplot(covid_2021_analysis_allstates, aes(x = `Estimate (%)`)) +
-  geom_histogram(binwidth = 5, fill = "blue", color = "black", alpha = 0.7) +
+  geom_histogram(bins = 8, fill = "blue", color = "black", alpha = 0.7) +
   geom_boxplot() +
   labs(title = "State distribution of hesitance", x = "Hesitance %", y = "No. of states")
 
 quartiles_1_3 = quantile(covid_2021_analysis_allstates$`Estimate (%)`, c(0.25, 0.75))
-n_outside_IQR = sum(covid_2021_analysis_allstates$`Estimate (%)` < quartiles_1_3[1] | covid_2021_analysis_allstates$`Estimate (%)` > quartiles_1_3[2])/nrow(covid_2021_analysis_allstates) * 100
+
+
+n_outliers <- covid_2021_analysis_allstates |>
+  mutate(lower_bound = quantile(`Estimate (%)`, 0.25) - 1.5*IQR(`Estimate (%)`),
+         upper_bound = quantile(`Estimate (%)`, 0.75) + 1.5*IQR(`Estimate (%)`)) |>
+  filter(`Estimate (%)` < lower_bound & `Estimate (%)` > upper_bound)
+
 ```
 
 Nationally, it can be seen that the following 10 segments demonstrated the highest vaccine hesitance rates in the period in question.
@@ -125,7 +144,7 @@ labs(title = "Top 10 categories with the highest hesitance in 2021", x = "Group 
         axis.title = element_text(size = 8),
         plot.title = element_text(size = 12))
 
-top_10_highest_hesitance_cat_list = c(covid_2021_analysis %>% ungroup %>% top_n (10, `Estimate (%)`) %>% select(concat))
+top_10_highest_hesitance_cat_list = covid_2021_analysis %>% ungroup %>% top_n (10, `Estimate (%)`) %>% select(concat)
 
 ```
 
@@ -133,7 +152,6 @@ top_10_highest_hesitance_cat_list = c(covid_2021_analysis %>% ungroup %>% top_n 
 
 Analyzing 10 states with the highest and lowest hesitance, the parallel coordinate plots below will review geographical patterns in segments of the population with the highest hesitance.
 
-#Karl to add parallel coordinate plots here and commentary using top_10_highest_hesitance_cat_list
 ```{r}
 
 # Calculate hesitance over three months in 2021 by state and group category
@@ -142,14 +160,9 @@ state_group_analysis <- covid |>
   filter(`Year` == 2021,
          `Time Period` %in% periods_to_combine_2021,
          `Geography Type` == "Jurisdictional Estimates",
-         `Indicator Category` == "Probably or definitely will not get vaccinated") |>
-  mutate(first_two_char = str_sub(Geography, 1, 2),
-         state_clean = ifelse(first_two_char == "PA", "Pennsylvania", ifelse(
-            first_two_char == "TX", "Texas", ifelse(
-            first_two_char == "NY", "New York", ifelse(
-            first_two_char == "IL", "Illinois", Geography)))),
-         n_hesitant = round(`Estimate (%)`/100 * `Sample Size`, 0)) |>
-  group_by(state_clean, `Group Name`, `Group Category`) |>
+         `Indicator Category` == "Probably or definitely will not get vaccinated",!grepl("-",Geography)) |>
+  mutate(n_hesitant = round(`Estimate (%)`/100 * `Sample Size`, 0)) |>
+  group_by(Geography, `Group Name`, `Group Category`) |>
   summarise(`Sample Size` = sum(`Sample Size`),
             n_hesitant = sum(n_hesitant)) |>
   mutate(`Estimate (%)` = n_hesitant / `Sample Size` * 100,
@@ -179,8 +192,8 @@ state_group_analysis$concat_wrap <- str_wrap(state_group_analysis$concat, width 
 # Pivot wider to convert row-level categories to columns containing hesitancy rates
 state_group_analysis_pivot <- state_group_analysis |>
   filter(concat %in% top_10_highest_hesitance_cat_list$concat) |>
-  select(state_clean, `Estimate (%)`, concat) |>
-  pivot_wider(id_cols = state_clean, names_from = "concat",
+  select(Geography, `Estimate (%)`, concat_wrap) |>
+  pivot_wider(id_cols = Geography, names_from = "concat_wrap",
               values_from = "Estimate (%)")
 
 # Pregnancy - pregnant is not available at the state level during the filtered timeframe
@@ -195,40 +208,39 @@ pregnancy_check <- covid |>
 # Identify top most hesitant states
 top_10_hesistant_states <- covid_2021_analysis_allstates |>
   arrange(desc(`Estimate (%)`)) |>
-  filter(!state_clean %in% c("Guam")) |>
+  filter(!Geography %in% c("Guam","Puerto Rico")) |>
   slice(1:10)
   
 # Identify top least hesitant states
-# Filtering out Guam and other small territories. Keep PR?
 bottom_10_hesistant_states <- covid_2021_analysis_allstates |>
   arrange(`Estimate (%)`)|>
-  filter(!state_clean %in% c("Guam")) |>
+  filter(!Geography %in% c("Guam","Puerto Rico")) |>
   slice(1:10)
 
 # Filter pivoted data on most hesitant states
 top_10_parallel_analaysis <- state_group_analysis_pivot |>
-  filter(state_clean %in% top_10_hesistant_states$state_clean)
+  filter(Geography %in% top_10_hesistant_states$Geography)
 
 
 # Display parallel coordinates plot for most hesitant states
-ggparcoord(top_10_parallel_analaysis, columns = c(2:8),
+ggparcoord(top_10_parallel_analaysis %>% select(where(~!any(is.na(.)))), columns = c(2:8),
            scale = "globalminmax",
            alpha = 0.4) +
     labs(title = "Top categories with the highest hesitance in 2021",
        x = "Group categories", y = "2021 hesitance (%)")
 
 # Maybe go with the iteractive version?
-top_10_parallel_analaysis |>
-  select(-c(`Age.Race - 18 – 49, Other`, `Pregnancy - Trying to get pregnant`)) |>
+top_10_parallel_analaysis |> select(where(~!any(is.na(.))))|>
   parcoords(rownames = F, brushMode = "1D-axes", reorderable = T, queue = T)
 
 # Filter pivoted data on least hesitant states
 bottom_10_parallel_analaysis <- state_group_analysis_pivot |>
-  filter(state_clean %in% bottom_10_hesistant_states$state_clean)
+  filter(Geography %in% bottom_10_hesistant_states$Geography)
 
 
 # Display parallel coordinates plot for least hesitant states
-ggparcoord(top_10_parallel_analaysis, columns = c(2:8),
+ggparcoord(bottom_10_parallel_analaysis %>% select(where(~!any(is.na(.)))), 
+           columns = c(2:7),   
            scale = "globalminmax",
            alpha = 0.4) +
     labs(title = "Top categories with the highest hesitance in 2021",
@@ -237,7 +249,7 @@ ggparcoord(top_10_parallel_analaysis, columns = c(2:8),
 
 # Maybe go with the iteractive version?
 bottom_10_parallel_analaysis |>
-  select(-c(`Age.Race - 18 – 49, Other`, `Pregnancy - Trying to get pregnant`)) |>
+  select(where(~!any(is.na(.))))|>
   parcoords(rownames = F, brushMode = "1D-axes", reorderable = T, queue = T)
 
 ```
