@@ -440,7 +440,7 @@ row_order$rows = str_wrap(row_order$rows, width = 10)
 row_order |> top_n (10, decline_21_23)  |> ggplot(aes(x = fct_reorder(rows,rev(decline_21_23)), y = decline_21_23)) +  geom_bar(stat = "identity")+
 labs(title = "Top 10 categories with the largest 2021-23 changes", x = "Group categories", y = "2021-23 change in hesitance") +
   theme_minimal() + 
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,size=6),
+  theme(axis.text.x = element_text(angle = 0, vjust = 1, hjust=0.5,size=6),
         axis.text.y = element_text(size=8),
         axis.title = element_text(size = 8),
         plot.title = element_text(size = 8))
