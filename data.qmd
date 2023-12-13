@@ -292,12 +292,16 @@ covid |> filter(is.na(`Estimate (%)`)) |>
   scale_y_continuous(labels = scales::percent)
 
 # Observation 2: Estimate (%) is rounded to 1 decimal point, and the lowest possible non-NA value is 0.1
-covid |> group_by(`Estimate (%)`) |>  summarize(count = n())  |> filter(`Estimate (%)`<=0.2 | is.na(`Estimate (%)`)) |> arrange(desc(`Estimate (%)`))
+covid |>
+  group_by(`Estimate (%)`) |>
+  summarize(count = n()) |>
+  filter(`Estimate (%)` <= 0.2 | is.na(`Estimate (%)`)) |>
+  arrange(desc(`Estimate (%)`))
 
 # Observation 3: Sense checks on subsets of the data where NAs are present are coherent, with a valid sample size, and the non-NA Estimate (%) summing up to 100
 NA_is_zero_proof1 <- covid |>
-  filter(Geography=="Wisconsin", `Time Period` == "April 22 - May 29",
-         Year==2021, `Group Name`=="Age",
+  filter(Geography == "Wisconsin", `Time Period` == "April 22 - May 29",
+         Year == 2021, `Group Name` == "Age",
          `Indicator Name` == "Vaccination uptake and intention",
          `Group Category` == "65+ years") |>
   select(`Group Category`,`Indicator Category`,`Estimate (%)`,

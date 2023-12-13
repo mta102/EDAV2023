@@ -10,10 +10,10 @@ format:
     out-width: 60%
     embed-resources: true
 ---
-
 # Results
-```{r}
 
+Import libraries
+```{r}
 
 # install.packages("choroplethr")
 # install.packages("RColorBrewer")
@@ -32,18 +32,29 @@ library(parcoords)
 library(RColorBrewer)
 library(choroplethr)
 
+```
 
+Import dataset
+```{r}
+
+# Load vaccine hesitancy data
 covid <- fread("../covid_dataset/covid.csv")
 
 ```
 
+
 #### Part 1: Study which segments of the population exhibited greatest covid vaccine hesitancy following the deployment of mass vaccinations in the US in early 2021. 
 
-The national average reported covid hesitance rate during the first quarter of the data collection period (April - June 2021) was 17.7%.
+The national average reported COVID hesitance rate during the first quarter of the data collection period (April - July 2021) was 17.7%. In Part 1, we will break down this percentage across U.S. geographies, identifying the states with the highest and lowest hesitancy rates. We will then analyze the type of population demographics (e.g., age, vaccination history, ethnicity, etc.) that had a strong association with COVID vaccine hesitancy.
+
+
+To obtain an initial baseline of vaccine hesitance rates, we developed the chunk of code below, which revealed that the nationwide hesitance rate from April 2021 to July 2021 was 17.7% nationwide. In other words, 17.7% of those surveyed after the mass deployment of vaccinations responded that they would probably or definitely not get vaccinated.
 ```{r}
 
-periods_to_combine_2021 <- c("April 22 - May 29","May 30 - June 26","June 27 - July 31") 
+# Store values of months that will be combined to analyze hesitancy when vaccines were initially released in 2021
+periods_to_combine_2021 <- c("April 22 - May 29","May 30 - June 26","June 27 - July 31")
 
+# Calculate overall nationwide hesitancy
 national_hesitance_rate <- covid |>
   filter(`Year` == 2021,
          `Time Period` %in% periods_to_combine_2021,
@@ -59,10 +70,11 @@ national_hesitance_rate <- covid |>
 
 ```
 
-There were significant differences of hesitance by state during this period, from 7.9% in Hawaii, to 33.3% in Wyoming, as illustrated in the map below.
+We began our analysis of variation in hesitancy rates by calculating hesitancy during the April-July 21' timeframe by state. As illustrated in the map below, states such as Hawaii, New York, and Vermont exhibited the lowest hesitance, while other states like Wyoming, North Dakota, and West Virginia exhibited the highest hesitance.
 
 ```{r}
 
+# Calculate early 2021 hesitance by state
 covid_2021_analysis_allstates <- covid |>
   filter(`Year` == 2021, `Time Period` %in% periods_to_combine_2021,
          `Group Category`== "All adults age 18+ years",
@@ -71,58 +83,37 @@ covid_2021_analysis_allstates <- covid |>
          !grepl("-",Geography)) |>
   mutate(n_hesitant = round(`Estimate (%)`/100 * `Sample Size`,0)) |>
   group_by(Geography) |>
-  summarise(`Sample Size` = sum(`Sample Size`), n_hesitant = sum(n_hesitant)) |>
+  summarise(`Sample Size` = sum(`Sample Size`),
+            n_hesitant = sum(n_hesitant)) |>
   mutate(`Estimate (%)` = n_hesitant / `Sample Size` * 100,
-         `Time Period` = "2021 analysis period", Year = 2021)
-# 
-# x <- covid |>
-#   distinct(`Geography Type`, Geography)
-# 
-# covid_2021_analysis_allstates <- covid |>
-#   filter(`Year` == 2021, `Time Period` %in% periods_to_combine_2021,
-#          `Group Category`== "All adults age 18+ years",
-#          `Geography Type` == "Jurisdictional Estimates",
-#          `Indicator Category` == "Probably or definitely will not get vaccinated") |>
-#   mutate(first_two_char = str_sub(Geography, 1, 2),
-#           = ifelse(first_two_char == "PA", "Pennsylvania", ifelse(
-#             first_two_char == "TX", "Texas", ifelse(
-#             first_two_char == "NY", "New York", ifelse(
-#             first_two_char == "IL", "Illinois", Geography)))),
-#          n_hesitant = round(`Estimate (%)`/100 * `Sample Size`, 0)) |>
-#   group_by(Geography) |>
-#   summarise(`Sample Size` = sum(`Sample Size`),
-#             n_hesitant = sum(n_hesitant)) |>
-#   mutate(`Estimate (%)` = n_hesitant / `Sample Size` * 100,
-#          `Time Period` = "2021 analysis period",
-#          Year = 2021) 
+         `Time Period` = "2021 analysis period",
+         Year = 2021)
 
-
+# Prep dataframe to be used in the state_choropleth function
 covid_2021_analysis_allstates_map <- covid_2021_analysis_allstates |>
   select(Geography, `Estimate (%)`) |>
-  #rownames_to_column("Geography") |> 
   transmute(region = tolower(Geography), value = `Estimate (%)`)
 
-my_palette <- brewer.pal(n = 8, name = "YlGnBu")
 
-p <- state_choropleth(covid_2021_analysis_allstates_map,
+# Display state heatmap of hesitance rates
+state_choropleth(covid_2021_analysis_allstates_map,
                  title = "   April-July 2021 COVID-19 Vaccine Hesitance Rates by State",
                  legend = "Hesitancy Rates")
 
-p
 
 ```
 
-The histogram and boxplot below shows that there are no clear outliers, even though over 50% of states fall outside the 1st and 3rd quartile.
+The histogram and boxplot below show that there are no clear outlier states. The code we developed also searches for outlier values using the lower and upper bounds of the distribution (lower bound = Q1 - 1.5xIQR, upper bound = Q3 + 1.5xIQR). While no outliers were identified, we will see how hesitance rates within states can vary significantly from one population segment to another.  
 
 ```{r}
+
+# Plot histogram of state hesitance rates
 ggplot(covid_2021_analysis_allstates, aes(x = `Estimate (%)`)) +
   geom_histogram(bins = 8, fill = "blue", color = "black", alpha = 0.7) +
   geom_boxplot() +
   labs(title = "State distribution of hesitance", x = "Hesitance %", y = "No. of states")
 
-quartiles_1_3 = quantile(covid_2021_analysis_allstates$`Estimate (%)`, c(0.25, 0.75))
-
-
+# Search for outliers
 n_outliers <- covid_2021_analysis_allstates |>
   mutate(lower_bound = quantile(`Estimate (%)`, 0.25) - 1.5*IQR(`Estimate (%)`),
          upper_bound = quantile(`Estimate (%)`, 0.75) + 1.5*IQR(`Estimate (%)`)) |>
@@ -130,52 +121,84 @@ n_outliers <- covid_2021_analysis_allstates |>
 
 ```
 
-Nationally, it can be seen that the following 10 segments demonstrated the highest vaccine hesitance rates in the period in question.
+Before diving into each state further, we examined the population segments with relatively higher vaccine hesitance rates from April-July 2021. Nationally, it can be seen that the 10 segments displayed below demonstrated the highest hesitance. Each segment represents a group of individuals who provided a particular response. For instance, "Fr.Fam.Vaccd - No_some" represents individuals who responded "No or some" to whether their friends and/or family are vaccinated.
 
 ```{r}
 
+# Shorten group names and group category names for visualization purposes
 
+# Create vector of shortened group names
 group_name_shortening <- c(
-"Sex" = "Sex","Age" = "Age","Race/Ethnicity (7 level)" = "Race","Age by race/ethnicity" = "Age.Race","Sexual orientation" = "S.Orientation","Gender identity" = "G.Identity","Metropolitan statistical area" = "Rural.Urban","Born in the U.S." = "US.Born","Language of interview" = "Language","Poverty status" = "Pov.Status","Insurance status" = "Insurance","Social Vulnerability Index (SVI) of county of residence" = "SVI","Political leaning of county of residence" = "Political","Received non-COVID-19 vaccine(s) in past two years" = "Past.Vaccin","Health condition associated with higher risk for COVID-19 (any)" = "Comorbidity","Disability status (any)" = "Disability","Pregnancy status (females age 18 – 49 years)" = "Pregnancy","Ever had COVID-19 disease (self-report)" = "Past.Covid","Concern about getting COVID-19 disease" = "Covid.Concern","Confidence in COVID-19 vaccine safety" = "Vaccine.Confiden","Confidence that COVID-19 vaccine is important" = "Vaccine.Imprtnt","Healthcare provider recommended I get a COVID-19 vaccine" = "Dr.Recommend","COVID-19 vaccination status of friends and family" = "Fr.Fam.Vaccd","Work or school requires COVID-19 vaccination" = "Work.School"
+"Sex" = "Sex","Age" = "Age","Race/Ethnicity (7 level)" = "Race","Age by race/ethnicity" = "Age.Race","Sexual orientation" = "S.Orientation","Gender identity" = "G.Identity","Metropolitan statistical area" = "Rural.Urban","Born in the U.S." = "US.Born","Language of interview" = "Language","Poverty status" = "Pov.Status","Insurance status" = "Insurance","Social Vulnerability Index (SVI) of county of residence" = "SVI","Political leaning of county of residence" = "Political","Received non-COVID-19 vaccine(s) in past two years" = "Past.Vaccin","Health condition associated with higher risk for COVID-19 (any)" = "Comorbidity","Disability status (any)" = "Disability","Pregnancy status (females age 18 – 49 years)" = "Pregnancy","Ever had COVID-19 disease (self-report)" = "Past.Covid","Concern about getting COVID-19 disease" = "Covid.Concern","Confidence in COVID-19 vaccine safety" = "Vaccine.Confiden","Confidence that COVID-19 vaccine is important" = "Vaccine.Imprtnt", "Healthcare provider recommended I get a COVID-19 vaccine" = "Dr.Recommend","COVID-19 vaccination status of friends and family" = "Fr.Fam.Vaccd","Work or school requires COVID-19 vaccination" = "Work.School"
 )
 
-group_cat_shortening = c("18 – 49 years" = "18 – 49","50 – 64 years" = "50 – 64","65+ years" = "65+","18 – 49 years, Black, non-Hispanic" = "18 – 49, Black","18 – 49 years, Hispanic" = "18 – 49, Hispanic","18 – 49 years, Other or multiple races, non-Hispanic" = "18 – 49, Other","18 – 49 years, White, non-Hispanic" = "18 – 49, White","50 – 64 years, Black, non-Hispanic" = "50 – 64, Black","50 – 64 years, Hispanic" = "50 – 64, Hispanic","50 – 64 years, Other or multiple races, non-Hispanic" = "50 – 64, Other","50 – 64 years, White, non-Hispanic" = "50 – 64, White","65+ years, Black, non-Hispanic" = "65+, Black","65+ years, Hispanic" = "65+, Hispanic","65+ years, Other or multiple races, non-Hispanic" = "65+, Other","65+ years, White, non-Hispanic" = "65+, White","Born in the U.S." = "US Born","Not born in the U.S." = "Not US Born","Many or almost all family or friends have received vaccine" = "Many","Some or no family or friends have been vaccinated" = "No_some","A little or not at all concerned" = "A little_not","Very or moderately concerned" = "Very_Moderately","Somewhat or not at all safe for me" = "Not at all_Somewhat","Very or completely safe for me" = "Very","A little or not at all important to protect me from COVID-19" = "A little_not at all","Somewhat or very important to protect me from COVID-19" = "Somewhat_very","No" = "No","Yes" = "Yes","Cisgender" = "Cisgender","Don't know/refused" = "Dont know","Transgender/Non-binary" = "TG/Non bin","Insured" = "Insured","Not insured" = "Not insured","English" = "English","Other" = "Other","Spanish" = "Spanish","Rural" = "Rural","Suburban" = "Suburban","Urban" = "Urban","Democrat-leaning" = "Democrat","Not Democrat-leaning or Republican-leaning" = "None","Republican-leaning" = "Republican","Above poverty, income <$75k" = "<$75k","Above poverty, income >=$75k" = ">=$75k","Below poverty" = "Below poverty","Unknown income" = "Unknown","Breastfeeding" = "Breastfeeding","Not pregnant, trying to get pregnant, or breastfeeding" = "Not pregnant","Pregnant" = "Pregnant","Trying to get pregnant" = "Trying to get pregnant","American Indian/Alaska Native, non-Hispanic" = "Native","Asian, non-Hispanic" = "Asian","Black, non-Hispanic" = "Black","Hispanic" = "Hispanic","Native Hawaiian/Pacific Islander, non-Hispanic" = "Pacific","Other or multiple races, non-Hispanic" = "Other","White, non-Hispanic" = "White","Female" = "Female","Male" = "Male","Gay/Lesbian/Bisexual/Other" = "LGB","Heterosexual/Straight" = "Hetero","High SVI" = "High","Low SVI" = "Low","Moderate SVI" = "Moderate","SVI unknown" = "Unknown","Not applicable/unemployed" = "Unemployed")
+# Create vector of shortened group category names
+group_cat_shortening <- c("18 – 49 years" = "18 – 49","50 – 64 years" = "50 – 64","65+ years" = "65+","18 – 49 years, Black, non-Hispanic" = "18 – 49, Black","18 – 49 years, Hispanic" = "18 – 49, Hispanic","18 – 49 years, Other or multiple races, non-Hispanic" = "18 – 49, Other","18 – 49 years, White, non-Hispanic" = "18 – 49, White","50 – 64 years, Black, non-Hispanic" = "50 – 64, Black","50 – 64 years, Hispanic" = "50 – 64, Hispanic","50 – 64 years, Other or multiple races, non-Hispanic" = "50 – 64, Other","50 – 64 years, White, non-Hispanic" = "50 – 64, White","65+ years, Black, non-Hispanic" = "65+, Black","65+ years, Hispanic" = "65+, Hispanic","65+ years, Other or multiple races, non-Hispanic" = "65+, Other","65+ years, White, non-Hispanic" = "65+, White","Born in the U.S." = "US Born","Not born in the U.S." = "Not US Born","Many or almost all family or friends have received vaccine" = "Many","Some or no family or friends have been vaccinated" = "No_some","A little or not at all concerned" = "A little_not","Very or moderately concerned" = "Very_Moderately","Somewhat or not at all safe for me" = "Not at all_Somewhat","Very or completely safe for me" = "Very","A little or not at all important to protect me from COVID-19" = "A little_not at all","Somewhat or very important to protect me from COVID-19" = "Somewhat_very","No" = "No","Yes" = "Yes","Cisgender" = "Cisgender","Don't know/refused" = "Dont know","Transgender/Non-binary" = "TG/Non bin","Insured" = "Insured","Not insured" = "Not insured","English" = "English","Other" = "Other","Spanish" = "Spanish","Rural" = "Rural","Suburban" = "Suburban","Urban" = "Urban","Democrat-leaning" = "Democrat","Not Democrat-leaning or Republican-leaning" = "None","Republican-leaning" = "Republican","Above poverty, income <$75k" = "<$75k","Above poverty, income >=$75k" = ">=$75k","Below poverty" = "Below poverty","Unknown income" = "Unknown","Breastfeeding" = "Breastfeeding","Not pregnant, trying to get pregnant, or breastfeeding" = "Not pregnant","Pregnant" = "Pregnant","Trying to get pregnant" = "Trying to get pregnant","American Indian/Alaska Native, non-Hispanic" = "Native","Asian, non-Hispanic" = "Asian","Black, non-Hispanic" = "Black","Hispanic" = "Hispanic","Native Hawaiian/Pacific Islander, non-Hispanic" = "Pacific","Other or multiple races, non-Hispanic" = "Other","White, non-Hispanic" = "White","Female" = "Female","Male" = "Male","Gay/Lesbian/Bisexual/Other" = "LGB","Heterosexual/Straight" = "Hetero","High SVI" = "High","Low SVI" = "Low","Moderate SVI" = "Moderate","SVI unknown" = "Unknown","Not applicable/unemployed" = "Unemployed")
+
+# Create vector of all group names as represented in the data
+group_name_toloop <- c("Sex","Age","Race/Ethnicity (7 level)","Age by race/ethnicity","Sexual orientation","Gender identity","Metropolitan statistical area","Born in the U.S.", "Language of interview","Poverty status", "Insurance status","Social Vulnerability Index (SVI) of county of residence", "Political leaning of county of residence", "Received non-COVID-19 vaccine(s) in past two years", "Health condition associated with higher risk for COVID-19 (any)","Disability status (any)", "Pregnancy status (females age 18 – 49 years)", "Ever had COVID-19 disease (self-report)","Concern about getting COVID-19 disease", "Confidence in COVID-19 vaccine safety",  "Confidence that COVID-19 vaccine is important", "Healthcare provider recommended I get a COVID-19 vaccine",  "COVID-19 vaccination status of friends and family","Work or school requires COVID-19 vaccination" )
 
 
-group_name_toloop = c("Sex","Age","Race/Ethnicity (7 level)","Age by race/ethnicity","Sexual orientation","Gender identity","Metropolitan statistical area","Born in the U.S.", "Language of interview","Poverty status", "Insurance status","Social Vulnerability Index (SVI) of county of residence", "Political leaning of county of residence", "Received non-COVID-19 vaccine(s) in past two years", "Health condition associated with higher risk for COVID-19 (any)","Disability status (any)", "Pregnancy status (females age 18 – 49 years)", "Ever had COVID-19 disease (self-report)","Concern about getting COVID-19 disease", "Confidence in COVID-19 vaccine safety",  "Confidence that COVID-19 vaccine is important", "Healthcare provider recommended I get a COVID-19 vaccine",  "COVID-19 vaccination status of friends and family","Work or school requires COVID-19 vaccination" )
-
-group_name_toloop_short = lapply(group_name_toloop, function(x) ifelse(x %in% names(group_name_shortening), group_name_shortening[[x]], x))
+group_name_toloop_short <- lapply(group_name_toloop, function(x) ifelse(x %in% names(group_name_shortening), group_name_shortening[[x]], x))
   
 
+# Calculate vaccine hesitance by group category/population segment
+covid_2021_analysis <- covid |>
+  filter(`Year` == 2021, `Time Period` %in% periods_to_combine_2021,
+         `Group Name` %in% group_name_toloop,
+         `Geography Type` %in% c("Jurisdictional Estimates",
+                                 "National Estimates"),
+         `Indicator Category` == "Probably or definitely will not get vaccinated",
+         !grepl("-", Geography)) |>
+  mutate(n_hesitant = round(`Estimate (%)`/100 * `Sample Size`,0)) |>
+  group_by(pick(c(1:6))) |>
+  summarise(`Sample Size` = sum(`Sample Size`),
+            n_hesitant = sum(n_hesitant)) |>
+  filter(Geography == "National") |>
+  mutate(`Estimate (%)` = n_hesitant / `Sample Size` * 100,
+         `Time Period` = "2021 analysis period",Year = 2021)
 
-covid_2021_analysis = covid|> filter(`Year` == 2021, `Time Period` %in% periods_to_combine_2021, `Group Name` %in% group_name_toloop, `Geography Type` %in% c("Jurisdictional Estimates","National Estimates"), `Indicator Category` == "Probably or definitely will not get vaccinated", !grepl("-",Geography)) |> mutate(n_hesitant = round(`Estimate (%)`/100 * `Sample Size`,0)) |> group_by(pick(c(1:6))) |> summarise(`Sample Size` = sum(`Sample Size`), n_hesitant = sum(n_hesitant)) |> filter(Geography == "National") |> mutate(`Estimate (%)` = n_hesitant / `Sample Size` * 100, `Time Period` = "2021 analysis period",Year = 2021)
-
-#shorten group names
-covid_2021_analysis = covid_2021_analysis |>
+# Shorten group names
+covid_2021_analysis <- covid_2021_analysis |>
   mutate_at(vars(`Group Name`), ~recode(., !!!group_name_shortening))
 
-covid_2021_analysis = covid_2021_analysis |>
+# Shorten group category names
+covid_2021_analysis <- covid_2021_analysis |>
   mutate_at(vars(`Group Category`), ~recode(., !!!group_cat_shortening))
 
-covid_2021_analysis = covid_2021_analysis |> mutate(concat = paste(`Group Name`, `Group Category`, sep = " - "))
+# Concatenate group name and category so that each combination can be uniquely identified
+covid_2021_analysis <- covid_2021_analysis |>
+  mutate(concat = paste(`Group Name`,`Group Category`, sep = " - "))
 
-covid_2021_analysis$concat_wrap = str_wrap(covid_2021_analysis$concat, width = 10)
+# Wrap the concatenated text for visualization purposes
+covid_2021_analysis$concat_wrap <- str_wrap(covid_2021_analysis$concat, width = 10)
 
-covid_2021_analysis |> ungroup |> top_n (10, `Estimate (%)`) |> ggplot(aes(x = fct_reorder(concat_wrap,-(`Estimate (%)`)), y = `Estimate (%)`)) +  geom_bar(stat = "identity")+
-labs(title = "Top 10 categories with the highest hesitance in 2021", x = "Group categories", y = "2021 hesitance (%)") +
+# Visualize the 10 categories with the highest hesitance rates
+covid_2021_analysis |> ungroup() |> top_n (10, `Estimate (%)`) |>
+  ggplot(aes(x = fct_reorder(concat_wrap, -(`Estimate (%)`)),
+             y = `Estimate (%)`)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Top 10 categories with the highest hesitance in 2021",
+       x = "Group categories", y = "2021 hesitance (%)") +
   theme_minimal() + 
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,size=6),
         axis.text.y = element_text(size=8),
         axis.title = element_text(size = 8),
         plot.title = element_text(size = 12))
 
-top_10_highest_hesitance_cat_list = covid_2021_analysis |> ungroup |> top_n (10, `Estimate (%)`) |> select(concat)
+# Store the categories with the highest hesitance rates in a single-column dataframe
+top_10_highest_hesitance_cat_list <- covid_2021_analysis |>
+  ungroup() |>
+  top_n(10, `Estimate (%)`) |> select(concat)
 
 ```
 
 
+To dive deeper into the variations in vaccine hesitance by state, we focused on the 10 most and least hesitant states and explored how their respective hesitance rates differed by population segment. Rather than considering all population segments, we narrowed the groups to those that, nationally, had the highest hesitance (see graph above).
 
-Analyzing 10 states with the highest and lowest hesitance, the parallel coordinate plots below will review geographical patterns in segments of the population with the highest hesitance.
+To facilitate our investigation, we created a set of parallel coordinate plots for the group of 10 most hesitant states and the group of 10 least hesitant states. In both cases, the hesitance rates were not uniform across all population segments. In particular, the group of individuals who responded "A little or not at all" to whether vaccines are important to them showed remarkably higher hesitance rates at the state level.
+
+Another question we looked at via interactive parallel coordinates plots is whether states with higher overall hesitance rates would consistently have higher rates at the population segment level. Conversely, we looked at whether states with lower overall hesitance rates had consistently lower rates relative to other states at the population segment level. The plots created revealed that no clear pattern existed for knowing whether a top 10 hesitant state would necessarily be in the top 10 for all population segments. For example, California had the highest hesitance among white individuals aged 18-49 but was not in the top 9 states for hesitance among those who have not previously been vaccinated (see segment = "Past.Vaccin - No").
 
 ```{r}
 
@@ -207,11 +230,6 @@ state_group_analysis <- state_group_analysis |> mutate(concat = paste(`Group Nam
 
 state_group_analysis$concat_wrap <- str_wrap(state_group_analysis$concat, width = 10)
 
-
-# top_5_highest_hesitance_cat_list <- covid_2021_analysis |>
-#                                          ungroup |>
-#                                          top_n(5, `Estimate (%)`) |>
-#                                          select(concat_wrap)
 
 # Filter groups for top most hesitant
 # Pivot wider to convert row-level categories to columns containing hesitancy rates
@@ -254,9 +272,11 @@ ggparcoord(top_10_parallel_analaysis |> select(where(~!any(is.na(.)))), columns 
     labs(title = "Top categories with the highest hesitance in 2021",
        x = "Group categories", y = "2021 hesitance (%)")
 
-# Maybe go with the iteractive version?
+
+# Display interactive version
 top_10_parallel_analaysis |> select(where(~!any(is.na(.))))|>
   parcoords(rownames = F, brushMode = "1D-axes", reorderable = T, queue = T)
+
 
 # Filter pivoted data on least hesitant states
 bottom_10_parallel_analaysis <- state_group_analysis_pivot |>
@@ -272,7 +292,7 @@ ggparcoord(bottom_10_parallel_analaysis |> select(where(~!any(is.na(.)))),
        x = "Group categories", y = "2021 hesitance (%)")
 
 
-# Maybe go with the iteractive version?
+# Display interactive version
 bottom_10_parallel_analaysis |>
   select(where(~!any(is.na(.))))|>
   parcoords(rownames = F, brushMode = "1D-axes", reorderable = T, queue = T)
@@ -280,24 +300,37 @@ bottom_10_parallel_analaysis |>
 ```
 
 
-Given the inconsistent trends seen across states and group categories with the highest hesitance, we proceeded to conduct chi squared tests on every group name defined within the scope of this exercise [link back to data.qmd] to determine those with the highest statistical significance.
+Given the inconsistent trends seen across states and population categories with the highest hesitance, we proceeded to conduct chi squared tests on every group name defined within the scope of this exercise [link back to data.qmd] to determine those with the highest statistical significance. For instance, does 
 
 ```{r}
 
-get_chi_sq<-function(df,geography,time_period,year,group_name,hesitant_group) {
+get_chi_sq <- function(df, geography, time_period, year, group_name, hesitant_group) {
   
-  temp = df |> filter(Geography == geography,`Indicator Name`=="Vaccination uptake and intention", `Time Period` == time_period,Year == year, `Group Name`==group_name)  |> mutate(hesitant = ifelse(`Indicator Category` %in% hesitant_group,1,0)) |> group_by(`Group Category`,hesitant) |> summarise(hesitance_rate = sum(`Estimate (%)`),sample_size = first(`Sample Size`)) |> mutate(n_hesitance = round(hesitance_rate/100 * sample_size,0)) |> filter(hesitant == 1) |> select(`Group Category`,n_hesitance,sample_size) 
-  if (nrow(temp) > 0) {
-    expected_proportion = sum(temp$n_hesitance)/sum(temp$sample_size)
+  temp <- df |> filter(Geography == geography,
+                       `Indicator Name`== "Vaccination uptake and intention",
+                       `Time Period` == time_period,
+                       Year == year,
+                       `Group Name`==group_name) |>
+    mutate(hesitant = ifelse(`Indicator Category` %in% hesitant_group,1,0)) |>
+    group_by(`Group Category`,hesitant) |>
+    summarise(hesitance_rate = sum(`Estimate (%)`),
+              sample_size = first(`Sample Size`)) |>
+    mutate(n_hesitance = round(hesitance_rate/100 * sample_size,0)) |>
+    filter(hesitant == 1) |>
+    select(`Group Category`,n_hesitance,sample_size)
+  
+  if(nrow(temp) > 0) {
+    expected_proportion <- sum(temp$n_hesitance)/sum(temp$sample_size)
 
-  temp = temp |> mutate(expected = sample_size*expected_proportion)
+  temp <- temp |>
+    mutate(expected = sample_size*expected_proportion)
   
-  res = chisq.test(x=temp$n_hesitance,p=temp$expected/sum(temp$expected))
-   output<-list(round(res$statistic,digits = 0),res$p.value)
+  res = chisq.test(x = temp$n_hesitance, p = temp$expected/sum(temp$expected))
+  output <- list(round(res$statistic,digits = 0), res$p.value)
     
   }
   else {
-    output<-list(0,0)
+    output <- list(0,0)
     
   }
   
@@ -305,20 +338,25 @@ get_chi_sq<-function(df,geography,time_period,year,group_name,hesitant_group) {
    return(output)
 }
 
-group_name_toloop = c("Sex","Age","Race/Ethnicity (7 level)","Age by race/ethnicity","Sexual orientation","Gender identity","Metropolitan statistical area","Born in the U.S.", "Language of interview","Poverty status", "Insurance status","Social Vulnerability Index (SVI) of county of residence", "Political leaning of county of residence", "Received non-COVID-19 vaccine(s) in past two years", "Health condition associated with higher risk for COVID-19 (any)","Disability status (any)", "Pregnancy status (females age 18 – 49 years)", "Ever had COVID-19 disease (self-report)","Concern about getting COVID-19 disease", "Confidence in COVID-19 vaccine safety",  "Confidence that COVID-19 vaccine is important", "Healthcare provider recommended I get a COVID-19 vaccine",  "COVID-19 vaccination status of friends and family","Work or school requires COVID-19 vaccination" )
+group_name_toloop <- c("Sex","Age","Race/Ethnicity (7 level)","Age by race/ethnicity","Sexual orientation","Gender identity","Metropolitan statistical area","Born in the U.S.", "Language of interview","Poverty status", "Insurance status","Social Vulnerability Index (SVI) of county of residence", "Political leaning of county of residence", "Received non-COVID-19 vaccine(s) in past two years", "Health condition associated with higher risk for COVID-19 (any)","Disability status (any)", "Pregnancy status (females age 18 – 49 years)", "Ever had COVID-19 disease (self-report)","Concern about getting COVID-19 disease", "Confidence in COVID-19 vaccine safety",  "Confidence that COVID-19 vaccine is important", "Healthcare provider recommended I get a COVID-19 vaccine",  "COVID-19 vaccination status of friends and family","Work or school requires COVID-19 vaccination" )
 
-group_name_toloop_short = lapply(group_name_toloop, function(x) ifelse(x %in% names(group_name_shortening), group_name_shortening[[x]], x))
+group_name_toloop_short <- lapply(group_name_toloop, function(x) ifelse(x %in% names(group_name_shortening), group_name_shortening[[x]], x))
   
 
 result_df2 <- data.frame(matrix(ncol = 3, nrow = 0))
 colnames(result_df2) <- c("group_name", "X2_test_stat", "p_value")
 
 for (x in group_name_toloop_short) {
-  res = get_chi_sq(covid_2021_analysis,geography="National",time_period = "2021 analysis period",year=2021,group_name=x,hesitant_group = c("Probably or definitely will not get vaccinated"))
+  res <- get_chi_sq(covid_2021_analysis,geography = "National",
+                    time_period = "2021 analysis period",
+                    year = 2021,
+                    group_name = x,
+                    hesitant_group = c("Probably or definitely will not get vaccinated"))
   result_df2[nrow(result_df2) + 1,] = c(x,res[1],res[2])
 
 }
-result_df2 = arrange(result_df2,desc(X2_test_stat))
+
+result_df2 <- arrange(result_df2, desc(X2_test_stat))
 
 
 ```
@@ -326,23 +364,23 @@ result_df2 = arrange(result_df2,desc(X2_test_stat))
 The top 10 most statistically significant group names are shown below:
 
 ```{r}
-result_df2 |> ungroup |> top_n(10,X2_test_stat)
+result_df2 |> ungroup() |> top_n(10,X2_test_stat)
 
 ```
-Two illustrative mosaic plots are shown below to confirm the chi square test result above - one for the group name with the higest X2 score (the segment that felt vaccines were important), and one for the lowest (gender identity). 
+Two illustrative mosaic plots are shown below to confirm the chi square test result above - one for the group name with the highest Chi-Square score (the segment that felt vaccines were important), and one for the lowest (gender identity). 
 
 
 ```{r}
 
-mosaic_2var <-function(df,indep_var_group_name,n_chars) {
+mosaic_2var <- function(df,indep_var_group_name,n_chars) {
 library(vcd)
   truncate_string <- function(x) {
   str_sub(x, 1, n_chars)}
 
-indep_var_group_name_no_spaces = gsub("[()\\[/\\\\ ]", ".", indep_var_group_name)
-indep_var_group_name_no_spaces = truncate_string(indep_var_group_name_no_spaces)
+indep_var_group_name_no_spaces <- gsub("[()\\[/\\\\ ]", ".", indep_var_group_name)
+indep_var_group_name_no_spaces <- truncate_string(indep_var_group_name_no_spaces)
 
-temp = df |> ungroup |> filter(`Group Name` == indep_var_group_name) |> mutate(n_not_hesitant = `Sample Size` - n_hesitant) |>  select(`Group Category`, n_hesitant, n_not_hesitant,`Sample Size`) |>  rename(
+temp = df |> ungroup() |> filter(`Group Name` == indep_var_group_name) |> mutate(n_not_hesitant = `Sample Size` - n_hesitant) |>  select(`Group Category`, n_hesitant, n_not_hesitant,`Sample Size`) |>  rename(
     !!indep_var_group_name_no_spaces := `Group Category`,hesitant = `n_hesitant`, `not hesitant` = n_not_hesitant) |> 
   pivot_longer(cols = hesitant:`not hesitant`,names_to = "group", values_to = "Freq" )
 
@@ -361,7 +399,7 @@ mosaic_2var(covid_2021_analysis,"G.Identity",100)
 
 
 ```
-It can be clearly seen that those that saw a vaccine as important had significantly lower hesitance than those that did not. However, for the group name with the lowest X2 score (gender identity), the observed and expected mosaic plots are nearly identical, thus confirming the X2 test result.
+It can be clearly seen that those that saw a vaccine as important had significantly lower hesitance than those that did not. However, for the group name with the lowest Chi-Square score (gender identity), the observed and expected mosaic plots are nearly identical, thus confirming the Chi-Square test result.
 
 [add commentary on results]
 
@@ -369,8 +407,7 @@ It can be clearly seen that those that saw a vaccine as important had significan
 #### Part 2: Analyze which segments showed the greatest reduction in covid vaccine hesitancy between 2021 and 2023
 
 
-We have already illustrated that national vaccine hesitance declined from around 18% in April/May 2021 to around 11% in June/July 2023.
-
+We have already illustrated that national vaccine hesitance declined from around 18% in April/May 2021 to around 11% in May/June 2023. 
 ```{r}
 
 # Filter for the vaccination uptake and intent indicator
@@ -408,46 +445,129 @@ However, some segments of the population demonstrated more decline in hesitance 
 
 ```{r}
 
-annual_monthly_snapshots = c("April 22 - May 29","May 1 - May 28","April 30 - May 27")
+annual_monthly_snapshots = c("April 22 - May 29","May 1 - May 28",
+                             "April 30 - May 27")
 
-snapshots = covid |> filter(`Time Period` %in% annual_monthly_snapshots,`Group Name` %in% group_name_toloop, Geography == "National",`Indicator Category` == "Probably or definitely will not get vaccinated" ) |> mutate(Year = as.factor(Year)) |> mutate_at(vars(`Group Name`), ~recode(., !!!group_name_shortening)) |> mutate_at(vars(`Group Category`), ~recode(., !!!group_cat_shortening)) |>   mutate(rows = paste(`Group Name`, `Group Category`, sep = " - ")) |> select(rows,Year,`Estimate (%)`) |> arrange(rows, Year) 
+snapshots <- covid |>
+  filter(`Time Period` %in% annual_monthly_snapshots,
+         `Group Name` %in% group_name_toloop,
+         Geography == "National",
+         `Indicator Category` == "Probably or definitely will not get vaccinated" ) |>
+  mutate(Year = as.factor(Year)) |>
+  mutate_at(vars(`Group Name`), ~recode(., !!!group_name_shortening)) |>
+  mutate_at(vars(`Group Category`), ~recode(., !!!group_cat_shortening)) |>
+  mutate(rows = paste(`Group Name`, `Group Category`, sep = " - ")) |>
+  select(rows,Year,`Estimate (%)`) |>
+  arrange(rows, Year) 
 
-row_order = snapshots |> pivot_wider(names_from = Year, values_from = `Estimate (%)`) |> drop_na(`2021`) |> drop_na(`2023`) |> mutate(decline_21_23 = `2021` - `2023`) |> arrange((decline_21_23))
+row_order <- snapshots |>
+  pivot_wider(names_from = Year, values_from = `Estimate (%)`) |>
+  drop_na(`2021`) |>
+  drop_na(`2023`) |>
+  mutate(decline_21_23 = `2021` - `2023`) |>
+  arrange((decline_21_23))
 
-row_order_list_chg_21_23 = c(row_order$rows)
+row_order_list_chg_21_23 <- c(row_order$rows)
 
-row_order_list_2021 = row_order  |> arrange(`2021`) |> top_n(20,`2021`) |> select(rows)
-row_order_list_2021 = row_order_list_2021$rows               
+row_order_list_2021 <- row_order |>
+  arrange(`2021`) |>
+  top_n(20,`2021`) |>
+  select(rows)
 
-row_order_list_2023 = c(row_order |> arrange((`2023`)) |> select(rows))
+row_order_list_2021 <- row_order_list_2021$rows               
 
-snapshots  = snapshots[snapshots$rows %in% row_order_list_chg_21_23, ]
+row_order_list_2023 <- c(row_order |>
+                           arrange((`2023`)) |>
+                           select(rows))
+
+snapshots <- snapshots[snapshots$rows %in% row_order_list_chg_21_23, ]
 
 
-snapshots  |>  filter(rows %in% row_order_list_2021) |> ggplot(aes(x = `Estimate (%)`, y = fct_relevel(rows,(row_order_list_2021)), color = Year)) +
+snapshots |> filter(rows %in% row_order_list_2021) |>
+  ggplot(aes(x = `Estimate (%)`, y = fct_relevel(rows,(row_order_list_2021)),
+             color = Year)) +
   geom_point(size = 1) +
-  labs(title = "20 most hesitant segments in 2021, and changes in 2022-23", x = "Vaccine hesitance (%)", y = "Sample segments") +
-  theme(legend.position = "bottom",axis.text.x = element_text(size = 10), axis.text.y = element_text(size = 6), plot.title = element_text(size = 10))
+  labs(title = "20 most hesitant segments in 2021, and changes in 2022-23",
+       x = "Vaccine hesitance (%)", y = "Sample segments") +
+  theme(legend.position = "bottom",axis.text.x = element_text(size = 10),
+        axis.text.y = element_text(size = 6), plot.title = element_text(size = 10))
 
 ```
-It can be seen from the cleveland dot plot below that the change in hesitance of the top 20 most hesitant segments in 2021 varies by group. The bar graph below shows the 10 segments that demonstrated the largest changes in hesitance.
+It can be seen from the cleveland dot plot that the change in hesitance of the top 20 most hesitant segments in 2021 varies by group. The bar graph below shows the 10 population segments that demonstrated the largest changes in hesitance.
 
 ```{r}
 #barplot of change
 library(stringr)
-row_order$rows = str_wrap(row_order$rows, width = 10)
+row_order$rows <- str_wrap(row_order$rows, width = 10)
 
-row_order |> top_n (10, decline_21_23)  |> ggplot(aes(x = fct_reorder(rows,rev(decline_21_23)), y = decline_21_23)) +  geom_bar(stat = "identity")+
-labs(title = "Top 10 categories with the largest 2021-23 changes", x = "Group categories", y = "2021-23 change in hesitance") +
+row_order |>
+  top_n (10, decline_21_23) |>
+  ggplot(aes(x = fct_reorder(rows,rev(decline_21_23)), y = decline_21_23)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Top 10 categories with the largest 2021-23 changes",
+       x = "Group categories", y = "2021-23 change in hesitance") +
   theme_minimal() + 
   theme(axis.text.x = element_text(angle = 0, vjust = 1, hjust=0.5,size=6),
         axis.text.y = element_text(size=8),
         axis.title = element_text(size = 8),
         plot.title = element_text(size = 8))
 ```
-The change in hesitance also varies by state:
 
-#Karl to add
+The change in hesitance also varies by state:
+```{r}
+
+comparison_baseline_2021 <- covid |>
+  filter(`Year` == 2021, `Time Period` == "April 22 - May 29",
+         `Group Category`== "All adults age 18+ years",
+         `Geography Type` %in% c("Jurisdictional Estimates"),
+         `Indicator Category` == "Probably or definitely will not get vaccinated",
+         !grepl("-", Geography)) |>
+  mutate(n_hesitant = round(`Estimate (%)`/100 * `Sample Size`, 0)) |>
+  group_by(Geography) |>
+  summarise(`Sample Size` = sum(`Sample Size`),
+            n_hesitant = sum(n_hesitant)) |>
+  mutate(`Estimate (%)` = n_hesitant / `Sample Size` * 100,
+         `Time Period` = "2021 most recent snapshot",
+         Year = 2021)
+
+covid_2023_analysis_allstates <- covid |>
+  filter(`Year` == 2023, `Time Period` == "May 28 - June 30",
+         `Group Category`== "All adults age 18+ years",
+         `Geography Type` %in% c("Jurisdictional Estimates"),
+         `Indicator Category` == "Probably or definitely will not get vaccinated",
+         !grepl("-", Geography)) |>
+  mutate(n_hesitant = round(`Estimate (%)`/100 * `Sample Size`, 0)) |>
+  group_by(Geography) |>
+  summarise(`Sample Size` = sum(`Sample Size`),
+            n_hesitant = sum(n_hesitant)) |>
+  mutate(`Estimate (%)` = n_hesitant / `Sample Size` * 100,
+         `Time Period` = "2023 most recent snapshot",
+         Year = 2023)
+
+
+state_delta <- left_join(covid_2023_analysis_allstates,
+                         comparison_baseline_2021 |>
+                           select(Geography, estimate_2021 = `Estimate (%)`),
+                         by = "Geography")
+
+state_delta <- state_delta |>
+  mutate(`Change in Hesitancy Rates` = `Estimate (%)` - estimate_2021)
+
+state_delta_map <- state_delta |>
+  select(Geography, `Change in Hesitancy Rates`) |>
+  transmute(region = tolower(Geography),
+            value = as.numeric(`Change in Hesitancy Rates`))
+
+
+# red_green_palette <- brewer.pal(n = 7, name = "RdYlGn")
+
+state_choropleth(state_delta_map,
+                 title = "   2021-2023 Changes in Vaccine Hesitance by State",
+                 legend = "Change in \nHesitancy Rates   ",
+                 num_colors = 0)
+
+
+```
 
 
 
