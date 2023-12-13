@@ -45,7 +45,7 @@ covid <- fread("../covid_dataset/covid.csv")
 
 #### Part 1: Study which segments of the population exhibited greatest covid vaccine hesitancy following the deployment of mass vaccinations in the US in early 2021. 
 
-The national average reported COVID hesitance rate during the first quarter of the data collection period (April - July 2021) was 17.7%. In Part 1, we will break down this percentage across U.S. geographies, identifying the states with the highest and lowest hesitancy rates. We will then analyze the type of population demographics (e.g., age, vaccination history, ethnicity, etc.) that had a strong association with COVID vaccine hesitancy.
+The national average COVID hesitance rate reported during the first quarter of the data collection period (April - July 2021) was 17.7%. In Part 1, we will break down this percentage across U.S. geographies, identifying the states with the highest and lowest hesitancy rates. We will then analyze the types of population demographics (e.g., age, vaccination history, ethnicity, etc.) that had a strong association with COVID vaccine hesitancy.
 
 
 To obtain an initial baseline of vaccine hesitance rates, we developed the chunk of code below, which revealed that the nationwide hesitance rate from April 2021 to July 2021 was 17.7% nationwide. In other words, 17.7% of those surveyed after the mass deployment of vaccinations responded that they would probably or definitely not get vaccinated.
@@ -517,7 +517,8 @@ The change in hesitance also varies by state:
 ```{r}
 
 comparison_baseline_2021 <- covid |>
-  filter(`Year` == 2021, `Time Period` == "April 22 - May 29",
+  filter(`Year` == 2021, `Time Type` == "Monthly",
+         `Time Period` == "April 22 - May 29",
          `Group Category`== "All adults age 18+ years",
          `Geography Type` %in% c("Jurisdictional Estimates"),
          `Indicator Category` == "Probably or definitely will not get vaccinated",
@@ -531,7 +532,8 @@ comparison_baseline_2021 <- covid |>
          Year = 2021)
 
 covid_2023_analysis_allstates <- covid |>
-  filter(`Year` == 2023, `Time Period` == "May 28 - June 30",
+  filter(`Year` == 2023, `Time Type` == "Monthly",
+         `Time Period` == "May 28 - June 30",
          `Group Category`== "All adults age 18+ years",
          `Geography Type` %in% c("Jurisdictional Estimates"),
          `Indicator Category` == "Probably or definitely will not get vaccinated",
@@ -570,6 +572,43 @@ state_choropleth(state_delta_map,
 ```
 
 
+```{r}
+
+hesitance_state_group_cat <- covid |>
+  filter(`Time Type` == "Monthly",
+         `Geography Type` %in% c("Jurisdictional Estimates"),
+         `Indicator Category` == "Probably or definitely will not get vaccinated",
+         !grepl("-", Geography)) |>
+  mutate(month_split = paste0(str_split(`Time Period`, "-",
+                                        simplify = TRUE)[, 2], ", ", Year),
+         month = mdy(month_split),
+         n_hesitant = round(`Estimate (%)`/100 * `Sample Size`, 0)) |>
+  group_by(Geography, `Group Name`, `Group Category`, month) |>
+  summarise(`Sample Size` = sum(`Sample Size`),
+            n_hesitant = sum(n_hesitant)) |>
+  mutate(`Estimate (%)` = n_hesitant / `Sample Size` * 100) |>
+  ungroup()
+
+
+hesitance_state_group_cat <- hesitance_state_group_cat |>
+  mutate_at(vars(`Group Name`), ~recode(., !!!group_name_shortening)) |>
+  mutate_at(vars(`Group Category`), ~recode(., !!!group_cat_shortening)) |>
+  mutate(concat = paste0(Geography, ": ", `Group Name`, " - ", `Group Category`),
+         concat_no_state = paste0(`Group Name`, " - ", `Group Category`))
+
+
+d3_input_prep <- hesitance_state_group_cat |>
+  pivot_wider(id_cols = month, names_from = "concat", values_from = `Estimate (%)`)
+
+write_csv(d3_input_prep, "D3 Inputs/All State-Category Values.csv")
+
+
+dropdown_selections <- hesitance_state_group_cat |>
+  distinct(Geography, concat_no_state)
+
+write_csv(dropdown_selections, "D3 Inputs/Dropdown Choices.csv")
+
+```
 
 
 
