@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
-<style> /* set the CSS */
+<style> 
 body { font: 12px Arial;}
 path { 
     stroke: steelblue;
@@ -19,8 +19,6 @@ path {
     font-weight: bold;
     text-anchor: middle;
 }
-
-
 
 </style>
 <body>
@@ -108,7 +106,7 @@ var jsondata = data.map(function(d) {
     return {
       category: d.Category,
       field1: +d[selectedColumn1],
-      field2: +d[selectedColumn2]   // Convert to a number if needed
+      field2: +d[selectedColumn2]  
     };
   });
 
@@ -141,7 +139,7 @@ var category = svg.selectAll(".category")
   .attr("class", "category")
   .attr("transform", d => `translate(${xScale0(d.category)},0)`);
 
-/* Add field1 bars */
+// Add field1 bars
 category.selectAll(".bar.field1")
   .data(d => [d])
   .enter()
@@ -155,7 +153,7 @@ category.selectAll(".bar.field1")
     return height - margin.top - margin.bottom - yScale(d.field1)
   });
   
-/* Add field2 bars */
+// Add field2 bars
 category.selectAll(".bar.field2")
   .data(d => [d])
   .enter()
@@ -212,7 +210,7 @@ svg.append("text")
   d3.select("#categorySelector1").on("change", function() {
     selectedColumn1 = d3.select("#stateSelector1").property("value") +": "+ this.value;
     updateChart(selectedColumn1,selectedColumn2);
-console.log(selectedColumn1,selectedColumn2);
+
 
   });
 
@@ -227,7 +225,7 @@ console.log(selectedColumn1,selectedColumn2);
   d3.select("#categorySelector2").on("change", function() {
     selectedColumn2 = d3.select("#stateSelector2").property("value") +": "+ this.value;
     updateChart(selectedColumn1,selectedColumn2);
-console.log(selectedColumn1,selectedColumn2);
+
 
   });
 
@@ -238,10 +236,10 @@ jsondata = data.map(function(d) {
     return {
       category: d.Category,
       field1: +d[column1],
-      field2: +d[column2]   // Convert to a number if needed
+      field2: +d[column2]   
     };
   });
-console.log(jsondata)
+
 yScale.domain([0, d3.max(jsondata, d => d.field1 > d.field2 ? d.field1 : d.field2)]);
 
     //Update y-axis
@@ -257,7 +255,7 @@ yScale.domain([0, d3.max(jsondata, d => d.field1 > d.field2 ? d.field1 : d.field
   // Function to update bars with transitions
   function updateBars() {
 
-/* change field1 bars */
+// change field1 bars
 d3.selectAll(".bar.field1")
   .data(jsondata.map(function(obj) {return obj["field1"]})).transition().duration(500)
   .attr("y", d => yScale(d))
@@ -265,14 +263,14 @@ d3.selectAll(".bar.field1")
     return height - margin.top - margin.bottom - yScale(d)
   });
   
-/* change field2 bars */
+// change field2 bars
 d3.selectAll(".bar.field2")
   .data(jsondata.map(function(obj) {return obj["field2"]})).transition().duration(500)
   .attr("y", d => yScale(d))
   .attr("height", d => {
     return height - margin.top - margin.bottom - yScale(d)
   });
-console.log()
+
 
   }
 
