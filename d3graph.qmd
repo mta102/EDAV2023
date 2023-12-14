@@ -4,9 +4,29 @@
   * {
     font-family: sans-serif;
   }
-</style> 
+</style>
 
-<div id="plot">
+<h3 style="font-size: 10px;">h3 Legend</h3>
+<div style="width: 590px; height: 20px; border: 1px solid #ccc; background-color: #3374FF;">
+
+  <label for="stateSelector1">Select State 1:</label>
+  <select id="stateSelector1"></select>
+
+  <label for="categorySelector1">Select Category 1:</label>
+  <select id="categorySelector1"></select>
+
+</div>
+
+<div style="width: 580px; height: 20px; border: 1px solid #ccc; background-color: #33FFAC;">
+  <label for="stateSelector2">Select State 2:</label>
+  <select id="stateSelector2"></select>
+
+  <label for="categorySelector2">Select Category 2:</label>
+  <select id="categorySelector2"></select>
+
+</div>
+
+<div id="plot"; height: 500px>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
