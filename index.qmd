@@ -9,6 +9,6 @@ The challenges posed by vaccine hesitance during the COVID-19 pandemic underscor
 
 - Study which segments of the population exhibited greatest COVID vaccine hesitancy following the deployment of mass vaccinations in the US in early 2021.
 
-- Analyse which segments showed the greatest reduction in COVID vaccine hesitancy between 2021 and 2023.
+- Analyze which segments showed the greatest reduction in COVID vaccine hesitancy between 2021 and 2023.
 
 - Propose high-level recommendations for segments of the population that need further public health interventions.

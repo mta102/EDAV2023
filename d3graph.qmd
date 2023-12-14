@@ -7,29 +7,62 @@
 </style>
 
 
-<p style="font-size: 14px;">
-The graph below plots COVID-19 vaccine hesitance rates over time for each combination of state and population segments.
+<p>
+The graph below visualizes COVID-19 vaccine hesitance rates for each state and population segment from 2021 to 2023. It is intended to compare how hesitancy within different geographies and population segments evolved over time. 
 </p>
 
 
 <h3 style="font-size: 12px;">Legend</h3>
 
-<div style="width: 700px; height: 20px; border: 1px solid #ccc; background-color: #3374FF;">
+<div style="width: 700px; height: 30px; border: 1px solid #ccc; background-color: #3374FF;">
   <label for="stateSelector1" style="font-size: 12px;">Select State 1:</label>
   <select id="stateSelector1" style="font-size: 12px;"></select>
   <label for="categorySelector1" style="font-size: 12px;">Select Category 1:</label>
   <select id="categorySelector1" style="font-size: 12px;"></select>
 </div>
 
-<div style="width: 700px; height: 20px; border: 1px solid #ccc; background-color: #33FFAC;">
+<div style="width: 700px; height: 30px; border: 1px solid #ccc; background-color: #33FFAC;">
   <label for="stateSelector2" style="font-size: 12px;">Select State 2:</label>
   <select id="stateSelector2" style="font-size: 12px;"></select>
   <label for="categorySelector2" style="font-size: 12px;">Select Category 2:</label>
   <select id="categorySelector2" style="font-size: 12px;"></select>
 </div>
 
-<div id="plot"; style = "width: 700px; height: 500px">
+<div id="plot"; style = "width: 700px; height: 420px">
 </div>
+
+<p>
+The following selections help illustrate some of the key findings discussed in the Results section of this report:
+</p>
+
+<p>
+- State 1: Oklahoma,      Category 1: Age - 50 – 64
+- State 2: West Virginia, Category 2: Insurance - Not insured OR
+- State 2: Utah,          Category 2: SVI - Moderate
+</p>
+
+
+The combinations above illustrate some of the remarkable disparities in how vaccine hesitance changed across geographies and population segments. Individuals between the ages 50 to 64 in Oklahoma saw a 14% increase in hesitance over the two years. On the other hand, West Virginia residents who are not insured had a 31% drop in hesitance, while Utah residents who qualified as "moderate" in the Social Vulnerability Index (SVI) also had a large decrease of 30% in hesitance.
+
+The disparities can also be seen within a given state. For instance, the selection below illustrates how two population segments in Texas, individuals with a disability and essential frontline workers, had very different trends in hesitance.
+
+<p>
+- State 1: Texas,     Category 1: Disability - Yes
+- State 2: Texas,     Category 2: Ess.Wrkr.grp - Frontline.Other
+</p>
+
+Lastly, the grouped bar chart also revealed that disparities in hesitance change can also occur within the same population segment. The selection below shows that individuals New Mexico between the age of 50 and 64 had a 16% increase in hesitance, whereas the same group had a 21% decrease in hesitance in Mississippi.
+
+<p>
+- State 1: New Mexico,    Category 1: Age.Race - 50 – 64, White
+- State 2: Mississippi,   Category 2: Age.Race - 50 – 64, White
+</p>
+
+
+We leave it up to the reader to explore differences in trends from other combinations of geographies and population segments. 
+
+
+
 
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
 <script src="scripts/myscript.js"></script>

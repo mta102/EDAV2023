@@ -2,10 +2,10 @@
 
 ## Technical Description 
 
-### Identify one or more data sources:
+### Data source selected:
 The data source which we will use for our study is the CDC’s National Immunization Survey Adult COVID Module (NIS-ACM). It provides information on COVID-19 vaccination status and intent, segmented by geography, age, ethnicity, socio-economic status, and other characteristics. The data can be found [here](https://www.cdc.gov/vaccines/imz-managers/coverage/covidvaxview/interactive/adults.html)
 
-### How the data are collected and by whom:
+### How the data was collected and by whom:
 The data was collected by the CDC through a series of telephone interviews conducted between April 2021 and June 2023 (latest sample available). Each week, the CDC surveyed between 7,500 to 20,000 US adults aged 18 years and above using a random-digit-dialed sample of cell telephone numbers. These samples were stratified by state, the District of Columbia, and five local jurisdictions (Bexar County, TX; Chicago, IL; Houston, TX; New York City, NY; and Philadelphia County, PA). During some survey periods, Guam, the US Virgin Islands, and Puerto Rico were included as well.
 
 To correct any imbalances or biases in the sample that might arise due to the survey design or data collection methods, the CDC applied weights to the proportion of the sampled individuals giving a particular response in the survey.
@@ -30,7 +30,7 @@ Given that the participant demographics and combinations of survey questions and
 ### Frequency of updates:
 The data is updated weekly, with the first samples of data having been collected the week of Apr 22 – May 1 2021 and the latest samples corresponding to the week of June 25 – June 30 2023. The CDC also aggregates its weekly estimates to determine monthly estimates.
 
-### Dimensions:
+### Dataset dimensions:
 The data contains 5.08M rows x 13 columns.
 
 ### Other relevant information:
@@ -64,7 +64,7 @@ Through data exploration and reviews of the data source documentation, we identi
 ## Research plan
 
 
-### Explain in detail how your data will enable you to answer your research questions from the introduction. 
+### How the data can be used for our research:
 The dataset chosen provides a number of interesting factors to be examined in the context of vaccine hesitance. Below, we have outlined the fields we plan to leverage in order to explore potential relationships between our dependent variable - vaccine hesitance response rates - and various independent variables such as geography, age, and ethnicity.
 
 **Dependent Variable(s)**
@@ -80,7 +80,7 @@ The data contains the following dependent variables of interest to our study, wh
 -	Estimate (%) for Indicator Category = “Vaccinated (>=1 dose)”
 
 
-Where applicable, we can combine the dependent variables above into the following two options:
+For analysis purposes, we combined the vaccine uptake/intention responses into two categories, Hesitant and Not Hesitant, as outlined below. Our focus is to explore factors that relate to Hesitant responses.
 
 -	Hesitant: Indicator Category = “Probably or definitely will not get vaccinated”
 
@@ -89,9 +89,9 @@ Where applicable, we can combine the dependent variables above into the followin
 
 **Independent variables**
 
-The correlation between the hesitance and the following independent variables (as defined by the column "Group Name") will be studied initially nationally (as defined by the column "Geography"), but any geographical disparities may be highlighted on a case by case basis:
+The disparities in vaccine hesitance will be studied initially by geography (as defined by the "Geography" column in our dataset) and then by population segment (specified in the "Group Name" and "Group Category" columns) on a case by case basis. Below are examples of population characteristics we will be analyzing while looking for drivers of vaccine hesitance:
 
-Demographics:
+General Demographics:
 
 - Gender
 
@@ -119,7 +119,7 @@ Demographics:
 
 - Political leaning
 
-Health condition
+Health Condition-Specific
 
 - Previous vaccination status
 
@@ -141,7 +141,7 @@ Health condition
 
 - "Importance" of vaccine
 
-Social pressure
+Social Pressure-Related Demographics
 
 - Recommended by healthcare providers
 
@@ -156,7 +156,7 @@ Logistics
 
 **Time window**
 
-We would also like to study changes in hesitance at particular points in time and changes over a large period of time (2 years, from Apr/May 2021 to Jun 2023). As such, we we will use the Time Period field as another variable for this analysis. While the data is broken down between weekly and monthly samples, we will be focusing on monthly data for our study. This is because we do not expect significant changes in hesitance on a weekly basis, and attempting to compare weekly data could be subject to sampling error due to the random-dialed study design.
+We would like to study changes in hesitance at particular points in time and changes over a large period of time (2 years, from Apr/May 2021 to Jun 2023). As such, we we will use the Time Period field as another variable for this analysis. While the data is broken down between weekly and monthly samples, we will be focusing on monthly data for our study. This is because we do not expect significant changes in hesitance on a weekly basis, and attempting to compare weekly data could be subject to sampling error due to the random-dialed study design.
 
 
 ### Approach:
@@ -166,42 +166,29 @@ Our analysis approach can be broken down into the following key activities:
 
 This process will consist of the following steps:
 
--	Writing R-code to auto rank every possible segment’s hesitance by statistical significance (i.e. using p-values and test-statistics from Chi-sq tests) at a point in time specified below.
+- Visualizing geographic disparities in vaccine hesitance via spatial heatmaps.
 
--	Building visuals of the 10 segments with the strongest association to vaccine hesitance to draw additional insights. For this step, we are considering using the following graph types: (x / indpt vars are cat: y / dep vars are numerical (% or n stating “Probably or definitely will not get vaccinated”)
+-	Performing Chi-Square tests to identify the types of population demographics that have an association  with vaccine hesitance.
 
-- Bars / stacked bars
+-	Developing supporting graphs that enable us to explore how vaccine hesitance varies by population segment and draw additional insights. For this step, we will leverage a variety of graph types such as parallel coordinates plots, bar charts, mosaic plots, and scatterplots.
 
-- Mosaic plots
-
-- Spatial heatmaps
-
-- The snapshot in time we will be using to measure associations will comprise of the first three monthly periods of data available, where the average proportion of responses corresponding to vaccine hesitance was ~18%. To combine the three monthly periods, we will create a weighted average of the survey responses. For instance, if vaccine hesitance rates for a particular group were 20 out 100 (20%) in month 1, 20/150 (13%) in month 2, and 10/90 (11%) in month 3, the weighted average hesitance rate for that group would be 50/340 (14.7%).
+The snapshot in time we will be using to analyze hesitancy will comprise of the first three monthly periods of data available, where the average proportion of responses corresponding to vaccine hesitance was ~18%. To combine the three monthly periods, we will create a weighted average of the survey responses. For instance, if vaccine hesitance rates for a particular group were 20 out 100 (20%) in month 1, 20/150 (13%) in month 2, and 10/90 (11%) in month 3, the weighted average hesitance rate for that group would be 50/340 (14.7%).
 
 The rationale for choosing the first three monthly periods of data is due to the prevalence and relative stability of hesitance during that time frame. Below, we will visualize vaccine hesitance over time to illustrate this.
 
-##### Import Libraries
 ```{r message=FALSE, warning = FALSE}
 
+#Plot vaccine hesitance over time
+
+# Import libraries
 # install.packages("data.table")
 library(tidyverse)
 library(data.table)
 library(lubridate)
 
-```
-
-
-##### Import dataset
-```{r message=FALSE, warning = FALSE}
-
 # Load dataset
 covid <- fread("../covid_dataset/covid.csv")
 
-```
-
-
-##### Plot vaccine hesitance over time
-```{r message=FALSE, warning = FALSE}
 
 # Filter for the vaccination uptake and intent indicator
 # Filter for responses corresponding to vaccine hesitancy
@@ -237,13 +224,13 @@ ggplot(vacc_intention_time, aes(x = month, y = `Estimate (%)`,
 
 
 #### Part 2: Analyze which segments showed the greatest reduction in covid vaccine hesitancy between 2021 and 2023
-We will analyse which segments showed the greatest reduction in COVID vaccine hesitancy between 2021 and 2023. To perform this step, we will leverage several visuals that can provide insights into trends of hesitancy over time:
+Following Part 1, will research which segments showed the greatest reduction in COVID vaccine hesitancy between 2021 and 2023. To perform this step, we will leverage several visuals that can provide insights into trends of hesitancy over time:
 
-- Cleveland dot plot - plot or annual snapshot of change in variable(s) of interest over time
+- Cleveland dot plots
 
-- Geographic heatmap (colours = changes)
+- Spatial heatmaps
 
-- Bar chart
+- Bar charts
 
 #### Part 3: Based on the findings above, we will propose high-level recommendations for segments of the population that need further public health interventions.
 
@@ -251,9 +238,9 @@ We will analyse which segments showed the greatest reduction in COVID vaccine he
 
 ## Missing value analysis
 
-### Describe any patterns you discover in missing values. If no values are missing, graphs should still be included showing that. (suggested: 2 graphs plus commentary)
+Before moving forward with our analysis approach, we conducted an investigation into possible missing data in our dataset. Our exploration of NAs in the dataset revealed the following findings:
 
-Our missing value analysis analyzes where the missing data is, determines the meaning of the missing data in the specific context of our dataset; we then make appropriate corrections.
+- Our dataset does contain NAs; however, they are isolated to the Estimate (%) column in our dataset, as shown below.
 
 ```{r message=FALSE, warning = FALSE}
 
@@ -277,6 +264,12 @@ ggplot(missing_vals_count_df,
        y = "Dataset Attributes") +
   theme_bw()
 
+```
+
+
+- Rows of data that have an NA hesitance rate still show the confidence interval for the true hesitance rate. The confidence intervals across these rows show hesitance rates close to 0%, suggesting that the NAs we are seeing should correspond to a hesitance rate of 0%.
+
+```{r message=FALSE, warning = FALSE}
 
 # To understand the NAs further, we made 3 observations which strongly indicates NA are in fact zero:
 
@@ -291,12 +284,31 @@ covid |> filter(is.na(`Estimate (%)`)) |>
   theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust=0.5))+
   scale_y_continuous(labels = scales::percent)
 
+```
+
+
+- This is further supported by another finding: there are 0 rows in the entire dataset showing a true 0% response rate. The lowest values that can be seen are 0.1%.
+
+
+```{r message=FALSE, warning = FALSE}
+
+# To understand the NAs further, we made 3 observations which strongly indicates NA are in fact zero:
+
 # Observation 2: Estimate (%) is rounded to 1 decimal point, and the lowest possible non-NA value is 0.1
 covid |>
   group_by(`Estimate (%)`) |>
   summarize(count = n()) |>
   filter(`Estimate (%)` <= 0.2 | is.na(`Estimate (%)`)) |>
   arrange(desc(`Estimate (%)`))
+
+```
+
+
+- Moreover, within each group and indicator containing at least one NA, the sum of response rates across the non-NA values adds up to 100%. Below is an example of vaccine uptake/intention response rates for individuals 65-years old or older in Wisconsin, sampled between April and May of 2021.
+
+```{r message=FALSE, warning = FALSE}
+
+# To understand the NAs further, we made 3 observations which strongly indicates NA are in fact zero:
 
 # Observation 3: Sense checks on subsets of the data where NAs are present are coherent, with a valid sample size, and the non-NA Estimate (%) summing up to 100
 NA_is_zero_proof1 <- covid |>
@@ -307,23 +319,8 @@ NA_is_zero_proof1 <- covid |>
   select(`Group Category`,`Indicator Category`,`Estimate (%)`,
          `Sample Size`,`95% CI (%)`)
 
-
-# Therefore, we will impute NAs as zeros 
-covid[is.na(covid)] = 0
-
-# Check: This does remove all NAs
-colSums(is.na(covid))
+print(NA_is_zero_proof1)
 
 ```
-
-Our exploration of NAs in the dataset revealed the following findings:
-
-- NAs are isolated to the Estimated (%) column in our dataset.
-
-- The pattern of NAs across various response rate confidence intervals suggests that these NAs should correspond to a response rate of 0%.
-
-- This is further supported by another finding: there are 0 rows in the entire dataset showing a true 0% response rate. The lowest values that can be seen are 0.1%.
-
-- Moreover, within each group and indicator containing at least one NA, the sum of response rates across the non-NA values adds up to 100%.
 
 Based on the findings above, we can safely conclude that the NAs in our dataset represent true 0% response rates. As such, we will impute NAs with 0s for our analysis purposes.
