@@ -31,14 +31,170 @@ library(GGally)
 library(parcoords)
 library(RColorBrewer)
 library(choroplethr)
+library(lubridate)
 
 ```
 
-Import dataset
+
+Import starting dataset and filter for vaccine hesitance indicator and monthly samples
 ```{r}
 
 # Load vaccine hesitancy data
 covid <- fread("../covid_dataset/covid.csv")
+
+# Filter for Monthly sample period and vaccine hesitance responses
+covid_hes <- covid |>
+  filter(`Time Type` == "Monthly",
+         `Indicator Category` == "Probably or definitely will not get vaccinated")
+
+```
+
+
+Prep data for analysis. The following chunk truncates the names of population segments for data visualization purposes
+```{r}
+
+
+# Create vector of shortened group names
+group_name_shortening <- c("Age" = "Age",
+                           "Age by race/ethnicity" = "Age.Race",
+                           "All adults 18+" = "18+ Adults",
+                           "Born in the U.S." = "US.Born",
+                           "Concern about getting COVID-19 disease" = "Covid.Concern",
+                           "Confidence in COVID-19 vaccine safety" = "Vaccine.Confiden",
+                           "Confidence that COVID-19 vaccine is important" = "Vaccine.Imprtnt",
+                           "COVID-19 vaccination status of friends and family" = "Fr.Fam.Vaccd",
+                           "COVID-19 vaccine information seeking frequency in past month" = "Vacc.Info.Seek",
+                           "Disability status (any)" = "Disability",
+                           "Essential worker group" = "Ess.Wrkr.grp",
+                           "Ever had COVID-19 disease (self-report)" = "Past.Covid",
+                           "Gender identity" = "G.Identity",
+                           "Have a regular physician or provider for primary care" = "Prim.Care.Providr.Status",
+                           "Health condition associated with higher risk for COVID-19 (any)" = "Comorbidity",
+                           "Healthcare provider recommended I get a COVID-19 booster" = "Dr.Recommend.Boostr",
+                           "Healthcare provider recommended I get a COVID-19 vaccine" = "Dr.Recommend.Vacc",
+                           "Insurance status" = "Insurance",
+                           "Language of interview" = "Language",
+                           "Mask-wearing frequency" = "Mask.Use",
+                           "Mental health status" = "Mental.Health",
+                           "Metropolitan statistical area" = "Rural.Urban",
+                            "Political leaning of county of residence" = "Political",
+                           "Poverty status" = "Pov.Status",
+                           "Pregnancy status (females age 18 – 49 years)" = "Pregnancy",
+                           "Race/Ethnicity (4 level)" = "Race.4lvl",
+                           "Race/Ethnicity (7 level)" = "Race.7lvl",
+                           "Received a flu vaccination" = "Flu.Vacc",
+                           "Received non-COVID-19 vaccine(s) in past two years" = "Past.Vaccin",
+                           "Self-perceived equity in seeking healthcare compared to other races/ethnicities" = "Racial.Equity",
+                           "Sex" = "Sex",
+                           "Sexual orientation" = "S.Orientation",
+                           "Social Vulnerability Index (SVI) of county of residence" = "SVI",
+                           "Speaks a language other than English at home" = "Non.Englsh.Language",
+                           "Work or school requires COVID-19 vaccination" = "Work.School")
+
+# Construct dataframe from vector
+group_name_shortened <- data.frame(`Group Name` = names(group_name_shortening), shortened_group = group_name_shortening, stringsAsFactors = FALSE)|>
+  dplyr::rename(`Group Name` = Group.Name)
+
+# Create vector of shortened group category names
+group_cat_shortening <- c("18 – 49 years" = "18 – 49",
+                          "50 – 64 years" = "50 – 64",
+                          "65+ years" = "65+",
+                          "18 – 49 years, Black, non-Hispanic" = "18 – 49, Black",
+                          "18 – 49 years, Hispanic" = "18 – 49, Hispanic",
+                          "18 – 49 years, Other or multiple races, non-Hispanic" = "18 – 49, Other",
+                          "18 – 49 years, White, non-Hispanic" = "18 – 49, White",
+                          "50 – 64 years, Black, non-Hispanic" = "50 – 64, Black",
+                          "50 – 64 years, Hispanic" = "50 – 64, Hispanic",
+                          "50 – 64 years, Other or multiple races, non-Hispanic" = "50 – 64, Other",
+                          "50 – 64 years, White, non-Hispanic" = "50 – 64, White",
+                          "65+ years, Black, non-Hispanic" = "65+, Black",
+                          "65+ years, Hispanic" = "65+, Hispanic",
+                          "65+ years, Other or multiple races, non-Hispanic" = "65+, Other",
+                          "65+ years, White, non-Hispanic" = "65+, White",
+                          "Born in the U.S." = "US Born",
+                          "Not born in the U.S." = "Not US Born",
+                          "Many or almost all family or friends have received vaccine" = "Many",
+                          "Some or no family or friends have been vaccinated" = "No_some","A little or not at all concerned" = "A little_not",
+                          "Very or moderately concerned" = "Very_Moderately",
+                          "Somewhat or not at all safe for me" = "Not at all_Somewhat",
+                          "Very or completely safe for me" = "Very",
+                          "A little or not at all important to protect me from COVID-19" = "A little_not at all",
+                          "Somewhat or very important to protect me from COVID-19" = "Somewhat_very",
+                          "No" = "No",
+                          "Yes" = "Yes",
+                          "Cisgender" = "Cisgender",
+                          "Don't know/refused" = "Dont know",
+                          "Transgender/Non-binary" = "TG/Non bin",
+                          "Insured" = "Insured",
+                          "Not insured" = "Not insured",
+                          "English" = "English",
+                          "Other" = "Other",
+                          "Spanish" = "Spanish",
+                          "Rural" = "Rural",
+                          "Suburban" = "Suburban",
+                          "Urban" = "Urban",
+                          "Democrat-leaning" = "Democrat",
+                          "Not Democrat-leaning or Republican-leaning" = "None",
+                          "Republican-leaning" = "Republican",
+                          "Above poverty, income <$75k" = "<$75k",
+                          "Above poverty, income >=$75k" = ">=$75k",
+                          "Below poverty" = "Below poverty",
+                          "Unknown income" = "Unknown",
+                          "Breastfeeding" = "Breastfeeding",
+                          "Not pregnant, trying to get pregnant, or breastfeeding" = "Not pregnant",
+                          "Pregnant" = "Pregnant",
+                          "Trying to get pregnant" = "Trying to get pregnant",
+                          "American Indian/Alaska Native, non-Hispanic" = "Native",
+                          "Asian, non-Hispanic" = "Asian",
+                          "Black, non-Hispanic" = "Black",
+                          "Hispanic" = "Hispanic",
+                          "Native Hawaiian/Pacific Islander, non-Hispanic" = "Pacific",
+                          "Other or multiple races, non-Hispanic" = "Other",
+                          "White, non-Hispanic" = "White",
+                          "Female" = "Female",
+                          "Male" = "Male",
+                          "Gay/Lesbian/Bisexual/Other" = "LGB",
+                          "Heterosexual/Straight" = "Hetero",
+                          "High SVI" = "High",
+                          "Low SVI" = "Low",
+                          "Moderate SVI" = "Moderate",
+                          "SVI unknown" = "Unknown",
+                          "Not applicable/unemployed" = "Unemployed",
+                          "All adults age 18+ years" = "18+ Adults",
+                          "Essential healthcare" = "Ess.Healthcare",
+                          "Other essential worker" = "Ess.Other",
+                          "Other frontline worker" = "Frontline.Other",
+                          "Persons who are not essential workers" = "Not.Ess.Wrkr",
+                          "School and childcare" = "School.Childcare",
+                          "Better than other races or ethnicities" = "Better",
+                          "Same as other races or ethnicities" = "Equal",
+                          "Worse than other races or ethnicities" = "Worse",
+                          "Did not receive flu vaccination" = "No",
+                          "Received a flu vaccination" = "Yes",
+                          "Political leaning unknown" = "Unknown",
+                          "Often or sometimes" = "Often.Sometimes",
+                          "Rarely or never" = "Rarely.Never",
+                          "Always or often wears mask" = "Always.Often",
+                          "Sometimes, rarely, or never wears mask" = "Occasional.Never",
+                          "Excellent, very good, or good" = "Excellent.Good",
+                          "Fair or poor" = "Fair.Poor")
+
+# Construct dataframe from vector
+group_cat_shortened <- data.frame(`Group Category` = names(group_cat_shortening), shortened_cat = group_cat_shortening, stringsAsFactors = FALSE) |>
+  dplyr::rename(`Group Category` = Group.Category)
+
+# Join shortened group names and categories to master table
+covid_hes_prepped <- left_join(left_join(covid_hes, group_name_shortened,
+                                         by = "Group Name"),
+                                         group_cat_shortened, by = "Group Category")
+
+
+# Create combinations of group names and categories via paste function
+# Include string wrapped version of text for visualization purposes
+covid_hes_prepped <- covid_hes_prepped |>
+  mutate(concat = paste(shortened_group, shortened_cat, sep = " - "),
+         concat_wrap = str_wrap(concat, width = 10))
+
 
 ```
 
@@ -55,12 +211,11 @@ To obtain an initial baseline of vaccine hesitance rates, we developed the chunk
 periods_to_combine_2021 <- c("April 22 - May 29","May 30 - June 26","June 27 - July 31")
 
 # Calculate overall nationwide hesitancy
-national_hesitance_rate <- covid |>
+national_hesitance_rate <- covid_hes_prepped |>
   filter(`Year` == 2021,
          `Time Period` %in% periods_to_combine_2021,
          `Group Category`== "All adults age 18+ years",
-         Geography == "National",
-         `Indicator Category` == "Probably or definitely will not get vaccinated") |>
+         Geography == "National") |>
   mutate(n_hesitant = round(`Estimate (%)`/100 * `Sample Size`,0)) |>
   group_by(Geography) |>
   summarise(`Sample Size` = sum(`Sample Size`), n_hesitant = sum(n_hesitant)) |>
@@ -75,12 +230,12 @@ We began our analysis of variation in hesitancy rates by calculating hesitancy d
 ```{r}
 
 # Calculate early 2021 hesitance by state
-covid_2021_analysis_allstates <- covid |>
-  filter(`Year` == 2021, `Time Period` %in% periods_to_combine_2021,
+covid_2021_analysis_allstates <- covid_hes_prepped |>
+  filter(`Year` == 2021,
+         `Time Period` %in% periods_to_combine_2021,
          `Group Category`== "All adults age 18+ years",
          `Geography Type` %in% c("Jurisdictional Estimates"),
-         `Indicator Category` == "Probably or definitely will not get vaccinated",
-         !grepl("-",Geography)) |>
+         !grepl("-", Geography)) |>
   mutate(n_hesitant = round(`Estimate (%)`/100 * `Sample Size`,0)) |>
   group_by(Geography) |>
   summarise(`Sample Size` = sum(`Sample Size`),
@@ -98,7 +253,7 @@ covid_2021_analysis_allstates_map <- covid_2021_analysis_allstates |>
 # Display state heatmap of hesitance rates
 state_choropleth(covid_2021_analysis_allstates_map,
                  title = "   April-July 2021 COVID-19 Vaccine Hesitance Rates by State",
-                 legend = "Hesitancy Rates")
+                 legend = "Hesitancy Rates (%) ")
 
 
 ```
@@ -125,15 +280,6 @@ Before diving into each state further, we examined the population segments with 
 
 ```{r}
 
-# Shorten group names and group category names for visualization purposes
-
-# Create vector of shortened group names
-group_name_shortening <- c(
-"Sex" = "Sex","Age" = "Age","Race/Ethnicity (7 level)" = "Race","Age by race/ethnicity" = "Age.Race","Sexual orientation" = "S.Orientation","Gender identity" = "G.Identity","Metropolitan statistical area" = "Rural.Urban","Born in the U.S." = "US.Born","Language of interview" = "Language","Poverty status" = "Pov.Status","Insurance status" = "Insurance","Social Vulnerability Index (SVI) of county of residence" = "SVI","Political leaning of county of residence" = "Political","Received non-COVID-19 vaccine(s) in past two years" = "Past.Vaccin","Health condition associated with higher risk for COVID-19 (any)" = "Comorbidity","Disability status (any)" = "Disability","Pregnancy status (females age 18 – 49 years)" = "Pregnancy","Ever had COVID-19 disease (self-report)" = "Past.Covid","Concern about getting COVID-19 disease" = "Covid.Concern","Confidence in COVID-19 vaccine safety" = "Vaccine.Confiden","Confidence that COVID-19 vaccine is important" = "Vaccine.Imprtnt", "Healthcare provider recommended I get a COVID-19 vaccine" = "Dr.Recommend","COVID-19 vaccination status of friends and family" = "Fr.Fam.Vaccd","Work or school requires COVID-19 vaccination" = "Work.School"
-)
-
-# Create vector of shortened group category names
-group_cat_shortening <- c("18 – 49 years" = "18 – 49","50 – 64 years" = "50 – 64","65+ years" = "65+","18 – 49 years, Black, non-Hispanic" = "18 – 49, Black","18 – 49 years, Hispanic" = "18 – 49, Hispanic","18 – 49 years, Other or multiple races, non-Hispanic" = "18 – 49, Other","18 – 49 years, White, non-Hispanic" = "18 – 49, White","50 – 64 years, Black, non-Hispanic" = "50 – 64, Black","50 – 64 years, Hispanic" = "50 – 64, Hispanic","50 – 64 years, Other or multiple races, non-Hispanic" = "50 – 64, Other","50 – 64 years, White, non-Hispanic" = "50 – 64, White","65+ years, Black, non-Hispanic" = "65+, Black","65+ years, Hispanic" = "65+, Hispanic","65+ years, Other or multiple races, non-Hispanic" = "65+, Other","65+ years, White, non-Hispanic" = "65+, White","Born in the U.S." = "US Born","Not born in the U.S." = "Not US Born","Many or almost all family or friends have received vaccine" = "Many","Some or no family or friends have been vaccinated" = "No_some","A little or not at all concerned" = "A little_not","Very or moderately concerned" = "Very_Moderately","Somewhat or not at all safe for me" = "Not at all_Somewhat","Very or completely safe for me" = "Very","A little or not at all important to protect me from COVID-19" = "A little_not at all","Somewhat or very important to protect me from COVID-19" = "Somewhat_very","No" = "No","Yes" = "Yes","Cisgender" = "Cisgender","Don't know/refused" = "Dont know","Transgender/Non-binary" = "TG/Non bin","Insured" = "Insured","Not insured" = "Not insured","English" = "English","Other" = "Other","Spanish" = "Spanish","Rural" = "Rural","Suburban" = "Suburban","Urban" = "Urban","Democrat-leaning" = "Democrat","Not Democrat-leaning or Republican-leaning" = "None","Republican-leaning" = "Republican","Above poverty, income <$75k" = "<$75k","Above poverty, income >=$75k" = ">=$75k","Below poverty" = "Below poverty","Unknown income" = "Unknown","Breastfeeding" = "Breastfeeding","Not pregnant, trying to get pregnant, or breastfeeding" = "Not pregnant","Pregnant" = "Pregnant","Trying to get pregnant" = "Trying to get pregnant","American Indian/Alaska Native, non-Hispanic" = "Native","Asian, non-Hispanic" = "Asian","Black, non-Hispanic" = "Black","Hispanic" = "Hispanic","Native Hawaiian/Pacific Islander, non-Hispanic" = "Pacific","Other or multiple races, non-Hispanic" = "Other","White, non-Hispanic" = "White","Female" = "Female","Male" = "Male","Gay/Lesbian/Bisexual/Other" = "LGB","Heterosexual/Straight" = "Hetero","High SVI" = "High","Low SVI" = "Low","Moderate SVI" = "Moderate","SVI unknown" = "Unknown","Not applicable/unemployed" = "Unemployed")
 
 # Create vector of all group names as represented in the data
 group_name_toloop <- c("Sex","Age","Race/Ethnicity (7 level)","Age by race/ethnicity","Sexual orientation","Gender identity","Metropolitan statistical area","Born in the U.S.", "Language of interview","Poverty status", "Insurance status","Social Vulnerability Index (SVI) of county of residence", "Political leaning of county of residence", "Received non-COVID-19 vaccine(s) in past two years", "Health condition associated with higher risk for COVID-19 (any)","Disability status (any)", "Pregnancy status (females age 18 – 49 years)", "Ever had COVID-19 disease (self-report)","Concern about getting COVID-19 disease", "Confidence in COVID-19 vaccine safety",  "Confidence that COVID-19 vaccine is important", "Healthcare provider recommended I get a COVID-19 vaccine",  "COVID-19 vaccination status of friends and family","Work or school requires COVID-19 vaccination" )
@@ -158,23 +304,25 @@ covid_2021_analysis <- covid |>
   mutate(`Estimate (%)` = n_hesitant / `Sample Size` * 100,
          `Time Period` = "2021 analysis period",Year = 2021)
 
-# Shorten group names
-covid_2021_analysis <- covid_2021_analysis |>
-  mutate_at(vars(`Group Name`), ~recode(., !!!group_name_shortening))
 
-# Shorten group category names
-covid_2021_analysis <- covid_2021_analysis |>
-  mutate_at(vars(`Group Category`), ~recode(., !!!group_cat_shortening))
+# Join shortened group names and categories to master table
+covid_2021_analysis <- left_join(left_join(covid_2021_analysis, group_name_shortened,
+                                         by = "Group Name"),
+                                         group_cat_shortened, by = "Group Category")
 
-# Concatenate group name and category so that each combination can be uniquely identified
-covid_2021_analysis <- covid_2021_analysis |>
-  mutate(concat = paste(`Group Name`,`Group Category`, sep = " - "))
 
-# Wrap the concatenated text for visualization purposes
-covid_2021_analysis$concat_wrap <- str_wrap(covid_2021_analysis$concat, width = 10)
+# Create combinations of group names and categories via paste function
+# Include string wrapped version of text for visualization purposes
+covid_2021_analysis <- covid_2021_analysis |>
+  mutate(concat = paste(shortened_group, shortened_cat, sep = " - "),
+         concat_wrap = str_wrap(concat, width = 10),
+         `Group Name` = shortened_group,
+         `Group Category` = shortened_cat) |>
+  select(-c(shortened_group, shortened_cat))
+
 
 # Visualize the 10 categories with the highest hesitance rates
-covid_2021_analysis |> ungroup() |> top_n (10, `Estimate (%)`) |>
+covid_2021_analysis |> ungroup() |> top_n(10, `Estimate (%)`) |>
   ggplot(aes(x = fct_reorder(concat_wrap, -(`Estimate (%)`)),
              y = `Estimate (%)`)) +
   geom_bar(stat = "identity") +
@@ -182,7 +330,7 @@ covid_2021_analysis |> ungroup() |> top_n (10, `Estimate (%)`) |>
        x = "Group categories", y = "2021 hesitance (%)") +
   theme_minimal() + 
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,size=6),
-        axis.text.y = element_text(size=8),
+        axis.text.y = element_text(size = 8),
         axis.title = element_text(size = 8),
         plot.title = element_text(size = 12))
 
@@ -208,7 +356,8 @@ state_group_analysis <- covid |>
   filter(`Year` == 2021,
          `Time Period` %in% periods_to_combine_2021,
          `Geography Type` == "Jurisdictional Estimates",
-         `Indicator Category` == "Probably or definitely will not get vaccinated",!grepl("-",Geography)) |>
+         `Indicator Category` == "Probably or definitely will not get vaccinated",
+         !grepl("-", Geography)) |>
   mutate(n_hesitant = round(`Estimate (%)`/100 * `Sample Size`, 0)) |>
   group_by(Geography, `Group Name`, `Group Category`) |>
   summarise(`Sample Size` = sum(`Sample Size`),
@@ -310,7 +459,7 @@ get_chi_sq <- function(df, geography, time_period, year, group_name, hesitant_gr
                        `Indicator Name`== "Vaccination uptake and intention",
                        `Time Period` == time_period,
                        Year == year,
-                       `Group Name`==group_name) |>
+                       `Group Name`== group_name) |>
     mutate(hesitant = ifelse(`Indicator Category` %in% hesitant_group,1,0)) |>
     group_by(`Group Category`,hesitant) |>
     summarise(hesitance_rate = sum(`Estimate (%)`),
@@ -574,31 +723,28 @@ state_choropleth(state_delta_map,
 
 ```{r}
 
-hesitance_state_group_cat <- covid |>
-  filter(`Time Type` == "Monthly",
-         `Geography Type` %in% c("Jurisdictional Estimates"),
-         `Indicator Category` == "Probably or definitely will not get vaccinated",
+hesitance_state_group_cat <- covid_hes_prepped |>
+  filter(`Geography Type` %in% c("Jurisdictional Estimates"),
          !grepl("-", Geography)) |>
   mutate(month_split = paste0(str_split(`Time Period`, "-",
                                         simplify = TRUE)[, 2], ", ", Year),
          month = mdy(month_split),
          n_hesitant = round(`Estimate (%)`/100 * `Sample Size`, 0)) |>
-  group_by(Geography, `Group Name`, `Group Category`, month) |>
+  group_by(Geography, `Group Name`, `Group Category`, concat, month) |>
   summarise(`Sample Size` = sum(`Sample Size`),
             n_hesitant = sum(n_hesitant)) |>
-  mutate(`Estimate (%)` = n_hesitant / `Sample Size` * 100) |>
+  mutate(`Estimate (%)` = n_hesitant / `Sample Size` * 100,
+         concat_no_state = concat,
+         concat = paste0(Geography, ": ", concat)) |>
   ungroup()
 
 
-hesitance_state_group_cat <- hesitance_state_group_cat |>
-  mutate_at(vars(`Group Name`), ~recode(., !!!group_name_shortening)) |>
-  mutate_at(vars(`Group Category`), ~recode(., !!!group_cat_shortening)) |>
-  mutate(concat = paste0(Geography, ": ", `Group Name`, " - ", `Group Category`),
-         concat_no_state = paste0(`Group Name`, " - ", `Group Category`))
-
-
 d3_input_prep <- hesitance_state_group_cat |>
-  pivot_wider(id_cols = month, names_from = "concat", values_from = `Estimate (%)`)
+  pivot_wider(id_cols = month, names_from = "concat", values_from = `Estimate (%)`) |>
+  dplyr::rename(Category = month)
+
+d3_input_prep[is.na(d3_input_prep)] <- 0
+
 
 write_csv(d3_input_prep, "D3 Inputs/All State-Category Values.csv")
 
