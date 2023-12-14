@@ -12,9 +12,9 @@ format:
 ---
 # Results
 
-Import libraries
-```{r}
 
+```{r}
+# Import libraries
 # install.packages("choroplethr")
 # install.packages("RColorBrewer")
 # install.packages("GGally")
@@ -22,7 +22,9 @@ Import libraries
 # install.packages("remotes")
 # install.packages("choroplethrMaps")
 # devtools::install_github("timelyportfolio/parcoords")
+# install.packages("ggpmisc")
 
+library(ggpmisc)
 library(tidyverse)
 library(data.table)
 library(vcd)
@@ -32,12 +34,15 @@ library(parcoords)
 library(RColorBrewer)
 library(choroplethr)
 library(lubridate)
+library(stringr)
 
 ```
 
 
-Import starting dataset and filter for vaccine hesitance indicator and monthly samples
+
 ```{r}
+#Import starting dataset and filter for vaccine hesitance indicator and monthly samples
+
 
 # Load vaccine hesitancy data
 covid <- fread("../covid_dataset/covid.csv")
@@ -50,9 +55,9 @@ covid_hes <- covid |>
 ```
 
 
-Prep data for analysis. The following chunk truncates the names of population segments for data visualization purposes
-```{r}
 
+```{r}
+#Prep data for analysis. The following chunk truncates the names of population segments for data visualization purposes
 
 # Create vector of shortened group names
 group_name_shortening <- c("Age" = "Age",
@@ -288,7 +293,7 @@ group_name_toloop <- c("Sex","Age","Race/Ethnicity (7 level)","Age by race/ethni
 group_name_toloop_short <- lapply(group_name_toloop, function(x) ifelse(x %in% names(group_name_shortening), group_name_shortening[[x]], x))
   
 
-# Calculate vaccine hesitance by group category/population segment
+# Calculate vaccine hesitance by population segment
 covid_2021_analysis <- covid |>
   filter(`Year` == 2021, `Time Period` %in% periods_to_combine_2021,
          `Group Name` %in% group_name_toloop,
@@ -346,11 +351,12 @@ To dive deeper into the variations in vaccine hesitance by state, we focused on 
 
 To facilitate our investigation, we created a set of parallel coordinate plots for the group of 10 most hesitant states and the group of 10 least hesitant states. In both cases, the hesitance rates were not uniform across all population segments. In particular, the group of individuals who responded "A little or not at all" to whether vaccines are important to them showed remarkably higher hesitance rates at the state level.
 
+[to review]
 Another question we looked at via interactive parallel coordinates plots is whether states with higher overall hesitance rates would consistently have higher rates at the population segment level. Conversely, we looked at whether states with lower overall hesitance rates had consistently lower rates relative to other states at the population segment level. The plots created revealed that no clear pattern existed for knowing whether a top 10 hesitant state would necessarily be in the top 10 for all population segments. For example, California had the highest hesitance among white individuals aged 18-49 but was not in the top 9 states for hesitance among those who have not previously been vaccinated (see segment = "Past.Vaccin - No").
 
 ```{r}
 
-# Calculate hesitance over three months in 2021 by state and group category
+# Calculate hesitance over three months in 2021 by state and population segment
 # Clean state column
 state_group_analysis <- covid |>
   filter(`Year` == 2021,
@@ -418,7 +424,7 @@ top_10_parallel_analaysis <- state_group_analysis_pivot |>
 ggparcoord(top_10_parallel_analaysis |> select(where(~!any(is.na(.)))), columns = c(2:8),
            scale = "globalminmax",
            alpha = 0.4) +
-    labs(title = "Top categories with the highest hesitance in 2021",
+    labs(title = "Top categories with the highest hesitance in 2021 (10 highest hesitance states)",
        x = "Group categories", y = "2021 hesitance (%)")
 
 
@@ -437,7 +443,7 @@ ggparcoord(bottom_10_parallel_analaysis |> select(where(~!any(is.na(.)))),
            columns = c(2:7),   
            scale = "globalminmax",
            alpha = 0.4) +
-    labs(title = "Top categories with the highest hesitance in 2021",
+    labs(title = "Top categories with the highest hesitance in 2021 (10 lowest hesitance states)",
        x = "Group categories", y = "2021 hesitance (%)")
 
 
@@ -449,7 +455,7 @@ bottom_10_parallel_analaysis |>
 ```
 
 
-Given the inconsistent trends seen across states and population categories with the highest hesitance, we proceeded to conduct chi squared tests on every group name defined within the scope of this exercise [link back to data.qmd] to determine those with the highest statistical significance. For instance, does 
+Given the inconsistent trends seen across states and population categories with the highest hesitance, we proceeded to conduct chi squared tests on every group name defined within the scope of this exercise to determine those with the highest statistical significance at a national level.
 
 ```{r}
 
@@ -510,7 +516,7 @@ result_df2 <- arrange(result_df2, desc(X2_test_stat))
 
 ```
 
-The top 10 most statistically significant group names are shown below:
+The top 10 most statistically significant group names are shown below, which by the definition of the chi squared test, showed the greatest divergence between the observed and expected values:
 
 ```{r}
 result_df2 |> ungroup() |> top_n(10,X2_test_stat)
@@ -548,9 +554,8 @@ mosaic_2var(covid_2021_analysis,"G.Identity",100)
 
 
 ```
-It can be clearly seen that those that saw a vaccine as important had significantly lower hesitance than those that did not. However, for the group name with the lowest Chi-Square score (gender identity), the observed and expected mosaic plots are nearly identical, thus confirming the Chi-Square test result.
+It can be clearly seen that those that saw a vaccine as important had significantly lower hesitance than those that did not. However, for the group name with the lowest Chi-Square score (gender identity), the observed plot are exactly as one would expect in a mosaic plot of expected values, thus confirming the statistically insignificant Chi-Square test result.
 
-[add commentary on results]
 
 
 #### Part 2: Analyze which segments showed the greatest reduction in covid vaccine hesitancy between 2021 and 2023
@@ -642,11 +647,11 @@ snapshots |> filter(rows %in% row_order_list_2021) |>
         axis.text.y = element_text(size = 6), plot.title = element_text(size = 10))
 
 ```
-It can be seen from the cleveland dot plot that the change in hesitance of the top 20 most hesitant segments in 2021 varies by group. The bar graph below shows the 10 population segments that demonstrated the largest changes in hesitance.
+It can be seen from the Cleveland dot plot that the change in hesitance of the top 20 most hesitant segments in 2021 varies by population segment. To visualise this change better, we created the bar graph below, which shows the 10 segments that demonstrated the largest changes in hesitance between 2021-23.
 
 ```{r}
 #barplot of change
-library(stringr)
+
 row_order$rows <- str_wrap(row_order$rows, width = 10)
 
 row_order |>
@@ -662,7 +667,27 @@ row_order |>
         plot.title = element_text(size = 8))
 ```
 
-The change in hesitance also varies by state:
+The bar chart shows the largest increases in  segments that believed vaccines were a little or not at all important, followed by those that had low confidence in vaccine safety/efficacy, and those trying to get pregnant.
+
+The scattergraph below shows the relationship between initial hesitance in 2021 and change in hesitance between 2021-23 across population segments: segments with the highest initial hesitance generally showed the greatest reduction in hesitance, with a high R2 of 0.75. This could be because those with the highest hesitance received targeted public healthcare interventions, or had the greatest scope for reduction in the first place - determining the exact reason requires further investigation that is beyond the scope of this project.
+
+
+```{r}
+
+row_order %>% ggplot(aes(x = `2021`, y = decline_21_23)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, color = "blue") + 
+  labs(title = "Scatterplot of 2021 hesitance vs. 2021-23 by population segment",
+       x = "2021 Hesitance (%)",
+       y = "Decline in hesitance (2021-23) (%)")+
+  stat_poly_eq(formula = y ~ x,   # Add R-squared value
+               aes(label = paste( ..rr.label.., sep = "~~~~")),
+               parse = TRUE,
+               size = 4)
+```
+
+
+To understand changes in hesitance by geography, we visualised the change in hesitance by state in the spatial heatmap below:
 ```{r}
 
 comparison_baseline_2021 <- covid |>
@@ -720,6 +745,29 @@ state_choropleth(state_delta_map,
 
 ```
 
+The spatial heatmap indicates that West Virginia exhibited the greatest overall change in hesitance (23.3%), while New Mexico experienced a slight increase in hesitance of 0.3%. 
+
+The scattergraph below shows the relationship between initial hesitance in 2021 and change in hesitance between 2021-23 by state: states with the highest initial hesitance generally showed the greatest decline in hesitance, although the R2 is low (0.15). The relationship is significantly weaker than a similar relationship seen for population segments, where the R2 was 0.75.
+
+
+```{r}
+
+state_delta %>% mutate(`Decline in Hesitancy Rates` = -1*`Change in Hesitancy Rates`) %>% ggplot(aes(x = estimate_2021, y = `Decline in Hesitancy Rates`)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, color = "blue") + 
+  labs(title = "Scatterplot of 2021 hesitance vs. 2021-23 by state",
+       x = "2021 Hesitance (%)",
+       y = "Decline in hesitance (2021-23) (%)")+
+  stat_poly_eq(formula = y ~ x,   # Add R-squared value
+               aes(label = paste( ..rr.label.., sep = "~~~~")),
+               parse = TRUE,
+               size = 4)
+
+
+```
+
+
+
 
 ```{r}
 
@@ -758,10 +806,10 @@ write_csv(dropdown_selections, "D3 Inputs/Dropdown Choices.csv")
 
 
 
-
-
-
 #### Part 3: Based on the findings above, we will propose high-level recommendations for segments of the population that need further public health interventions.
+
+
+
 
 Provide a short nontechnical summary of the most revealing findings of your analysis written for a nontechnical audience. Take extra care to clean up your graphs, ensuring that best practices for presentation are followed, as described in the  audience ready style section  below.
 
