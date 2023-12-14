@@ -204,7 +204,7 @@ covid_hes_prepped <- covid_hes_prepped |>
 ```
 
 
-#### Part 1: Study which segments of the population exhibited greatest covid vaccine hesitancy following the deployment of mass vaccinations in the US in early 2021. 
+## Part 1: Study which segments of the population exhibited greatest covid vaccine hesitancy following the deployment of mass vaccinations in the US in early 2021. 
 
 The national average COVID hesitance rate reported during the first quarter of the data collection period (April - July 2021) was 17.7%. In Part 1, we will break down this percentage across U.S. geographies, identifying the states with the highest and lowest hesitancy rates. We will then analyze the types of population demographics (e.g., age, vaccination history, ethnicity, etc.) that had a strong association with COVID vaccine hesitancy.
 
@@ -558,7 +558,7 @@ It can be clearly seen that those that saw a vaccine as important had significan
 
 
 
-#### Part 2: Analyze which segments showed the greatest reduction in covid vaccine hesitancy between 2021 and 2023
+## Part 2: Analyze which segments showed the greatest reduction in covid vaccine hesitancy between 2021 and 2023
 
 
 We have already illustrated that national vaccine hesitance declined from around 18% in April/May 2021 to around 11% in May/June 2023. 
@@ -677,7 +677,7 @@ The scattergraph below shows the relationship between initial hesitance in 2021 
 row_order %>% ggplot(aes(x = `2021`, y = decline_21_23)) +
   geom_point() +
   geom_smooth(method = "lm", se = FALSE, color = "blue") + 
-  labs(title = "Scatterplot of 2021 hesitance vs. 2021-23 by population segment",
+  labs(title = "Scatterplot of 2021 hesitance vs. 2021-23 decline by population segment",
        x = "2021 Hesitance (%)",
        y = "Decline in hesitance (2021-23) (%)")+
   stat_poly_eq(formula = y ~ x,   # Add R-squared value
@@ -755,7 +755,7 @@ The scattergraph below shows the relationship between initial hesitance in 2021 
 state_delta %>% mutate(`Decline in Hesitancy Rates` = -1*`Change in Hesitancy Rates`) %>% ggplot(aes(x = estimate_2021, y = `Decline in Hesitancy Rates`)) +
   geom_point() +
   geom_smooth(method = "lm", se = FALSE, color = "blue") + 
-  labs(title = "Scatterplot of 2021 hesitance vs. 2021-23 by state",
+  labs(title = "Scatterplot of 2021 hesitance vs. 2021-23 decline by state",
        x = "2021 Hesitance (%)",
        y = "Decline in hesitance (2021-23) (%)")+
   stat_poly_eq(formula = y ~ x,   # Add R-squared value
@@ -806,13 +806,12 @@ write_csv(dropdown_selections, "D3 Inputs/Dropdown Choices.csv")
 
 
 
-#### Part 3: Based on the findings above, we will propose high-level recommendations for segments of the population that need further public health interventions.
+## Part 3: Based on the findings above, we will propose high-level recommendations for segments of the population that need further public health interventions.
 
+Our project highlighted 3 clear trends:
 
+1. Statistically significant drivers to covid vaccine hesitance in 2021 were those that had reservations about the importance or safety and efficacy of vaccines, and those with unvaccinated friends and family.
+2. Hesitance can be reduced - there was a history of successful reductions in hesitance between 2021-23 nationally (18%), state-wise (up to 23%) and population segment-wise (32%). This was especially visible in states like W Virginia, and segments such as those who had reservations about the importance or the safety and efficacy of vaccines. This indicates potential to further reduce hesitance in these segments, although further study into the causes of these declines in hesitance is required.
+3. 3 years after the beginning of the pandemic, vaccine hesitance persists in some segments of the populations, and in some states, and within vulnerable population segments such as pregnant women and those with unvaccinated family members
 
-
-Provide a short nontechnical summary of the most revealing findings of your analysis written for a nontechnical audience. Take extra care to clean up your graphs, ensuring that best practices for presentation are followed, as described in the  audience ready style section  below.
-
-Use subheadings (##) as appropriate. See  Todd Schneider’s blog posts  for examples of thoughtful, informative subheadings. An approach that works well is to create a subheading for each of your research questions.
-
-The number of graphs will vary by project; we suggest a target of 10. (A plot with multiple facets counts as 1 graph).  If you go over, make sure they are high quality and include commentary.  A project with 10 good graphs plus commentary will receive a better grade than a project with 10 good graphs and 10 mediocre ones.
+Our findings suggest the need for further study into the drivers of reduced hesitance in the population segments mentioned above, to explore what additional public healthcare interventions would further reduce hesitance, especially among vulnerable demographics.
