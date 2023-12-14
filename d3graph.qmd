@@ -6,27 +6,29 @@
   }
 </style>
 
-<h3 style="font-size: 10px;">h3 Legend</h3>
-<div style="width: 590px; height: 20px; border: 1px solid #ccc; background-color: #3374FF;">
 
-  <label for="stateSelector1">Select State 1:</label>
-  <select id="stateSelector1"></select>
+<p style="font-size: 14px;">
+The graph below plots COVID-19 vaccine hesitance rates over time for each combination of state and population segments.
+</p>
 
-  <label for="categorySelector1">Select Category 1:</label>
-  <select id="categorySelector1"></select>
 
+<h3 style="font-size: 12px;">Legend</h3>
+
+<div style="width: 700px; height: 20px; border: 1px solid #ccc; background-color: #3374FF;">
+  <label for="stateSelector1" style="font-size: 12px;">Select State 1:</label>
+  <select id="stateSelector1" style="font-size: 12px;"></select>
+  <label for="categorySelector1" style="font-size: 12px;">Select Category 1:</label>
+  <select id="categorySelector1" style="font-size: 12px;"></select>
 </div>
 
-<div style="width: 580px; height: 20px; border: 1px solid #ccc; background-color: #33FFAC;">
-  <label for="stateSelector2">Select State 2:</label>
-  <select id="stateSelector2"></select>
-
-  <label for="categorySelector2">Select Category 2:</label>
-  <select id="categorySelector2"></select>
-
+<div style="width: 700px; height: 20px; border: 1px solid #ccc; background-color: #33FFAC;">
+  <label for="stateSelector2" style="font-size: 12px;">Select State 2:</label>
+  <select id="stateSelector2" style="font-size: 12px;"></select>
+  <label for="categorySelector2" style="font-size: 12px;">Select Category 2:</label>
+  <select id="categorySelector2" style="font-size: 12px;"></select>
 </div>
 
-<div id="plot"; height: 500px>
+<div id="plot"; style = "width: 700px; height: 500px">
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>

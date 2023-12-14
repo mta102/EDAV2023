@@ -56,8 +56,8 @@ var jsondata = data.map(function(d) {
 
 
 var container = d3.select('div#plot'),
-    width = 500,
-    height = 300,
+    width = 700,
+    height = 400,
     margin = {top: 30, right: 20, bottom: 70, left: 50},
     barPadding = .2,
     axisTicks = {qty: 5, outerSize: 0, dateFormat: '%m-%d'};
