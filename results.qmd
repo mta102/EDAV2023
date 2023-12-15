@@ -521,7 +521,7 @@ The top 10 most statistically significant types of demographics are displayed ab
 
 - One's age and race may also influence hesitance (see "Age.Race" above). We previously saw that white individuals between the ages of 18-49 were more hesitant than others.
 
-- Moreover, whether an individual's company or school requires vaccination could also impact willingness to receive the COVID-19 vaccine (see Chi-Squared "Work.School").
+- Moreover, whether an individual associates themselves with the Republican party could also impact willingness to receive the COVID-19 vaccine (see Chi-Squared "Political").
 
 
 Two illustrative mosaic plots are shown below to confirm the Chi-Square test results above. The first plot helps visualize the relationship between COVID-19 vaccine hesitance vs the self-perceived importance of vaccines in general (the group with the highest Chi-Square score). The second plot visualizes the association between hesitance and gender identity (the group with the lowest Chi-Square score). 
@@ -551,25 +551,27 @@ temp[[indep_var_group_name_no_spaces]] =  substr(temp[[indep_var_group_name_no_s
 
 formula <- as.formula(paste("group", "~", indep_var_group_name_no_spaces))
 
-mosaic(formula, direction = c("v", "h"), temp,
+
+
+return(mosaic(formula, direction = c("v", "h"), temp,
        highlighting_fill = c("grey80", "cornflowerblue"),
        gp_varnames = gpar(fontsize = 10, fontface = 1),
-       gp_labels = gpar(fontsize = 6))
-
-return(temp)
+       gp_labels = gpar(fontsize = 6)))
 
 }
 
-mosaic_2var(covid_2021_analysis,"Vaccine.Imprtnt",100)
+mosaic_2var(covid_2021_analysis,"Vaccine.Imprtnt", 100)
 
-mosaic_2var(covid_2021_analysis,"G.Identity",100)
+mosaic_2var(covid_2021_analysis,"G.Identity", 100)
 
 
 ```
 
-It can be clearly seen that those who consider vaccines as important had significantly lower hesitance than those that did not. On the other hand, gender identity yielded a plot that exactly matches a mosaic plot of expected values, thus confirming the statistically insignificant Chi-Square test result.
+It can be seen in the first plot that those who consider vaccines as important had significantly lower hesitance than those who did not. On the other hand, gender identity yielded a plot that exactly matches a mosaic plot of expected values, thus confirming its statistically insignificant Chi-Square test result.
 
-Now that we have a better understanding of how geography and demographics related to COVID-19 vaccine hesitance in 2021, we will move onto the second part of our research, which looks at how vaccine hesitance has changed over time.
+While mosaic plots can be analyzed for every type of demographic, having the list of most statistically significant groups is beneficial on its own for furthering our exploration of vaccine hesitance. For instance, the significant results we obtained may spark an interest in researching how race affected hesitance in 2021. We can also begin to research the influence of being U.S. born or living in a rural community on hesitance, as both these categories of demographics had a statistically significant Chi-Squared.
+
+Now that we have a better understanding of the relationships between geography, demographics, and 2021 COVID-19 vaccine hesitance, we will move onto the second part of our research, which looks at how vaccine hesitance has changed over time.
 
 ## Part 2: Analysis of segments that showed the greatest reduction in COVID vaccine hesitancy between 2021 and 2023
 
@@ -662,7 +664,7 @@ snapshots |> filter(rows %in% row_order_list_2021) |>
 
 ```
 
-It can be seen from the Cleveland dot plot that the change in hesitance of the top 20 most hesitant segments in 2021 varies by population segment. To visualize this change better, we also created the bar graph below, which shows the 10 segments that demonstrated the largest decreases in hesitance between 2021 and 2023.
+It can be seen from the cleveland dot plot that the change in hesitance of the top 20 most hesitant segments in 2021 varies by population segment. To visualize this change better, we also created the bar graph below, which shows the 10 segments that demonstrated the largest decreases in hesitance between 2021 and 2023.
 
 ```{r}
 
@@ -674,8 +676,8 @@ row_order |>
   top_n(10, decline_21_23) |>
   ggplot(aes(x = fct_reorder(rows,rev(decline_21_23)), y = decline_21_23)) +
   geom_bar(stat = "identity", fill = "navy", color = "black") +
-  labs(title = "Top 10 Segments with the Largest 2021-23 Changes",
-       x = "Group Categories", y = "2021-23 % Decrease in Hesitance") +
+  labs(title = "Top 10 Segments with the Largest 2021-23 Decreases",
+       x = "Population Segments", y = "2021-23 % Decrease in Hesitance") +
   theme_bw() + 
   theme(axis.text.x = element_text(angle = 0, vjust = 1, hjust=0.5,size=6),
         axis.text.y = element_text(size=8),
@@ -720,9 +722,9 @@ row_order |>
 
 ```
 
-The bar chart shows that individuals who did not perceive vaccines as essential had the sharpest decline in hesitance. Other groups who also had large decreases are  those that had low confidence in vaccine safety/efficacy and those who were trying to get pregnant.
+The bar chart shows that individuals who did not perceive vaccines as essential had the sharpest decline in hesitance. Other groups who also had large decreases are those who had low confidence in vaccine safety/efficacy and those who contracted COVID.
 
-The scatterplot below shows the relationship between initial hesitance in 2021 and change in hesitance between 2021-23 across population segments: segments with the highest initial hesitance generally showed the greatest reduction in hesitance, with a high R2 of 0.75. This could be because those with the highest hesitance received targeted public healthcare interventions, or had the greatest scope for reduction in the first place - determining the exact reason requires further investigation that is beyond the scope of this project.
+While more research is required to understand why some of these segments had more substantial decreases in hesitance, we can analyze whether initial hesitance in 2021 is an associated factor. The scatterplot below shows the relationship between hesitance rates in 2021 and the change in hesitance from 2021-23 across population segments.
 
 ```{r}
 
@@ -738,8 +740,10 @@ row_order %>% ggplot(aes(x = `2021`, y = decline_21_23)) +
                size = 4)
 ```
 
+Segments with the highest initial hesitance generally showed the greatest reduction in hesitance, with a high R2 of 0.75. This could be because those with the highest hesitance received targeted public healthcare interventions, or simply because they had the greatest scope for reduction in the first place. Determining the exact reason requires further investigation that is beyond the scope of this project.
 
-To understand changes in hesitance by geography, we also visualized the change in hesitance by state in the heatmap below:
+Similar to Part 1 of our analysis, we are also interested in understanding changes in hesitance by geography. To answer this question, we constructed the following heatmap of changes in hesitance by state.
+
 ```{r}
 
 comparison_baseline_2021 <- covid |>
@@ -797,18 +801,17 @@ state_choropleth(state_delta_map,
 
 ```
 
-The spatial heatmap indicates that West Virginia exhibited the greatest overall change in hesitance (-23.3%), while New Mexico experienced a slight increase in hesitance of 0.3%. 
+The heatmap indicates that West Virginia exhibited the greatest overall change in hesitance (-23.3%). Other geographies that had higher hesitance rates in 2021, such as the South East and Northern Mountain West, also had more notable decreases in hesitance. Conversely, some states had almost no change in hesitance. New Mexico, in particular, experienced a slight increase in hesitance of 0.3%. 
 
-The scatterplot below shows the relationship between initial hesitance in 2021 and change in hesitance between 2021-23 by state: states with the highest initial hesitance generally showed the greatest decline in hesitance, although the R-Squared statistic is low (0.15). The relationship is significantly weaker than a similar relationship seen for population segments, where the R-Squared was 0.75.
-
+The scatterplot below shows the relationship between initial hesitance in 2021 and the change in hesitance between 2021-23 by state.
 ```{r}
 
 state_delta %>% mutate(`Decline in Hesitancy Rates` = -1*`Change in Hesitancy Rates`) %>% ggplot(aes(x = estimate_2021, y = `Decline in Hesitancy Rates`)) +
   geom_point() +
   geom_smooth(method = "lm", se = FALSE, color = "blue") + 
-  labs(title = "Scatterplot of 2021 hesitance vs. 2021-23 decline by state",
+  labs(title = "Scatterplot of 2021 Hesitance vs. 2021-23 Decline by State",
        x = "2021 Hesitance (%)",
-       y = "Decline in hesitance (2021-23) (%)")+
+       y = "2021-23 Decline in Hesitance (%)")+
   stat_poly_eq(formula = y ~ x,   # Add R-squared value
                aes(label = paste( ..rr.label.., sep = "~~~~")),
                parse = TRUE,
@@ -817,8 +820,52 @@ state_delta %>% mutate(`Decline in Hesitancy Rates` = -1*`Change in Hesitancy Ra
 
 ```
 
+As seen in the heatmap, states with the highest initial hesitance generally showed the greatest decline in hesitance; although, the R-Squared statistic is low (0.15). This relationship is significantly weaker than a similar relationship seen for population segments where the R-Squared was 0.75.
+
+To view the latest distribution of vaccine hesitance by state, we produced one additional heatmap of statewide hesitance rates as of June 30th, 2023.
+```{r}
+
+# Prep dataframe to be used in the state_choropleth function
+covid_2023_analysis_allstates_map <- covid_2023_analysis_allstates |>
+  select(Geography, `Estimate (%)`) |>
+  transmute(region = tolower(Geography), value = `Estimate (%)`)
 
 
+# Display state heatmap of hesitance rates
+state_choropleth(covid_2023_analysis_allstates_map,
+                 title = "   June 2023 COVID-19 Vaccine Hesitance Rates by State",
+                 legend = "Hesitancy Rates (%) ")
+
+```
+This map shows vaccine hesitance is still prevalent in some states, namely in southern states, as well as Wyoming, Wisconsin, Indiana, and Ohio. 
+
+In the following section, we summarize our takeaways from Part 1 as well as the time series analysis from Part 2.
+
+## Part 3: High-level recommendations for segments of the population that need further public health interventions.
+
+Our analyses highlighted several key findings:
+
+1. In 2021, COVID-19 vaccine hesitance was present in all states and many segments of the population. However, some regions and groups were more susceptible to hesitance, as seen by the disparities in hesitance rates between states and population segments.
+
+2. Some differences between population demographics may have been drivers of vaccine hesitance in 2021. For example, population characteristics such as one's perception of the importance, safety, and efficacy of vaccines or having unvaccinated friends and family appear to be linked with hesitancy. We recommend further analysis into how someone's willingness to receive the COVID vaccine may be impacted by the following characteristics:
+
+- General perception of vaccination importance
+- Past history of vaccination
+- Race/ethnicity
+- Political views
+- Living in a rural vs urban community
+- Being U.S. Born or not
+
+3. Three years after the beginning of the pandemic, vaccine hesitance persists in most states and some segments of the populations. However, hesitance can be reduced. There was a history of successful reductions in hesitance between 2021-23 nationally (-7%), state-wise (up to -23%), and by population segment (up to -32%). This was especially visible in states like West Virginia, and segments such as those who had reservations about the importance or the safety and efficacy of vaccines. This indicates potential to further reduce hesitance in these segments; although, further study into the causes of these declines in hesitance is required. As of June 2023, the geographies and population segments listed below exhibit the largest hesitance. In the event that future COVID outbreaks were to occur, we recommend prioritizing outreach to these groups to reduce hesitance and mitigate further spread of the disease.
+
+- Residents of states with high hesitance rates: Texas, Oklahoma, Arkansas, Wyoming, Wisconsin, Indiana, and Ohio
+- Individuals who have not been previously vaccinated
+- Individuals who are not insured
+- Women who are pregnant and have not been vaccinated
+- Individuals who are white and between the age of 18 and 49
+- Individuals living in rural communities
+
+Additional trends in vaccination hesitance over time may exist. In the following section of this report, we provide a tool that visualizes month-by-month hesitance by state and population segment.
 
 ```{r}
 
@@ -859,14 +906,3 @@ state_delta %>% mutate(`Decline in Hesitancy Rates` = -1*`Change in Hesitancy Ra
 ```
 
 
-## Part 3: High-level recommendations for segments of the population that need further public health interventions.
-
-Our project highlighted 3 clear trends:
-
-1. Statistically significant drivers to covid vaccine hesitance in 2021 were those that had reservations about the importance or safety and efficacy of vaccines, and those with unvaccinated friends and family.
-
-2. Hesitance can be reduced. There was a history of successful reductions in hesitance between 2021-23 nationally (18%), state-wise (up to 23%) and population segment-wise (32%). This was especially visible in states like West Virginia, and segments such as those who had reservations about the importance or the safety and efficacy of vaccines. This indicates potential to further reduce hesitance in these segments, although further study into the causes of these declines in hesitance is required.
-
-3. Three years after the beginning of the pandemic, vaccine hesitance persists in some segments of the populations, and in some states, and within vulnerable population segments such as pregnant women and those with unvaccinated family members.
-
-Our findings suggest the need for further study into the drivers of reduced hesitance in the population segments mentioned above, to explore what additional public healthcare interventions would further reduce hesitance, especially among vulnerable demographics.

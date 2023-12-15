@@ -1,6 +1,15 @@
 # Conclusion
-Our investigation into COVID-19 vaccine hesitance rates across the U.S. revealed the complexities of achieving widespread conformity with regard to public health guidelines. While hesitance is not entirely isolated to a specific handful of groups within the U.S., the data provided allows us to develop recommendations for structuring effective outreach to the populations that continue to exhibit hesitance. For instance, prioritizing outreach to individuals within states such as Oklahoma, Indiana, and Texas could yield more significant reductions in hesitance, relative to geographies that have historically supported vaccination.
+During the COVID-19 pandemic, vaccine hesitance was an obstacle in the global response to the virus. Given the extended length and severity of the pandemic, as well as the possibility of future outbreaks, we decided to investigate COVID-19 vaccine hesitance rates in the U.S. to identify patterns in hesitance and potential interventions for public healthcare professionals to lessen the impact of future pandemics.
 
-Perhaps just as importantly, our research also showed that vaccine hesitance can be reduced over time. A number of regions and population groups showed sizable decreases in hesitance since 2021. A more detailed follow-up investigation into these areas and groups may reveal key information and strategies on how to mitigate concerns with vaccines that could be implemented in future public health vaccination campaigns.
+Our investigation into vaccine hesitance rates revealed the complexities of achieving widespread conformity with regard to public health guidelines. While hesitance is not entirely isolated to a specific handful of groups within the U.S., the data allowed us to develop recommendations for structuring effective outreach to the geographies and populations that continue to exhibit hesitance despite nearly three years of global experience with COVID vaccines. Prioritizing outreach to the following population segments that exhibited high hesitance may be effective in reducing hesitance:
 
-[test]
+- Segments that felt vaccines were unimportant
+- Segments that felt vaccines were unsafe or ineffective 
+- Segments where friends and family were not vaccinated
+
+Similarly, prioritizing outreach to individuals within states such as Oklahoma, Indiana, and Texas could yield more significant reductions in hesitance relative to geographies that have historically supported vaccination.
+
+Our research showed encouraging signs that, in the right conditions, vaccine hesitance can be reduced over time. While national hesitance declined from about 18% in 2021 to around 11% in May/June 2023, several geographies and population segments showed even more sizable decreases in hesitance since 2021 than the national average - a maximum decline of up to 32% has been recorded for some population segments. 
+
+Further research into the reasons behind some geographic regions and population segments exhibiting above-average declines in hesitance may help public health professionals understand strategies to reduce hesitance in geographic areas and population segments exhibiting below-average declines. With this further research, vaccine hesitance in the U.S. (and possibly globally) can be reduced, improving global public health and economic resilience in future pandemics.
+
