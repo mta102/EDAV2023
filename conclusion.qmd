@@ -2,3 +2,5 @@
 Our investigation into COVID-19 vaccine hesitance rates across the U.S. revealed the complexities of achieving widespread conformity with regard to public health guidelines. While hesitance is not entirely isolated to a specific handful of groups within the U.S., the data provided allows us to develop recommendations for structuring effective outreach to the populations that continue to exhibit hesitance. For instance, prioritizing outreach to individuals within states such as Oklahoma, Indiana, and Texas could yield more significant reductions in hesitance, relative to geographies that have historically supported vaccination.
 
 Perhaps just as importantly, our research also showed that vaccine hesitance can be reduced over time. A number of regions and population groups showed sizable decreases in hesitance since 2021. A more detailed follow-up investigation into these areas and groups may reveal key information and strategies on how to mitigate concerns with vaccines that could be implemented in future public health vaccination campaigns.
+
+[test]
