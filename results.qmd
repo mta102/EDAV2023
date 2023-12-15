@@ -515,7 +515,7 @@ result_df2 |>
 
 ```
 
-The top 10 most statistically significant types of demographics are displayed above. These results provide key insights into understanding COVID-19 vaccine hesitance. For instance:
+The top 10 most statistically significant types of demographics are displayed above. These results provide key insights into understanding COVID-19 vaccine hesitance, such as:
 
 - Whether an individual has been vaccinated in the past may determine their hesitance toward the COVID-19 vaccine (see Chi-Squared for "Past.Vaccin").
 
@@ -524,7 +524,7 @@ The top 10 most statistically significant types of demographics are displayed ab
 - Moreover, whether an individual's company or school requires vaccination could also impact willingness to receive the COVID-19 vaccine (see Chi-Squared "Work.School").
 
 
-Two illustrative mosaic plots are shown below to confirm the Chi-Square test results above. The first plot helps visualize the relationship between COVID-19 vaccine hesitance vs the self-perceived importance of vaccines in general (the group with the highest Chi-Square score). The second plot visualizes the associated between hesitance and gender identity (the group with the lowest Chi-Square score). 
+Two illustrative mosaic plots are shown below to confirm the Chi-Square test results above. The first plot helps visualize the relationship between COVID-19 vaccine hesitance vs the self-perceived importance of vaccines in general (the group with the highest Chi-Square score). The second plot visualizes the association between hesitance and gender identity (the group with the lowest Chi-Square score). 
 
 ```{r}
 
@@ -567,14 +567,14 @@ mosaic_2var(covid_2021_analysis,"G.Identity",100)
 
 ```
 
-It can be clearly seen that those who consider vaccines as important had significantly lower hesitance than those that did not. On the other, gender identity yielded a plot that exactly matches a mosaic plot of expected values, thus confirming the statistically insignificant Chi-Square test result.
+It can be clearly seen that those who consider vaccines as important had significantly lower hesitance than those that did not. On the other hand, gender identity yielded a plot that exactly matches a mosaic plot of expected values, thus confirming the statistically insignificant Chi-Square test result.
 
 Now that we have a better understanding of how geography and demographics related to COVID-19 vaccine hesitance in 2021, we will move onto the second part of our research, which looks at how vaccine hesitance has changed over time.
 
 ## Part 2: Analysis of segments that showed the greatest reduction in COVID vaccine hesitancy between 2021 and 2023
 
 
-We have already illustrated that national vaccine hesitance declined from around 18% in April/May 2021 to around 11% in May/June 2023. 
+Across the nation, vaccine hesitance declined from around 18% in April/May 2021 to 11% in May/June 2023, as shown in the previously-seen graph below. 
 ```{r}
 
 # Filter for the vaccination uptake and intent indicator
@@ -608,7 +608,8 @@ ggplot(vacc_intention_time, aes(x = month, y = `Estimate (%)`,
 
 
 ```
-However, some segments of the population demonstrated a greater decline in hesitance than others. The Cleveland dot plot below shows the change in hesitance by population segment, for the 20 most hesitant segments in 2021.
+
+However, some segments of the population demonstrated a greater decline in hesitance than others. To better understand population-specific changes in hesitance, we developed the following cleveland dot plot, which breaks down vaccine hesitance for 20 population segments that had the highest initial hesitance 2021.
 
 ```{r}
 
@@ -660,20 +661,21 @@ snapshots |> filter(rows %in% row_order_list_2021) |>
         axis.text.y = element_text(size = 6), plot.title = element_text(size = 10))
 
 ```
-It can be seen from the Cleveland dot plot that the change in hesitance of the top 20 most hesitant segments in 2021 varies by population segment. To visualize this change better, we created the bar graph below, which shows the 10 segments that demonstrated the largest changes in hesitance between 2021-23.
 
+It can be seen from the Cleveland dot plot that the change in hesitance of the top 20 most hesitant segments in 2021 varies by population segment. To visualize this change better, we also created the bar graph below, which shows the 10 segments that demonstrated the largest decreases in hesitance between 2021 and 2023.
 
 ```{r}
-#barplot of change
+
+# Bar chart of changes
 
 row_order$rows <- str_wrap(row_order$rows, width = 10)
 
 row_order |>
   top_n(10, decline_21_23) |>
   ggplot(aes(x = fct_reorder(rows,rev(decline_21_23)), y = decline_21_23)) +
-  geom_bar(stat = "identity") +
+  geom_bar(stat = "identity", fill = "navy", color = "black") +
   labs(title = "Top 10 Segments with the Largest 2021-23 Changes",
-       x = "Group Categories", y = "2021-23 Change in Hesitance") +
+       x = "Group Categories", y = "2021-23 % Decrease in Hesitance") +
   theme_bw() + 
   theme(axis.text.x = element_text(angle = 0, vjust = 1, hjust=0.5,size=6),
         axis.text.y = element_text(size=8),
@@ -718,10 +720,9 @@ row_order |>
 
 ```
 
-The bar chart shows the largest increases in segments that believed vaccines were a little or not at all important, followed by those that had low confidence in vaccine safety/efficacy, and those trying to get pregnant.
+The bar chart shows that individuals who did not perceive vaccines as essential had the sharpest decline in hesitance. Other groups who also had large decreases are  those that had low confidence in vaccine safety/efficacy and those who were trying to get pregnant.
 
 The scatterplot below shows the relationship between initial hesitance in 2021 and change in hesitance between 2021-23 across population segments: segments with the highest initial hesitance generally showed the greatest reduction in hesitance, with a high R2 of 0.75. This could be because those with the highest hesitance received targeted public healthcare interventions, or had the greatest scope for reduction in the first place - determining the exact reason requires further investigation that is beyond the scope of this project.
-
 
 ```{r}
 
@@ -798,7 +799,7 @@ state_choropleth(state_delta_map,
 
 The spatial heatmap indicates that West Virginia exhibited the greatest overall change in hesitance (-23.3%), while New Mexico experienced a slight increase in hesitance of 0.3%. 
 
-The scatterplot below shows the relationship between initial hesitance in 2021 and change in hesitance between 2021-23 by state: states with the highest initial hesitance generally showed the greatest decline in hesitance, although the R2 is low (0.15). The relationship is significantly weaker than a similar relationship seen for population segments, where the R2 was 0.75.
+The scatterplot below shows the relationship between initial hesitance in 2021 and change in hesitance between 2021-23 by state: states with the highest initial hesitance generally showed the greatest decline in hesitance, although the R-Squared statistic is low (0.15). The relationship is significantly weaker than a similar relationship seen for population segments, where the R-Squared was 0.75.
 
 ```{r}
 
@@ -858,7 +859,7 @@ state_delta %>% mutate(`Decline in Hesitancy Rates` = -1*`Change in Hesitancy Ra
 ```
 
 
-## Part 3: Based on the findings above, we will propose high-level recommendations for segments of the population that need further public health interventions.
+## Part 3: High-level recommendations for segments of the population that need further public health interventions.
 
 Our project highlighted 3 clear trends:
 
