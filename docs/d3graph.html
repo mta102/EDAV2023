@@ -2,12 +2,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.450">
+<meta name="generator" content="quarto-1.3.433">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>YOUR PROJECT TITLE - 4&nbsp; Interactive graph</title>
+<title>Covid-19 Vaccine Hesitance Analysis - 4&nbsp; Interactive graph</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -89,7 +89,7 @@ ul.task-list li input[type="checkbox"] {
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
-      <a href="./">YOUR PROJECT TITLE</a> 
+      <a href="./">Covid-19 Vaccine Hesitance Analysis</a> 
         <div class="sidebar-tools-main">
     <a href="https://github.com/mta102/EDAV2023" rel="" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
 </div>
@@ -165,9 +165,46 @@ ul.task-list li input[type="checkbox"] {
     font-family: sans-serif;
   }
 </style>
-<div id="plot">
-
+<p>
+The graph below visualizes COVID-19 vaccine hesitance rates for each state and population segment from 2021 to 2023. It is intended to compare how hesitancy within different geographies and population segments evolved over time.
+</p>
+<h3 style="font-size: 12px;" class="anchored">
+Legend
+</h3>
+<div style="width: 700px; height: 30px; border: 1px solid #ccc; background-color: #3374FF;">
+<p><label for="stateSelector1" style="font-size: 12px;">Select State 1:</label> <select id="stateSelector1" style="font-size: 12px;"></select> <label for="categorySelector1" style="font-size: 12px;">Select Category 1:</label> <select id="categorySelector1" style="font-size: 12px;"></select></p>
 </div>
+<div style="width: 700px; height: 30px; border: 1px solid #ccc; background-color: #33FFAC;">
+<p><label for="stateSelector2" style="font-size: 12px;">Select State 2:</label> <select id="stateSelector2" style="font-size: 12px;"></select> <label for="categorySelector2" style="font-size: 12px;">Select Category 2:</label> <select id="categorySelector2" style="font-size: 12px;"></select></p>
+</div>
+<div id="plot" ;="" style="width: 700px; height: 420px">
+</div>
+<p>
+The following selections help illustrate some of the key findings discussed in the Results section of this report:
+</p>
+<p>
+</p><ul>
+<li>State 1: Oklahoma, Category 1: Age - 50 – 64</li>
+<li>State 2: West Virginia, Category 2: Insurance - Not insured -31% OR</li>
+<li>State 2: Utah, Category 2: SVI - Moderate - 30%</li>
+</ul>
+<p></p>
+<p>The combinations above illustrate some of the remarkable disparities in how vaccine hesitance changed across geographies and population segments. Individuals between the ages 50 to 64 in Oklahoma saw a 14% increase in hesitance over the two years. On the other hand, West Virginia residents who are not insured had a 31% drop in hesitance, while Utah residents who qualified as “moderate” in the Social Vulnerability Index (SVI) also had a large decrease of 30% in hesitance.</p>
+<p>The disparities can also be seen within a given state. For instance, the selection below illustrates how two population segments in Texas, individuals with a disability and essential frontline workers, had very different trends in hesitance.</p>
+<p>
+</p><ul>
+<li>State 1: Texas, Category 1: Disability - Yes</li>
+<li>State 2: Texas, Category 2: Ess.Wrkr.grp - Frontline.Other</li>
+</ul>
+<p></p>
+<p>Lastly, the grouped bar chart also revealed that disparities in hesitance change can also occur within the same population segment. The selection below shows that individuals New Mexico between the age of 50 and 64 had a 16% increase in hesitance, whereas the same group had a 21% decrease in hesitance in Mississippi.</p>
+<p>
+</p><ul>
+<li>State 1: New Mexico, Category 1: Age.Race - 50 – 64, White</li>
+<li>State 2: Mississippi, Category 2: Age.Race - 50 – 64, White</li>
+</ul>
+<p></p>
+<p>We leave it up to the reader to explore differences in trends from other combinations of geographies and population segments.</p>
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
 <script src="scripts/myscript.js"></script>
 
