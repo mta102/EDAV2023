@@ -1,1 +1,227 @@
 // add your JavaScript/D3 to this file
+
+
+d3.csv("https://raw.githubusercontent.com/mta102/EDAV2023/main/D3%20Inputs/Dropdown%20Choices.csv").then(function(choices) {
+
+d3.csv("https://raw.githubusercontent.com/mta102/EDAV2023/main/D3%20Inputs/All%20State-Category%20Values.csv").then(function(data) {
+
+
+var columns = Object.keys(data[0]).slice(1);
+var stateValues = Array.from(new Set(choices.map(function(d) { return d["Geography"]; })));
+var categoryValues = Array.from(new Set(choices.map(function(d) { return d["concat_no_state"]; })));
+var selectedColumn1 = columns[0];
+var selectedColumn2 = columns[0];
+
+  // Create state dropdown options
+  d3.select("#stateSelector1")
+    .selectAll("option")
+    .data(stateValues)
+    .enter().append("option")
+    .text(function(d) { return d; });
+
+
+
+  // Create category dropdown options
+  d3.select("#categorySelector1")
+    .selectAll("option")
+    .data(categoryValues)
+    .enter().append("option")
+    .text(function(d) { return d; });
+
+
+  d3.select("#stateSelector2")
+    .selectAll("option")
+    .data(stateValues)
+    .enter().append("option")
+    .text(function(d) { return d; });
+
+
+  // Create category dropdown options
+  d3.select("#categorySelector2")
+    .selectAll("option")
+    .data(categoryValues)
+    .enter().append("option")
+    .text(function(d) { return d; });
+
+
+
+
+var jsondata = data.map(function(d) {
+    return {
+      category: d.Category,
+      field1: +d[selectedColumn1],
+      field2: +d[selectedColumn2]
+    };
+  });
+
+
+var container = d3.select('div#plot'),
+    width = 700,
+    height = 400,
+    margin = {top: 30, right: 20, bottom: 70, left: 50},
+    barPadding = .2,
+    axisTicks = {qty: 5, outerSize: 0, dateFormat: '%m-%d'};
+
+var svg = container
+   .append("svg")
+   .attr("width", width)
+   .attr("height", height)
+   .append("g")
+   .attr("transform", `translate(${margin.left},${margin.top})`);
+
+var xScale0 = d3.scaleBand().range([0, width - margin.left - margin.right]).padding(barPadding);
+var xScale1 = d3.scaleBand();
+var yScale = d3.scaleLinear().range([height - margin.top - margin.bottom, 0]);
+
+xScale0.domain(jsondata.map(d => d.category));
+xScale1.domain(['field1', 'field2']).range([0, xScale0.bandwidth()]);
+yScale.domain([0, d3.max(jsondata, d => d.field1 > d.field2 ? d.field1 : d.field2)]);
+
+var category = svg.selectAll(".category")
+  .data(jsondata)
+  .enter().append("g")
+  .attr("class", "category")
+  .attr("transform", d => `translate(${xScale0(d.category)},0)`);
+
+// Add field1 bars
+category.selectAll(".bar.field1")
+  .data(d => [d])
+  .enter()
+  .append("rect")
+  .attr("class", "bar field1")
+.style("fill","#3374FF")
+  .attr("x", d => xScale1('field1'))
+  .attr("y", d => yScale(d.field1))
+  .attr("width", xScale1.bandwidth())
+  .attr("height", d => {
+    return height - margin.top - margin.bottom - yScale(d.field1)
+  });
+
+// Add field2 bars
+category.selectAll(".bar.field2")
+  .data(d => [d])
+  .enter()
+  .append("rect")
+  .attr("class", "bar field2")
+.style("fill","#33FFAC")
+  .attr("x", d => xScale1('field2'))
+  .attr("y", d => yScale(d.field2))
+  .attr("width", xScale1.bandwidth())
+  .attr("height", d => {
+    return height - margin.top - margin.bottom - yScale(d.field2)
+  });
+
+// Add the X Axis
+svg.append("g")
+   .attr("class", "x-axis")
+   .attr("transform", `translate(0,${height - margin.top - margin.bottom})`)
+   .call(d3.axisBottom(xScale0))
+  .selectAll("text")
+    .style("text-anchor", "end")
+    .attr("dx", "-0.8em")
+    .attr("dy", "0.15em")
+    .attr("transform", "rotate(-45)");
+
+
+
+
+// Add the Y Axis
+svg.append("g")
+   .attr("class", "y-axis")
+   .call(d3.axisLeft(yScale));
+
+
+svg.append("text")
+    .attr("transform", "rotate(-90)")
+    .attr("y", 0 - margin.left)
+    .attr("x", 0 - (height / 2))
+    .attr("dy", "1em")
+    .attr("dx", "5em")
+    .style("text-anchor", "middle")
+    .text("Covid Vaccine Hesitance (%)");
+
+
+  // Handle dropdown change event
+
+  d3.select("#stateSelector1").on("change", function() {
+    selectedColumn1 = this.value +": "+ d3.select("#categorySelector1").property("value");
+    updateChart(selectedColumn1,selectedColumn2);
+
+
+
+  });
+
+  d3.select("#categorySelector1").on("change", function() {
+    selectedColumn1 = d3.select("#stateSelector1").property("value") +": "+ this.value;
+    updateChart(selectedColumn1,selectedColumn2);
+
+
+  });
+
+
+  d3.select("#stateSelector2").on("change", function() {
+    selectedColumn2 = this.value +": "+ d3.select("#categorySelector2").property("value");
+    updateChart(selectedColumn1,selectedColumn2);
+
+
+  });
+
+  d3.select("#categorySelector2").on("change", function() {
+    selectedColumn2 = d3.select("#stateSelector2").property("value") +": "+ this.value;
+    updateChart(selectedColumn1,selectedColumn2);
+
+
+  });
+
+
+
+  function updateChart(column1,column2) {
+jsondata = data.map(function(d) {
+    return {
+      category: d.Category,
+      field1: +d[column1],
+      field2: +d[column2]
+    };
+  });
+
+yScale.domain([0, d3.max(jsondata, d => d.field1 > d.field2 ? d.field1 : d.field2)]);
+
+    //Update y-axis
+    svg.select(".y-axis")
+      .transition()
+      .duration(1000)
+      .call(d3.axisLeft(yScale));
+
+    // Update bars
+    updateBars();
+  }
+
+  // Function to update bars with transitions
+  function updateBars() {
+
+// change field1 bars
+d3.selectAll(".bar.field1")
+  .data(jsondata.map(function(obj) {return obj["field1"]})).transition().duration(500)
+  .attr("y", d => yScale(d))
+  .attr("height", d => {
+    return height - margin.top - margin.bottom - yScale(d)
+  });
+
+// change field2 bars
+d3.selectAll(".bar.field2")
+  .data(jsondata.map(function(obj) {return obj["field2"]})).transition().duration(500)
+  .attr("y", d => yScale(d))
+  .attr("height", d => {
+    return height - margin.top - margin.bottom - yScale(d)
+  });
+
+
+  }
+
+
+
+
+
+
+});
+});
